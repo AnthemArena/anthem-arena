@@ -33,7 +33,7 @@ export const PREVIEW_STEPS = [
             const m = voice.achievement('spark', { name: a.name, description: a.description, xp: a.xp, rarity: a.rarity });
             return {
                 priority: 2, type: 'achievement', matchId: 'achievement-preview', thumbnailUrl: ddragonUrl('img/item/3041.png'),
-                icon: '🏆', achievementName: a.name, rarity: a.rarity,
+                icon: '🏆', achievementName: a.name, rarity: a.rarity, description: a.description, xp: a.xp,
                 message: m?.message || `Achievement unlocked: ${a.name}`, detail: m?.detail || `${a.description} • +${a.xp} XP`, cta: m?.cta || 'Close preview', ctaAction: dismiss, duration: 6000
             };
         }
@@ -41,7 +41,7 @@ export const PREVIEW_STEPS = [
     {
         id: 'level-up', label: 'Level up', build: ({ voice, dismiss }) => {
             const m = voice.achievement('level-up', { rank: 'Streetwise', xp: 100 });
-            return { type: 'level-up', level: 5, message: m?.message || 'New Arcane rank!', detail: m?.detail || 'You reached Streetwise.', cta: m?.cta || 'Close preview', ctaAction: dismiss, duration: 6000 };
+            return { type: 'level-up', level: 5, rankTitle: 'Streetwise', nextLevel: 6, xpToNext: 140, message: m?.message || 'New Arcane rank!', detail: m?.detail || 'You reached Streetwise.', cta: m?.cta || 'Close preview', ctaAction: dismiss, duration: 6000 };
         }
     },
     {

@@ -3,6 +3,7 @@
 // ========================================
 import { computeStats } from './stats-model.js';
 import { shortTitle } from './title-clean.js';
+import { isOpenNow } from './vote-closed.js';
 
 // the same rule as the gallery: an edit that has entered a cup and may be embedded
 export const isEntered = e => !!e && Array.isArray(e.tournaments) && e.tournaments.length > 0
@@ -14,9 +15,27 @@ export const editCard = e => ({ id: e.id || e.videoId, videoId: e.videoId || '',
 export function newestEdits(edits = [], n = 6) {
     return edits.filter(isEntered).sort((a, b) => String(b.uploadDate || '').localeCompare(String(a.uploadDate || ''))).slice(0, n).map(editCard);
 }
-export function mostWatched(edits = [], n = 6) {
-    return edits.filter(isEntered).sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, n).map(editCard);
+// Edits that are in a match which is open right now. Their creator and their YouTube numbers stay hidden until the match closes
+// (the same blind-voting rule as the vote page), so the showcase rows use this set to leave them out or to blank the creator.
+export const inLive = (e, liveIds) => !!liveIds && (liveIds.has(e.id) || liveIds.has(e.videoId));
+
+// Fewer cards than this and the row looks thin, so the row is hidden instead.
+export const MIN_ROW = 4;
+
+export function mostWatched(edits = [], n = 6, liveIds = null) {
+    const rows = edits.filter(isEntered).filter(e => !inLive(e, liveIds)).sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, n).map(editCard);
+    return rows.length < Math.min(MIN_ROW, n) ? [] : rows;
 }
+
+// 6252392 -> "6.3M", 48200 -> "48K", 900 -> "900"
+export const compactCount = v => {
+    const x = Number(v) || 0;
+    return x >= 1e6 ? (x / 1e6).toFixed(x >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M' : x >= 1e3 ? (x / 1e3).toFixed(x >= 1e4 ? 0 : 1).replace(/\.0$/, '') + 'K' : String(x);
+};
+
+// Has this visitor ever voted? (js/voter-state.js: shared with the header)
+export { hasCastVotes } from './voter-state.js';
+export const needsVote = (liveMatchIds = [], userVotes = {}) => liveMatchIds.filter(id => !(userVotes && userVotes[id])).length;
 
 const side = m => (m.winnerId && (m.winnerId === m.song1?.id || m.winnerId === 'song1') ? 1 : m.winnerId && (m.winnerId === m.song2?.id || m.winnerId === 'song2') ? 2 : 0);
 const comp = c => ({ id: c?.id || '', videoId: c?.videoId || '', title: shortTitle(c?.shortTitle || c?.title || '', 60), creator: c?.artist || '' });
@@ -27,7 +46,7 @@ const endMs = m => { const t = Date.parse(m.endDate || m.endTime || ''); return 
 export function homeState(matches = [], now = Date.now()) {
     const list = (Array.isArray(matches) ? matches : []).filter(m => m && m.song1 && m.song2);
     const stats = computeStats(list);
-    const live = list.filter(m => m.status === 'live');
+    const live = list.filter(m => isOpenNow(m, now));
     const completed = list.filter(m => m.status === 'completed');
     const final = completed.find(m => /^final$/i.test(m.roundLabel || '') && side(m));
 
@@ -51,6 +70,9 @@ export function homeState(matches = [], now = Date.now()) {
         featured: featuredRaw ? { matchId: featuredRaw.matchId, label: featuredRaw.roundLabel || '', total: votesOf(featuredRaw),
             a: comp(featuredRaw.song1), b: comp(featuredRaw.song2), closesAt: endMs(featuredRaw) } : null,
         closesAt: future[0] || null,
+        liveMatchIds: live.map(m => m.matchId).filter(Boolean),
+        liveEditIds: [...new Set(live.flatMap(m => [m.song1.id, m.song1.videoId, m.song2.id, m.song2.videoId]).filter(Boolean))],
+        liveLabel: live.length ? (live.map(m => m.roundLabel).find(Boolean) || '') : '',
         recent, topVoted,
         champion: final ? comp(side(final) === 1 ? final.song1 : final.song2) : null
     };
@@ -63,3 +85,17 @@ export function countdownText(targetMs, now = Date.now()) {
     const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
     return d ? `${d}d ${h}h` : h ? `${h}h ${m}m` : `${Math.max(m, 1)}m`;
 }
+
+// the single status line under the logo: "Jinx Cup 1 · Group A is live · ends in 5d 22h". It carries the group and the countdown only:
+// how many matches are left to vote in is said once, by the heading above the cards ("4 Matches Need Your Vote!").
+// Returned in parts so the page can wrap between them on a narrow screen instead of in the middle of a phrase.
+export function statusParts({ cup, label, liveCount, closesAt }, now = Date.now()) {
+    const first = [cup, label ? `${label} is live` : `${liveCount} ${liveCount === 1 ? 'match' : 'matches'} live`].filter(Boolean).join(' · ');
+    const parts = [first];
+    if (closesAt && closesAt > now) parts.push(`ends in ${countdownText(closesAt, now)}`);
+    return parts;
+}
+export const statusLine = (info, now = Date.now()) => statusParts(info, now).join(' · ');
+
+// The "votes cast" tile is a weak number for a new visitor ("9 votes cast"), so it only shows once the total reaches this.
+export const MIN_VOTES_TILE = 100;

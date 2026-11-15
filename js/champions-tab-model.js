@@ -70,10 +70,12 @@ const earnOrder = s => (s.achievement ? 99 : s.mastery) * 1000 + s.num;
 export function championsHtml(view, { own = false, filters = {} } = {}) {
     if (!view) return '';
     const byId = Object.fromEntries(view.rows.map(r => [r.packId, r]));
+    const spreadTitle = own ? 'Your votes by champion' : 'Votes by champion';
+    const spreadScope = own ? 'all cups' : 'finished matches, all cups';
     const spread = view.total
-        ? view.shares.map(s => `<div class="cm-share"><img class="cm-face" src="${escapeHtml(tile(s.packId, byId[s.packId].faceSkin))}" alt="" loading="lazy"><span class="cm-share-name">${escapeHtml(byId[s.packId].name)}</span><span class="cm-bar" role="img" aria-label="${s.percent}% of votes"><span style="width:${s.percent}%"></span></span><span class="cm-pct">${s.percent}%</span><span class="cm-votes">${s.votes} ${s.votes === 1 ? 'vote' : 'votes'}</span></div>`).join('')
+        ? view.shares.filter(s => s.votes > 0).map((s, _i, all) => all.length === 1 ? `<div class="cm-share cm-share-one"><img class="cm-face" src="${escapeHtml(tile(s.packId, byId[s.packId].faceSkin))}" alt="" loading="lazy"><span class="cm-share-name">${escapeHtml(byId[s.packId].name)}</span><span class="cm-votes">${s.votes} ${s.votes === 1 ? 'vote' : 'votes'}</span></div>` : `<div class="cm-share"><img class="cm-face" src="${escapeHtml(tile(s.packId, byId[s.packId].faceSkin))}" alt="" loading="lazy"><span class="cm-share-name">${escapeHtml(byId[s.packId].name)}</span><span class="cm-bar" role="progressbar" aria-label="${s.percent}% of votes" aria-valuenow="${s.percent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${s.percent}%"></span></span><span class="cm-pct">${s.percent}%</span><span class="cm-votes">${s.votes} ${s.votes === 1 ? 'vote' : 'votes'}</span></div>`).join('')
         : `<p class="cm-empty">No votes yet. Votes are counted for the champion you had when they were cast.</p>`;
-    const cards = view.rows.map(r => {
+    const cards = [...view.rows].sort((a, b) => (b.active ? 1 : 0) - (a.active ? 1 : 0)).map(r => {
         const m = r.mastery;
         const next = r.next ? `Next: ${r.next.skins.map(s => escapeHtml(s.name)).join(' + ')} at Mastery ${r.next.mastery}` : 'Every mastery skin unlocked';
         const filter = FILTERS.some(([k]) => k === filters[r.packId]) ? filters[r.packId] : 'all';
@@ -84,21 +86,22 @@ export function championsHtml(view, { own = false, filters = {} } = {}) {
         const skins = shown.map(s => {
             const label = `${s.name}${s.unlocked ? '' : ` (${s.requirement})`}`;
             // Changing the skin happens in Settings (one place, one Save): the tab shows the collection and opens Settings on the skin
-            const buttons = s.unlocked && s.current ? '<span class="cm-skin-tag">Wearing</span>'
-                : (own && s.unlocked ? `<span class="cm-skin-actions"><button type="button" class="cm-act" data-action="wear" data-pack="${r.packId}" data-skin="${s.num}" title="Open Settings to wear ${escapeHtml(s.name)}">Wear</button></span>` : '');
+            const buttons = s.unlocked && s.current ? '<span class="cm-skin-tag">Worn</span>'
+                : (own && s.unlocked ? `<span class="cm-skin-actions"><button type="button" class="cm-act" data-action="wear" data-pack="${r.packId}" data-skin="${s.num}" aria-label="Wear ${escapeHtml(r.name)} ${escapeHtml(s.name)}" title="Open Settings to wear ${escapeHtml(s.name)}">Wear</button></span>` : '');
             return `<div class="cm-skin${s.unlocked ? '' : ' locked'}${s.current ? ' current' : ''}"><img src="${escapeHtml(tile(r.packId, s.num))}" alt="" loading="lazy"><span class="cm-skin-name">${escapeHtml(s.name)}</span>${s.unlocked ? buttons : `<span class="cm-skin-lock" title="${escapeHtml(label)}">🔒 ${escapeHtml(s.requirement)}</span>`}</div>`;
         }).join('');
         return `<article class="cm-card${r.active ? ' active' : ''}" data-pack="${r.packId}">
             <header class="cm-head"><img class="cm-face big" src="${escapeHtml(tile(r.packId, r.faceSkin))}" alt="" loading="lazy">
-              <div class="cm-head-text"><h3>${escapeHtml(r.name)}${r.active ? ' <span class="cm-active">Your champion</span>' : ''}</h3>
+              <div class="cm-head-text"><h3>${escapeHtml(r.name)}${r.active ? ` <span class="cm-active">${own ? 'Your champion' : 'Their champion'}</span>` : ''}</h3>
               <div class="cm-level">Mastery ${m.level}${m.isMax ? ' · Max' : ''}</div>
-              <div class="cm-bar thin" role="img" aria-label="${m.percent}% to the next mastery level"><span style="width:${m.percent}%"></span></div>
+              <div class="cm-bar thin" role="progressbar" aria-label="${escapeHtml(r.name)} mastery progress" aria-valuenow="${m.percent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${m.percent}%"></span></div>
               <div class="cm-xp">${m.isMax ? `${m.xp.toLocaleString()} XP` : `${m.progressXp.toLocaleString()} / ${m.neededXp.toLocaleString()} XP to Mastery ${m.level + 1}`}</div></div></header>
             <p class="cm-next">${next} · ${r.unlockedCount}/${r.skinCount} skins</p>
             ${chips}
             <div class="cm-skins">${skins || `<p class="cm-empty">${filter === 'locked' ? 'Everything is unlocked.' : 'Nothing unlocked yet.'}</p>`}</div></article>`;
     }).join('');
-    return `<section class="cm-spread" aria-label="Vote spread"><h3 class="cm-title">Vote spread</h3>${spread}</section><div class="cm-cards">${cards}</div>`;
+    const spreadHtml = (own || view.total) ? `<section class="cm-spread" aria-label="${spreadTitle}"><h3 class="cm-title">${spreadTitle} </h3><p class="cm-scope">${spreadScope}</p>${spread}</section>` : '';   // a visitor with nothing countable gets no 0% bars
+    return `${spreadHtml}<div class="cm-cards">${cards}</div>`;
 }
 
 // Mastery chip + thin bar + next reward for a companion card in the settings modal ('' for a pack without skins).
@@ -111,6 +114,14 @@ export function masteryChipHtml(packId, xp) {
 
 // Settings > Your Champion: the one selected champion with the skins they have unlocked to choose from.
 // `row` is one entry of buildChampionsView().rows (the pack the person picked).
+// Columns that split N skins into even rows (6 -> 3 + 3, not 5 + 1)
+export function skinColumns(n) {
+    if (n <= 4) return Math.max(1, n);
+    if (n % 3 === 0) return 3;
+    if (n % 4 === 0) return 4;
+    return Math.ceil(n / 2);
+}
+
 export function yourChampionHtml(row) {
     const m = row.mastery, name = escapeHtml(row.name);
     const unlocked = row.skins.filter(s => s.unlocked), locked = row.skinCount - row.unlockedCount;
@@ -121,7 +132,7 @@ export function yourChampionHtml(row) {
           <div class="yc-text"><h4>${name}</h4><div class="yc-level">Mastery ${m.level}${m.isMax ? ' · Max' : ''}</div>
           <span class="champion-mastery-bar"><span style="width:${m.percent}%"></span></span><small>${next}</small></div></div>
         <div class="yc-label">Skin</div>
-        <div class="yc-skins" role="group" aria-label="Choose ${name}'s skin">${skins}</div>
+        <div class="yc-skins" style="--cols:${skinColumns(unlocked.length)}" role="group" aria-label="Choose ${name}'s skin">${skins}</div>
         <p class="yc-note">${locked ? `${locked} more skin${locked === 1 ? '' : 's'} to unlock. Your Champions tab shows how.` : 'Every skin unlocked.'}</p>
         <button type="button" class="champion-preview-btn yc-preview" data-action="preview"><i class="fas fa-play"></i> Preview alert</button>
     </div>`;

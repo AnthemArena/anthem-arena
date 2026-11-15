@@ -20,6 +20,18 @@ export const EARLY_VOTER_LIMIT = 10;
 export const UNDERDOG_POT_GAP = 2;
 export const UNDERDOG_SEED_GAP_FALLBACK = 8;
 
+// How a vote stands against the votes right now (a live standing, not the cast-time facts above). One definition for the profile's
+// Underdog / Mainstream / Close call tiles and the legacy `voteType`, so the three can't drift apart:
+//   under 40% of the votes = underdog, 40-60% inclusive = close call (an exact 50-50 is a close call), over 60% = mainstream.
+//   A match nobody has voted in yet has no standing: 'unclassified' (counted in none of the three).
+export const STANDING_BANDS = { underdogBelow: 40, mainstreamAbove: 60 };
+export function standingBand(sharePct, totalVotes) {
+    if (!(totalVotes > 0) || !Number.isFinite(sharePct)) return 'unclassified';
+    if (sharePct < STANDING_BANDS.underdogBelow) return 'underdog';
+    if (sharePct > STANDING_BANDS.mainstreamAbove) return 'mainstream';
+    return 'closeCall';
+}
+
 const isNum = v => typeof v === 'number' && Number.isFinite(v);
 
 // `voted` / `other`: { votes, seed, pot } for the two edits as they stood just before the vote was counted.
@@ -122,7 +134,7 @@ export function buildVoteRecord({ existing = null, songId, votedSong = {}, oppon
         if (Number.isFinite(totalVotesAtTime)) record.totalVotesAtTime = totalVotesAtTime;
         record.tiedBefore = record.facts.tiedBefore;
         // kept for older readers of this record (alerts, matches page)
-        record.voteType = record.facts.underdog || record.facts.againstTide ? 'underdog' : record.facts.close ? 'closeCall' : sharePct > 60 ? 'mainstream' : 'balanced';
+        record.voteType = record.facts.underdog || record.facts.againstTide ? 'underdog' : record.facts.close ? 'closeCall' : sharePct > STANDING_BANDS.mainstreamAbove ? 'mainstream' : 'balanced';
     } else {
         record.voteType = 'balanced';
     }

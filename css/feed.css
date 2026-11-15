@@ -3263,3 +3263,119 @@ body {
     border-radius: 10px; font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, .75);
     background: rgba(255, 79, 180, .08); border: 1px dashed rgba(255, 79, 180, .35); }
 .results-lock { font-size: 13px; opacity: .8; }
+
+/* ---------- Nov 2026: composer, end of feed, a roomier Live Matches rail ---------- */
+.char-count { min-height: 1.2em; }
+.char-count:empty { visibility: hidden; }
+body.theme-arcane.page-feed .post-btn:disabled {
+    opacity: 1; box-shadow: none; transform: none;
+    background: rgba(255, 255, 255, .06); color: var(--text-muted, #b9b3c1); border: 1px solid rgba(255, 255, 255, .16);
+}
+.feed-end { margin: 1.5rem 0 .5rem; text-align: center; color: var(--text-faint, #8a8494); font-size: .9rem; }
+.feed-end[hidden] { display: none; }
+
+.live-matches-widget .widget-content { padding: 10px; margin-top: 0; }
+.widget-match-card { transform: none; margin-bottom: 10px; }
+/* "Jinx Cup 1 · Group A" on one line; every card in this rail is live, so the heading says it and the pill is dropped */
+body.theme-arcane.page-feed .widget-match-card .match-header { flex-wrap: nowrap; gap: .4rem; padding: 0 0 .5rem; margin-bottom: .6rem; }
+body.theme-arcane.page-feed .widget-match-card .match-tournament { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.theme-arcane.page-feed .widget-match-card .match-round { width: auto; padding: 0; border: 0; white-space: nowrap; }
+body.theme-arcane.page-feed .widget-match-card .match-round::before { content: "\00b7"; margin-right: .4rem; }
+body.theme-arcane.page-feed .widget-match-card .live-badge { display: none; }
+
+/* ---------- Nov 2026 (mobile): compact vote rows, search behind an icon, collapsed composer, tab fade ---------- */
+.feed-title-row { display: flex; align-items: center; justify-content: center; gap: .6rem; position: relative; }
+.feed-search-toggle { display: none; }
+
+/* a vote is one light row: who, what, one thin strip, one link */
+.feed-post-vote { padding-top: 12px; padding-bottom: 8px; }
+.vote-compact { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 2px; }
+.vote-split { display: flex; align-items: center; gap: 10px; }
+.vote-split-bar { flex: 1; height: 5px; border-radius: 999px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+.vote-split-bar > span { display: block; height: 100%; border-radius: 999px; background: var(--pink-bright, #ff70c3); }
+.vote-split-pct { font-size: .78rem; color: var(--text-muted, #b9b3c1); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vote-compact-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.vote-compact .match-view-btn { min-height: 44px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 999px; }
+.feed-post-vote .post-actions-bar { padding-top: 0; margin-top: 0; }
+.feed-post-vote .action-btn { min-height: 44px; min-width: 44px; justify-content: center; }
+.feed-post-vote .like-count[hidden], .feed-post-vote .comment-count[hidden] { display: none; }
+.feed-post-vote .share-btn { font-size: 0; gap: 0; }
+.feed-post-vote .share-btn i { font-size: .95rem; }
+
+/* the digest line: the count first, the names after it (they truncate, the count does not) */
+.vote-digest-text { display: flex; gap: .4rem; align-items: baseline; min-width: 0; }
+.vote-digest-main { flex: none; font-weight: 700; }
+.vote-digest-who { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted, #b9b3c1); font-size: .85em; }
+
+/* touch targets */
+.follow-btn { min-height: 44px; }
+.like-btn, .comment-btn, .share-btn { min-height: 44px; min-width: 44px; }
+
+@media (max-width: 900px) {
+    body.theme-arcane.page-feed .feed-page-layout { margin-top: 56px; }
+    .feed-header { margin-bottom: 12px; }
+    .feed-title-row { justify-content: space-between; }
+    .feed-search-toggle { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .13); background: rgba(255, 255, 255, .04); color: var(--text, #f4f0f7); cursor: pointer; }
+    .feed-search-toggle[aria-expanded="true"] { border-color: var(--pink-bright, #ff70c3); color: var(--pink-bright, #ff70c3); }
+    .feed-search-container { display: none; margin-bottom: 10px; }
+    .feed-search-container.open { display: block; }
+    /* the composer is one line until you tap it */
+    .create-post-box { padding: 10px 12px; margin-bottom: 14px; }
+    .post-input { min-height: 44px; }
+    .create-post-box:not(:focus-within) .post-actions { display: none; }
+    /* tab row: fade the right edge while there is more to scroll to */
+    .feed-filters:not(.at-end) { -webkit-mask-image: linear-gradient(to right, #000 88%, transparent); mask-image: linear-gradient(to right, #000 88%, transparent); }
+    .feed-end { margin-bottom: 0; }
+}
+@media (max-width: 900px) {
+    html body.theme-arcane.page-feed .feed-page-layout { margin-top: 0; padding-top: 12px; }
+}
+.feed-post-vote .post-header { gap: 10px; margin-bottom: 8px; }
+.feed-post-vote .user-avatar { width: 36px; height: 36px; }
+.feed-post-vote .post-meta { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; min-width: 0; }
+.feed-post-vote .post-text { margin: 0; }
+html body.theme-arcane.page-feed .vote-compact .match-view-btn { background: none; box-shadow: none; border: 1px solid var(--pink-bright, #ff70c3); color: var(--pink-bright, #ff70c3); font-weight: 700; }
+html body.theme-arcane.page-feed .vote-compact .match-view-btn:hover { background: rgba(255, 79, 180, .14); }
+
+/* ========================================
+   REPORT / BLOCK (js/moderation.js)
+   ======================================== */
+.post-header .follow-btn { margin-left: auto; }
+.post-menu.post-menu-other { margin-left: .25rem; }
+.comment-report-btn {
+    margin-left: auto; background: none; border: 0; color: rgba(255, 255, 255, .45);
+    padding: 4px 8px; min-width: 32px; min-height: 32px; border-radius: 6px; cursor: pointer; font-size: .8rem;
+    opacity: 0; transition: opacity .15s, color .15s;
+}
+.comment:hover .comment-report-btn, .comment-report-btn:focus-visible { opacity: 1; }
+.comment-report-btn:hover { color: var(--gold); }
+@media (hover: none) { .comment-report-btn { opacity: .7; min-width: 44px; min-height: 44px; } }
+.blocked-link {
+    display: block; margin: .25rem auto 1.5rem; background: none; border: 0; padding: .5rem 1rem; min-height: 44px;
+    color: rgba(255, 255, 255, .5); font: inherit; font-size: .85rem; text-decoration: underline; cursor: pointer;
+}
+.blocked-link:hover { color: var(--gold); }
+
+.mod-dialog {
+    margin: auto; width: min(92vw, 420px); padding: 0; background: #14101c; color: #f3eefb;
+    border: 1px solid rgba(255, 79, 180, .6); border-radius: 16px; box-shadow: 0 24px 80px rgba(0, 0, 0, .7);
+}
+.mod-dialog::backdrop { background: rgba(3, 2, 8, .8); backdrop-filter: blur(3px); }
+.mod-form { padding: 1.25rem 1.25rem 1rem; }
+.mod-form h2 { margin: 0 0 .5rem; font-size: 1.15rem; }
+.mod-sub { margin: 0 0 1rem; color: rgba(243, 238, 251, .75); font-size: .92rem; line-height: 1.5; }
+.mod-reasons { display: flex; flex-direction: column; gap: .35rem; margin-bottom: 1rem; }
+.mod-reason { display: flex; align-items: center; gap: .6rem; min-height: 44px; padding: 0 .75rem; border: 1px solid rgba(255, 255, 255, .14); border-radius: 10px; cursor: pointer; }
+.mod-reason:has(input:checked) { border-color: #ff4fb4; background: rgba(255, 79, 180, .12); }
+.mod-error { margin: 0 0 .75rem; color: #ff8a9b; font-size: .88rem; }
+.mod-actions { display: flex; justify-content: flex-end; gap: .6rem; }
+.mod-actions button { min-height: 44px; padding: 0 1.2rem; border-radius: 999px; font-weight: 700; font-size: .92rem; font-family: inherit; cursor: pointer; border: 1px solid rgba(255, 255, 255, .25); background: transparent; color: inherit; }
+.mod-actions .mod-send { background: #ff4fb4; border-color: #ff4fb4; color: #1a0716; }
+.mod-actions button:disabled { opacity: .6; cursor: default; }
+.mod-actions button:focus-visible, .mod-unblock:focus-visible { outline: 2px solid #ff4fb4; outline-offset: 2px; }
+.mod-blocked { list-style: none; margin: 0 0 1rem; padding: 0; }
+.mod-blocked li { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .35rem 0; border-bottom: 1px solid rgba(255, 255, 255, .1); }
+.mod-unblock { min-height: 44px; padding: 0 1rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .25); background: transparent; color: inherit; cursor: pointer; }
+
+/* the rule, explained where people meet it: a vote in a live match you have not voted in */
+.vote-locked-note { color: rgba(255, 255, 255, .55); font-size: .85em; font-weight: 400; margin-left: .25em; }

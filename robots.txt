@@ -5,6 +5,9 @@ Allow: /
 # Block admin and setup pages
 Disallow: /admin
 Disallow: /admin.html
+Disallow: /test-toasts.html
+Disallow: /docs/
+Disallow: /tools/
 Disallow: /init-tournament
 Disallow: /init-tournament.html
 

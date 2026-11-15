@@ -1,7 +1,7 @@
 // node tools/test-notification-model.mjs
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { dangerShouldAlert, wasShownOnce, markShownOnce, encouragementDue, isMoveOnCta, eventButtonUrl, achievementButtonUrl, EVENT_KINDS, tieBreakerCandidates, isStripAlert, eventGlyph, eventKind, isEventNotification, eventTag, eventUrl, eventChips, isStreakNotification, streakView, pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
+import { mergeAchievementToasts, achievementItems, dangerShouldAlert, wasShownOnce, markShownOnce, encouragementDue, isMoveOnCta, eventButtonUrl, achievementButtonUrl, EVENT_KINDS, tieBreakerCandidates, isStripAlert, eventGlyph, eventKind, isEventNotification, eventTag, eventUrl, eventChips, isStreakNotification, streakView, pickUnshown, isSocialNotification, isSocialTabItem, isFollowNotification, followQuip, followHeadline, FOLLOW_QUIPS, isFollowBack, FOLLOW_BACK_QUIPS, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentCta, contentIcon, mentionWhere, CONTENT_PRIORITY } from '../js/notification-model.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 const now = 1_000_000, cutoff = now - 600_000;
 const n = (id, o) => ({ id, shownAsToast: false, timestamp: now - 60_000, expiresAt: now + 1e6, ...o });
@@ -218,4 +218,57 @@ t('encouragement nudges are spaced out', () => {
     assert.ok(!encouragementDue('gentle', 5 * 60000) && !encouragementDue('gentle', 44 * 60000) && encouragementDue('gentle', 45 * 60000));
     assert.ok(!encouragementDue('urgent', 29 * 60000) && encouragementDue('urgent', 30 * 60000));
 });
+
+t('notifications from the site itself (achievements, level-ups, mastery, alerts) are never merged into one row', () => {
+    const sys = (id, type, timestamp) => ({ id, type, timestamp, message: type });
+    const g = groupNotifications([sys('a1', 'achievement', 2), sys('a2', 'achievement', 1), sys('l', 'level-up', 3), sys('n1', 'nailbiter', 5), sys('n2', 'nailbiter', 4)]);
+    assert.equal(g.length, 5);
+    assert.ok(g.every(x => x.count === 1));
+    // one person's votes of the same kind still group per person
+    const v = (id, ts, m) => ({ id, type: 'live-activity', triggerUserId: 'kai', triggerUsername: 'Kai', relationship: 'ally', timestamp: ts, matchId: m });
+    const follows = new Set(['kai']);
+    const grouped = groupNotifications([v('v1', 1, 'x'), v('v2', 2, 'y')], follows);
+    assert.equal(grouped.length, 1); assert.equal(grouped[0].count, 2);
+});
+t('achievements unlocked together become one toast: names, XP and rarity kept, duplicates ignored', () => {
+    const a = { type: 'achievement', achievementName: 'First Choice', description: 'Cast your first vote', xp: 25, rarity: 'common', detail: 'x \u2022 +25 XP' };
+    const b = { type: 'achievement', achievementName: 'Founding Member', description: 'One of the first 1,000 voters', xp: 150, rarity: 'legendary' };
+    const m = mergeAchievementToasts(a, b);
+    assert.equal(m.achievementName, '2 achievements');
+    assert.deepEqual(achievementItems(m).map(x => [x.name, x.xp]), [['First Choice', 25], ['Founding Member', 150]]);
+    const c = mergeAchievementToasts(m, { type: 'achievement', achievementName: 'Spark', detail: 'y \u2022 +50 XP' });
+    assert.equal(achievementItems(c).length, 3);
+    assert.equal(achievementItems(c)[2].xp, 50);                       // XP read from the detail line when the toast has no xp field
+    assert.equal(mergeAchievementToasts(m, b), m);                      // same achievement again adds nothing
+    assert.equal(achievementItems(a).length, 1);
+});
+
 console.log(`${pass} passed`);
+
+// ---- waiting alerts while a reward card is up ----
+{
+    const { holdAlert, alertTier } = await import('../js/notification-model.js');
+    const ok = (c, m) => { if (!c) { console.error('FAIL', m); process.exit(1); } console.log('  ok  ', m); };
+    ok(alertTier('level-up') === 0 && alertTier('closing-3h') === 1 && alertTier('novotes') === 1 && alertTier('streak') === 2 && alertTier('welcome') === 3, 'tiers: reward, match, people, the rest');
+    let h = [];
+    h = holdAlert(h, { type: 'welcome', id: 1 }); h = holdAlert(h, { type: 'streak', id: 2 });
+    ok(h.length === 1 && h[0].type === 'streak', 'a people alert replaces a flavour one');
+    h = holdAlert(h, { type: 'welcome', id: 3 });
+    ok(h.length === 1 && h[0].type === 'streak', 'a lower-priority alert does not replace it');
+    h = holdAlert(h, { type: 'lowvotes', id: 4 });
+    ok(h.length === 1 && h[0].type === 'lowvotes', 'a match alert beats a people alert');
+    h = holdAlert(h, { type: 'level-up', id: 5 }); h = holdAlert(h, { type: 'mastery-up', id: 6 }); h = holdAlert(h, { type: 'novotes', id: 7 });
+    ok(h.map(x => x.id).join() === '5,6,7', 'rewards all kept and first; the newest of the same tier is the one that waits');
+}
+
+// ---- pop-up switches ----
+{
+    const { popupAllowed } = await import('../js/notification-model.js');
+    const ok = (c, m) => { if (!c) { console.error('FAIL', m); process.exit(1); } console.log('  ok  ', m); };
+    const on = { popups: true, socialPopups: true, chatterPopups: true };
+    ok(popupAllowed(on, { type: 'streak' }) && popupAllowed(on, { type: 'welcome' }), 'everything shows by default');
+    ok(!popupAllowed({ ...on, popups: false }, { type: 'danger' }) && !popupAllowed({ ...on, popups: false }, { type: 'level-up' }), 'master off: no pop-ups');
+    ok(popupAllowed({ ...on, popups: false }, { type: 'danger', _preview: true }) && popupAllowed({ ...on, popups: false }, { type: 'champion-selected' }), 'previews and a just-chosen champion always show');
+    ok(!popupAllowed({ ...on, socialPopups: false }, { type: 'like' }) && popupAllowed({ ...on, socialPopups: false }, { type: 'danger' }), 'people off hides people only');
+    ok(!popupAllowed({ ...on, chatterPopups: false }, { type: 'encouragement' }) && popupAllowed({ ...on, chatterPopups: false }, { type: 'level-up' }), 'chatter off hides welcome / encouragement only');
+}

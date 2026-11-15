@@ -624,7 +624,7 @@ function renderNotificationItem(notification) {
     } else if (notification.thumbnailUrl) {
         imageHtml = `
             <div style="position: relative; width: 40px; height: 40px; flex-shrink: 0; margin-right: 8px;">
-                <img src="${notification.thumbnailUrl}" 
+                <img src="${esc(notification.thumbnailUrl)}" 
                      style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid rgba(200, 155, 60, 0.3);">
                 <div style="position: absolute; bottom: -2px; right: -2px; width: 18px; height: 18px; background: linear-gradient(135deg, #C8AA6E, #B89A5E); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border: 2px solid #1a1a2e;">
                     ${icon}${countBadge}
@@ -656,10 +656,10 @@ function renderNotificationItem(notification) {
     if (notification.ctaAction === 'send-emote') {
         ctaHtml = `
             <button class="notification-item-cta" 
-                    data-id="${notification.ids ? notification.ids.join(',') : notification.id}"
-                    data-action="${notification.ctaAction}"
-                    data-target-user="${notification.triggerUserId}"
-                    data-url="${notification.targetUrl || ''}">
+                    data-id="${esc(notification.ids ? notification.ids.join(',') : notification.id)}"
+                    data-action="${esc(notification.ctaAction)}"
+                    data-target-user="${esc(notification.triggerUserId)}"
+                    data-url="${esc(notification.targetUrl || '')}">
                 <span class="cta-loading">Checking...</span>
             </button>
         `;
@@ -668,7 +668,7 @@ function renderNotificationItem(notification) {
             <button class="notification-item-cta" 
                     data-id="${notification.ids ? notification.ids.join(',') : notification.id}"
                     data-action="${notification.ctaAction}"
-                    data-url="${notification.targetUrl || ''}">
+                    data-url="${esc(notification.targetUrl || '')}">
                 ${notification.ctaText}
             </button>
         `;
@@ -676,12 +676,12 @@ function renderNotificationItem(notification) {
     
     return `
         <div class="notification-item ${unreadClass}" 
-             data-id="${notification.ids ? notification.ids.join(',') : notification.id}"
+             data-id="${esc(notification.ids ? notification.ids.join(',') : notification.id)}"
              ${championAttr} ${notification.relationship ? `data-relationship="${esc(notification.relationship)}"` : ''}>
             <div class="notification-item-header" style="display: flex; align-items: center;">
                 ${imageHtml}
                 <div style="flex: 1; min-width: 0;">
-                    <div class="notification-item-message">${displayMessage}</div>
+                    <div class="notification-item-message">${esc(displayMessage)}</div>
                 </div>
                 <button class="notification-item-dismiss" 
                         data-id="${notification.ids ? notification.ids.join(',') : notification.id}">
@@ -689,7 +689,7 @@ function renderNotificationItem(notification) {
                 </button>
             </div>
             
-            ${displayDetail ? `<div class="notification-item-detail notification-item-detail-clamp">${displayDetail}</div>` : ''}
+            ${displayDetail ? `<div class="notification-item-detail notification-item-detail-clamp">${esc(displayDetail)}</div>` : ''}
             ${isSocial && notification.matchTitle && (!(notification.count > 1) || notification.groupKind === 'match') ? `<div class="notification-item-match" title="${esc(notification.matchTitle)}">in ${esc(notification.matchTitle)}</div>` : ''}
             
 

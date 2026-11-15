@@ -11,7 +11,8 @@ async function loadCups() {
     return (await res.json()).cups || [];
 }
 
-export async function loadCupHistory(userId) {
+// viewer: { isOwner, viewerVoted(matchId) }. Picks the viewer may not see are never put into the page (js/profile-visibility.js).
+export async function loadCupHistory(userId, viewer = { isOwner: true, viewerVoted: () => true }) {
     const host = document.getElementById('cupHistory');
     if (!host || !userId) return;
     try {
@@ -23,8 +24,9 @@ export async function loadCupHistory(userId) {
             const m = await getAllMatches(false, c.id);
             if (m.length) matchesByCup[c.id] = m;
         }));
-        host.innerHTML = renderCupHistory(buildCupHistory({ votes, cups, matchesByCup }));
+        host.innerHTML = renderCupHistory(buildCupHistory({ votes, cups, matchesByCup, viewer }), { own: viewer.isOwner });
         host.hidden = false;
+        host.dispatchEvent(new CustomEvent('cuphistory:ready'));
     } catch (error) {
         console.warn('Cup history unavailable:', error);
         host.hidden = true;

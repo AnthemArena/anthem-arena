@@ -121,6 +121,7 @@ export async function getUnlockedAchievementsFromFirebase() {
 // Music-focused achievements with League item icons
 // ========================================
 
+import { FOUNDING_MEMBER_XP } from './founding-member-xp.js';
 import { CHAMPION_ACHIEVEMENTS, CHAMPION_ACHIEVEMENTS_FLAT } from './champion-achievements/index.js';
 
 export const GENERAL_ACHIEVEMENTS = {
@@ -496,14 +497,14 @@ export const GENERAL_ACHIEVEMENTS = {
   // SESSION / SPECIAL
   // ========================================
 
-  // Awarded by js/founding-member-tracker.js (it grants the 500 XP itself),
+  // Awarded by js/founding-member-tracker.js (it grants the XP itself, see js/founding-member-xp.js),
   // so the condition never fires here and cannot pay the XP out twice.
   'founding-member': {
     id: 'founding-member',
     name: 'Founding Member',
     description: 'One of the first 1,000 voters',
     icon: '👑',
-    xp: 500,
+    xp: FOUNDING_MEMBER_XP,
     category: 'special',
     hidden: true,
     tier: 'legendary',

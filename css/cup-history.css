@@ -18,3 +18,7 @@ body.theme-arcane.page-profile .cup-history .section-title { margin-bottom: 14px
 .ch-won { color: #5fd38d; } .ch-lost { color: var(--pink); } .ch-pending { color: var(--text-faint); }
 .ch-more, .ch-empty { color: var(--muted); font-size: .85rem; padding: 0 16px 12px; margin: 0; }
 .ch-empty { padding: 16px; background: var(--card); border: 1px dashed var(--border); border-radius: 12px; }
+
+/* one progress bar per cup row (replaces the separate Journey card while there is a single stage) */
+.ch-bar { grid-column: 1 / -1; display: block; height: 8px; border-radius: 999px; background: rgba(255,255,255,.12); overflow: hidden; margin-top: 4px; }
+.ch-bar-fill { display: block; height: 100%; background: var(--pink-bright); border-radius: 999px; }

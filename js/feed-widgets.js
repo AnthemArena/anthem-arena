@@ -7,7 +7,6 @@ import { ARCANE_CONFIG } from './arcane-config.js';
 import { createMatchCard } from './match-card-renderer.js';
 import { getAllMatches } from './api-client.js';
 import { shortTitle } from './title-clean.js';
-import { buildParticipation } from './participation-model.js';
 import { closingSoon, announcementToShow, formatLeft } from './feed-strip-model.js';
 import { collection, getDocs, query, where, orderBy, limit, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getFollowerCount, getFollowingCount } from './follow-system.js';
@@ -35,14 +34,11 @@ export async function initializeFeedWidgets() {
         loadUserProfile(),
         // ✅ NEW: Personal widgets
         loadPersonalRankCard(),
-        loadRoundProgress(),
         loadFeedStrips(),
         loadFeaturedAchievement(),
         loadTopMoment(),
         // Existing widgets
-        loadLiveMatches(),
-        loadRecentActivity(),
-        loadTournamentStats()
+        loadLiveMatches()
     ]);
     
     console.log('✅ Feed widgets loaded');
@@ -71,7 +67,7 @@ async function loadUserProfile() {
         try {
             avatar = JSON.parse(avatarJson);
         } catch {
-            avatar = { type: 'emoji', value: '🎵' };
+            avatar = { type: 'emoji', value: '👤' };
         }
         
         const avatarEl = document.getElementById('sidebarAvatar');
@@ -156,7 +152,7 @@ async function loadPersonalRankCard() {
         try {
             avatar = JSON.parse(avatarJson);
         } catch {
-            avatar = { type: 'emoji', value: '🎵' };
+            avatar = { type: 'emoji', value: '👤' };
         }
         const avatarUrl = getAvatarUrl(avatar);
         
@@ -170,7 +166,7 @@ async function loadPersonalRankCard() {
         const achievementCount = unlockedIds.length;
         
         // Progress percentage
-        const progressPercent = Math.round(rank.progressPercent);
+        const progressPercent = Math.max(0, Math.min(100, Math.round(rank.progressPercentage) || 0));
         
         // Clean rank title (remove emojis)
         const cleanTitle = rank.currentLevel.title.replace(/[^\w\s]/gi, '').trim();
@@ -191,7 +187,7 @@ async function loadPersonalRankCard() {
                         <div class="progress-bar-fill" style="width: ${progressPercent}%"></div>
                     </div>
                     <div class="progress-text">
-                        ${(rank.currentXP || 0).toLocaleString()} / ${(rank.nextLevel?.xpNeeded || 0).toLocaleString()} XP
+                        ${rank.isMaxLevel ? `${(rank.totalXP || 0).toLocaleString()} XP · max level` : `${(rank.progressXP || 0).toLocaleString()} / ${(rank.xpForNextLevel || 0).toLocaleString()} XP`}
                     </div>
                 </div>
                 
@@ -267,59 +263,6 @@ async function loadFeedStrips() {
     } catch (e) { console.error('❌ Error loading closing-soon strip:', e); }
 }
 
-async function loadRoundProgress() {
-    const container = document.getElementById('roundProgressWidget');
-    if (!container) return;
-
-    try {
-        const userId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
-        if (!userId) { container.style.display = 'none'; return; }
-
-        // Same numbers as the profile: only matches that have opened count, stage by stage (js/participation-model.js).
-        const [matches, votes] = await Promise.all([matchesOnce(), myVotesOnce(userId)]);
-        const p = buildParticipation({ matches, votes, cupId: ARCANE_CONFIG.tournamentId });
-
-        if (p.totalVotes === 0 || p.totalPossible === 0) { container.style.display = 'none'; return; }
-
-        let cta;
-        if (p.overallPercentage === 100) cta = '<div class="progress-cta complete">✅ Every open match voted! More coming soon.</div>';
-        else if (p.current) cta = `<div class="progress-cta">🎯 ${p.current.total - p.current.voted} left in ${esc(p.current.label)}!</div>`;
-        else cta = '<div class="progress-cta"><a href="/matches.html">View Matches →</a></div>';
-
-        container.innerHTML = `
-            <div class="round-progress-card">
-                <div class="progress-header">
-                    <i class="fa-solid fa-trophy"></i>
-                    <span>Tournament Progress</span>
-                </div>
-                <div class="overall-progress">
-                    <div class="progress-circle-mini">
-                        <svg width="60" height="60">
-                            <circle cx="30" cy="30" r="25" stroke="rgba(255, 79, 180, 0.2)" stroke-width="4" fill="none"/>
-                            <circle cx="30" cy="30" r="25" stroke="#ff4fb4" stroke-width="4" fill="none"
-                                stroke-dasharray="157" stroke-dashoffset="${157 - (157 * p.overallPercentage / 100)}"
-                                transform="rotate(-90 30 30)" style="transition: stroke-dashoffset 0.5s ease;"/>
-                        </svg>
-                        <div class="progress-value">${p.overallPercentage}%</div>
-                    </div>
-                    <div class="progress-label">${p.totalVotes} / ${p.totalPossible} open matches</div>
-                </div>
-                <div class="rounds-breakdown-mini">
-                    ${p.byStage.map(r => `
-                        <div class="round-row-mini ${r.percentage === 100 ? 'complete' : ''} ${r.live ? 'active-round' : ''}">
-                            <span class="round-name" title="${esc(r.label)}">${esc(r.short)}</span>
-                            <div class="round-bar-mini"><div class="round-bar-fill" style="width: ${r.percentage}%"></div></div>
-                            <span class="round-votes">${r.voted}/${r.total}</span>
-                        </div>`).join('')}
-                </div>
-                ${cta}
-            </div>
-        `;
-    } catch (error) {
-        console.error('❌ Error loading round progress:', error);
-        container.style.display = 'none';
-    }
-}
 
 // ========================================
 // ✅ NEW: FEATURED ACHIEVEMENT WIDGET
@@ -455,8 +398,19 @@ async function loadLiveMatches() {
     try {
         // Match documents carry the real vote counts (see note above), so read them via /api/matches
         const allMatches = await matchesOnce();
-        const liveMatches = allMatches.filter(m => m.status === 'live');
-        
+        const votedIn = m => {
+            const id = m.id || m.matchId;
+            let saved = {};
+            try { saved = JSON.parse(localStorage.getItem('userVotes') || '{}') || {}; } catch (e) {}
+            return !!saved[id] || !!localStorage.getItem(`vote_${ARCANE_CONFIG.tournamentId}_${id}`);
+        };
+        // what still needs a vote first, then the match that closes soonest
+        const liveMatches = allMatches.filter(m => m.status === 'live').sort((a, b) => {
+            if (votedIn(a) !== votedIn(b)) return votedIn(a) ? 1 : -1;
+            const ea = Date.parse(a.endDate || ''), eb = Date.parse(b.endDate || '');
+            return (Number.isFinite(ea) ? ea : Infinity) - (Number.isFinite(eb) ? eb : Infinity);
+        });
+
         if (liveMatches.length === 0) {
             container.innerHTML = '<p class="widget-loading">No live matches right now</p>';
             return;
@@ -513,7 +467,12 @@ function transformToMatchCardFormat(apiMatch) {
         endDate: apiMatch.endDate,
         totalVotes: apiMatch.totalVotes || 0,
         // vote.js remembers each vote locally under this key
-        hasVoted: !!localStorage.getItem(`vote_${ARCANE_CONFIG.tournamentId}_${apiMatch.id || apiMatch.matchId}`),
+        hasVoted: (() => {
+            const id = apiMatch.id || apiMatch.matchId;
+            let saved = {};
+            try { saved = JSON.parse(localStorage.getItem('userVotes') || '{}') || {}; } catch (e) {}
+            return !!saved[id] || !!localStorage.getItem(`vote_${ARCANE_CONFIG.tournamentId}_${id}`);
+        })(),
         
         competitor1: {
             seed: apiMatch.song1?.seed || 1,
@@ -535,71 +494,6 @@ function transformToMatchCardFormat(apiMatch) {
             leading: (apiMatch.song2?.votes || 0) > (apiMatch.song1?.votes || 0)
         }
     };
-}
-
-// ========================================
-// RIGHT SIDEBAR - Recent Activity Widget
-// ========================================
-
-async function loadRecentActivity() {
-    const container = document.getElementById('recentActivityWidget');
-
-    try {
-        // Newest first, a few extra so that votes from earlier (test) cups can be dropped and still leave five.
-        const snapshot = await getDocs(query(collection(db, 'activity'), orderBy('timestamp', 'desc'), limit(40)));
-        const cup = ARCANE_CONFIG.tournamentId;
-        const activities = snapshot.docs
-            .map(doc => doc.data())
-            .filter(a => a.isPublic !== false)
-            // this cup only: new votes carry tournamentId, and every match id starts with its cup id
-            .filter(a => a.tournamentId === cup || String(a.matchId || '').startsWith(cup + '-'))
-            .slice(0, 5);
-
-        if (activities.length === 0) {
-            container.innerHTML = '<p class="widget-loading">No recent activity</p>';
-            return;
-        }
-
-        container.innerHTML = activities.map(activity => {
-            const title = truncate(shortTitle(activity.songTitle || '', 40), 18);
-            // songId on an activity is the video id of the edit that was voted for
-            const thumb = activity.songId ? `https://img.youtube.com/vi/${encodeURIComponent(activity.songId)}/mqdefault.jpg` : null;
-            return `
-                <a class="activity-item-mini" href="/vote?match=${encodeURIComponent(activity.matchId)}">
-                    <img src="${esc(getAvatarUrl(activity.avatar))}" alt="" class="activity-avatar-mini">
-                    <div class="activity-info-mini">
-                        <div class="activity-username">${esc(activity.username)}</div>
-                        <div class="activity-action">voted for ${esc(title)}</div>
-                        <div class="activity-time">${getTimeAgo(activity.timestamp)}</div>
-                    </div>
-                    ${thumb ? `<img src="${thumb}" alt="" class="activity-song-thumbnail" loading="lazy">` : ''}
-                </a>`;
-        }).join('');
-    } catch (error) {
-        console.error('❌ Error loading recent activity:', error);
-        container.innerHTML = '<p class="widget-loading">Failed to load activity</p>';
-    }
-}
-
-// ========================================
-// RIGHT SIDEBAR - Tournament Stats Widget
-// ========================================
-
-async function loadTournamentStats() {
-    try {
-        // Everything comes from the match list (its vote counters). The old version also read EVERY vote document in the
-        // database to count voters: thousands of reads for every visitor, and it counted voters from earlier test cups.
-        const allMatches = await matchesOnce();
-        const totalVotes = allMatches.reduce((sum, m) => sum + (m.totalVotes || 0), 0);
-        const live = allMatches.filter(m => m.status === 'live').length;
-        const completed = allMatches.filter(m => m.status === 'completed').length;
-
-        document.getElementById('widgetTotalVotes').textContent = totalVotes.toLocaleString();
-        document.getElementById('widgetLiveMatches').textContent = live.toLocaleString();
-        document.getElementById('widgetCompletedMatches').textContent = completed.toLocaleString();
-    } catch (error) {
-        console.error('❌ Error loading tournament stats:', error);
-    }
 }
 
 // ========================================
@@ -682,14 +576,14 @@ function getTimeAgo(timestamp) {
 
 function getAvatarUrl(avatar) {
     if (!avatar) {
-        return createEmojiAvatar('🎵');
+        return createEmojiAvatar('👤');
     }
     
     if (avatar.type === 'url') return fixAvatarUrl(avatar.value);
     if (avatar.type === 'champion') return fixAvatarUrl(avatar.imageUrl);
     if (avatar.type === 'emoji') return createEmojiAvatar(avatar.value);
     
-    return createEmojiAvatar('🎵');
+    return createEmojiAvatar('👤');
 }
 
 function createEmojiAvatar(emoji) {

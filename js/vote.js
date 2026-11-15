@@ -24,6 +24,7 @@ import './global-notifications.js';
 import { createMatchCard } from './match-card-renderer.js';
 import { unvotedLiveMatches, nextMatchBarHtml } from './next-match.js';
 import { cleanTitle, shortTitle } from './title-clean.js';
+import { editAspects, applyEditShape, openWatchDialog, pausePlayer, DEFAULT_RATIO } from './watch-dialog.js';
 import { votingState, closedButton } from './vote-closed.js';
 import { renderChampionBubble, loadChampionPack, shortName } from './champion-bubble.js';
 import { buildMatchShare, shareKind } from './match-share.js';
@@ -39,7 +40,8 @@ import { awardFoundingMemberBadge, initFoundingMemberTracking, backfillFoundingM
 
 
 // Default avatars: Arcane characters, by Data Dragon id (ids with spaces like 'Lee Sin' 404 there).
-const CHAMPIONS = ['Jinx', 'Vi', 'Caitlyn', 'Ekko', 'Jayce', 'Viktor', 'Heimerdinger'];
+// New accounts start as one of the champions that have a pack (levels, skins, voice); more join this list when they get one.
+const CHAMPIONS = ['Jinx', 'Vi', 'Caitlyn'];
 
 // ========================================
 // 🆕 PAGE-LEVEL MATCHES CACHE
@@ -583,17 +585,8 @@ const h2hRecord = undefined;
                 </div>
             `;
         }
-    } else {
-        // Tournament debut
-        metaHTML += `
-            <div class="meta-row tournament-stats">
-                <span class="meta-item debut">
-                    <i class="fas fa-star"></i>
-                    <span class="meta-value">Tournament Debut</span>
-                </span>
-            </div>
-        `;
     }
+    // No history: nothing to add. ("Tournament Debut" on both sides said nothing, and the header already shows the year and creator.)
 
     metaElement.innerHTML = metaHTML;
 }
@@ -732,6 +725,66 @@ function updateNextMatchBar(remaining) {
     }
     bar.innerHTML = nextMatchBarHtml(remaining);
     document.body.classList.add('has-next-bar');
+    tuckBarWhenMatchesShown(bar);
+}
+
+// Inline confirm: tapping an entry's button asks "Vote for X? Confirm / Cancel" right under it. Nothing is recorded until Confirm.
+function closeVoteConfirm() {
+    document.getElementById('vote-confirm')?.remove();
+}
+function askToConfirmVote(button, songId) {
+    closeVoteConfirm();
+    const entry = songId === 'song1' ? currentMatch.competitor1 : currentMatch.competitor2;
+    const box = document.createElement('div');
+    box.id = 'vote-confirm';
+    box.className = 'vote-confirm';
+    box.setAttribute('role', 'group');
+    box.setAttribute('aria-label', 'Confirm your vote');
+    box.innerHTML = `<p class="vote-confirm-text">Vote for <strong>${escapeHtml(cleanTitle(entry.name))}</strong>? This is final.</p>
+        <div class="vote-confirm-actions">
+            <button type="button" class="vote-confirm-yes">Confirm vote</button>
+            <button type="button" class="vote-confirm-no">Cancel</button>
+        </div>`;
+    button.insertAdjacentElement('afterend', box);
+    box.querySelector('.vote-confirm-yes').addEventListener('click', async () => { closeVoteConfirm(); await submitVote(songId); });
+    box.querySelector('.vote-confirm-no').addEventListener('click', () => { closeVoteConfirm(); button.focus(); });
+    box.querySelector('.vote-confirm-yes').focus({ preventScroll: true });
+    box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('vote-confirm')) closeVoteConfirm(); });
+
+// "Pre-vote" = a live match this visitor has not voted in yet. Then the page is only about the vote: no seeds (so nobody just backs the
+// higher seed), no share block, no "Keep Voting" list, and one line saying votes are final. CSS does the hiding (css/vote.css).
+function updatePreVote() {
+    const pre = !hasVoted && currentMatch?.status === 'live';
+    document.body.classList.toggle('pre-vote', pre);
+}
+
+// The "Keep Voting" list below says the same thing as the bar, so the bar steps aside while that list is on screen
+// (hidden, not just faded: it also leaves the tab order, so keyboard focus never lands behind it).
+// The result, right where the vote is confirmed ("60% voted the same way, 3 of 5"), so it is on the first screen on a phone
+// instead of below both videos. Called again whenever the counts change.
+let votedSide = null;
+function showResultInBanner() {
+    const el = document.getElementById('voted-indicator-result');
+    if (!el || !votedSide || !currentMatch?.competitor1) return;
+    const mine = votedSide === 'song1' ? currentMatch.competitor1 : currentMatch.competitor2;
+    const total = (currentMatch.competitor1.votes || 0) + (currentMatch.competitor2.votes || 0);
+    if (!total) { el.textContent = ''; return; }
+    const pct = Math.round(((mine.votes || 0) / total) * 100);
+    el.textContent = `${pct}% picked the same (${mine.votes || 0} of ${total} vote${total === 1 ? '' : 's'})`;
+}
+
+let barObserver = null;
+function tuckBarWhenMatchesShown(bar) {
+    const list = document.getElementById('other-matches-section');
+    if (!list || typeof IntersectionObserver === 'undefined') return;
+    if (barObserver) barObserver.disconnect();
+    barObserver = new IntersectionObserver(entries => {
+        const el = document.getElementById('next-match-bar');
+        if (el) el.classList.toggle('is-tucked', entries.some(e => e.isIntersecting && list.style.display !== 'none'));
+    }, { threshold: 0.15 });
+    barObserver.observe(list);
 }
 
 /**
@@ -885,7 +938,7 @@ async function checkVoteStatus() {
         const localVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);
 
         if (localVote) {
-            hasVoted = true;
+            hasVoted = true; updatePreVote();
             console.log('✅ Found vote in localStorage:', localVote);
 
             // Make sure it's saved in the new format too
@@ -910,7 +963,7 @@ async function checkVoteStatus() {
         const voteDoc = await getDoc(voteRef);
 
         if (voteDoc.exists()) {
-            hasVoted = true;
+            hasVoted = true; updatePreVote();
             const voteData = voteDoc.data();
             console.log('✅ User already voted (found in Firebase):', voteData.choice);
 
@@ -927,7 +980,7 @@ async function checkVoteStatus() {
             disableVoting(voteData.choice);
             await loadOtherLiveMatches();
         } else {
-            hasVoted = false;
+            hasVoted = false; updatePreVote();
             console.log('📝 No vote found - user can vote');
         }
     } catch (error) {
@@ -935,7 +988,7 @@ async function checkVoteStatus() {
         // Fallback to localStorage only
         const localVote = localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${currentMatch.id}`);
         if (localVote) {
-            hasVoted = true;
+            hasVoted = true; updatePreVote();
             updateVoteCountsUI();
             disableVoting(localVote);
         }
@@ -946,6 +999,7 @@ async function checkVoteStatus() {
      * ⭐ UPDATED: Disable voting UI after user has voted
      */
     function disableVoting(votedFor) {
+        votedSide = votedFor;
         const voteButtons = document.querySelectorAll('.vote-btn');
 
         voteButtons.forEach(btn => {
@@ -974,7 +1028,7 @@ async function checkVoteStatus() {
 
             } else {
                 // Button they didn't vote for - dim it
-                btn.style.opacity = '0.4';
+                btn.classList.add('not-selected');      // readable, quiet: a status, not a dimmed button
 
                 // Change button text
                 const textSpan = btn.querySelector('.vote-text');
@@ -997,6 +1051,7 @@ async function checkVoteStatus() {
                 <div>
                     <div style="font-weight: 600; margin-bottom: 0.25rem;">Vote Recorded</div>
                     <div style="opacity: 0.9;">You voted for <strong>${escapeHtml(cleanTitle(songName))}</strong></div>
+                    <div id="voted-indicator-result" style="opacity: 0.9; margin-top: .25rem;"></div>
                 </div>
             </div>
         `;
@@ -1024,6 +1079,7 @@ async function checkVoteStatus() {
         });
 
         console.log('📊 Vote statistics revealed');
+        showResultInBanner();
     }
 
     // ========================================
@@ -1105,7 +1161,7 @@ if (profileDoc.exists()) {
         console.error('❌ Error creating auto profile:', error);
         // Fallback to Anonymous
         localStorage.setItem('username', 'Anonymous');
-        localStorage.setItem('avatar', JSON.stringify({ type: 'emoji', value: '🎵' }));
+        localStorage.setItem('avatar', JSON.stringify({ type: 'emoji', value: '👤' }));
     }
 }
 
@@ -1166,6 +1222,8 @@ function generateUsername() {
                 matchTitle.textContent = `${cleanTitle(currentMatch.competitor1.name)} vs ${cleanTitle(currentMatch.competitor2.name)}`;
             }
         }
+
+        updatePreVote();
 
         // Update tournament badge
         const tournamentBadge = document.getElementById('tournament-badge');
@@ -1254,6 +1312,7 @@ if (timeRemaining) {
             comp1Seed.style.display = hasSeed ? '' : 'none';
         }
         if (comp1Name) comp1Name.textContent = cleanTitle(currentMatch.competitor1.name);
+        const r1 = document.getElementById('competitor1-result-name'); if (r1) r1.textContent = cleanTitle(currentMatch.competitor1.name);
         if (comp1Source) comp1Source.textContent = currentMatch.competitor1.source;
        if (comp1Percentage) comp1Percentage.textContent = `${currentMatch.competitor1.percentage}`;
 if (comp1Votes) comp1Votes.style.display = 'none'; // ✅ Hide vote count
@@ -1286,6 +1345,7 @@ if (comp2Seed) {
     comp2Seed.style.display = hasSeed ? '' : 'none';
 }
 if (comp2Name) comp2Name.textContent = cleanTitle(currentMatch.competitor2.name);
+const r2 = document.getElementById('competitor2-result-name'); if (r2) r2.textContent = cleanTitle(currentMatch.competitor2.name);
 if (comp2Source) comp2Source.textContent = currentMatch.competitor2.source;
 if (comp2Percentage) comp2Percentage.textContent = `${currentMatch.competitor2.percentage}`;
 if (comp2Votes) comp2Votes.style.display = 'none'; // ✅ Hide vote count
@@ -1299,6 +1359,13 @@ comp2Video.src = `https://www.youtube.com/embed/${currentMatch.competitor2.video
     comp2Video.title = `${song2Name} by ${artist2} - Arcane Moments edit`;
     comp2Video.loading = 'lazy';
 }
+
+// each player takes its edit's own shape (square edits no longer sit in a tall box); 9:16 until data/edits.json answers
+editAspects().then(aspects => {
+    [['competitor1', 'competitor1-wrapper'], ['competitor2', 'competitor2-wrapper']].forEach(([side, id]) => {
+        applyEditShape(document.getElementById(id), aspects.get(currentMatch?.[side]?.videoId) ?? DEFAULT_RATIO);
+    });
+});
 
 
 
@@ -1708,7 +1775,7 @@ async function submitVote(songId) {
         console.log('✅ Guaranteed profile loaded:', { username, isPublic, avatar: !!avatar });
 
         // Disable voting buttons immediately
-        hasVoted = true;
+        hasVoted = true; updatePreVote();
         const voteButtons = document.querySelectorAll('.vote-btn');
         voteButtons.forEach(btn => {
             btn.disabled = true;
@@ -2027,7 +2094,7 @@ console.log(
         showNotification('Error submitting vote. Please try again.', 'error');
 
         // Re-enable voting on error
-        hasVoted = false;
+        hasVoted = false; updatePreVote();
         const voteButtons = document.querySelectorAll('.vote-btn');
         voteButtons.forEach(btn => {
             btn.disabled = false;
@@ -2175,7 +2242,7 @@ async function replayProgressAsToasts(events) {
                 if (e.type === 'achievement') {
                     showAchievementUnlock(getAchievementById(e.id) || { id: e.id, name: e.name, description: '', xp: e.xp, rarity: e.rarity, icon: e.icon });
                 } else if (e.type === 'level' && window.showBulletin) {
-                    window.showBulletin({ type: 'level-up', level: e.to, message: '⬆️ New Arcane Rank!', detail: `You've reached ${e.title}!`, cta: 'View Progress', ctaAction: () => { window.location.href = '/profile#overview'; }, duration: 5000 });
+                    window.showBulletin({ type: 'level-up', level: e.to, rankTitle: e.title, message: '⬆️ New Arcane Rank!', detail: `You've reached ${String(e.title || '').replace(/^[^\p{L}\p{N}]+/u, '').trim()}!`, cta: 'View Progress', ctaAction: () => { window.location.href = '/profile#overview'; }, duration: 5000 });
                 } else if (e.type === 'mastery' && window.showBulletin) {
                     const names = (e.skins || []).map(x => x.name).join(', ');
                     window.showBulletin({ type: 'mastery-up', level: e.to, packId: e.packId, message: `${e.packId.charAt(0).toUpperCase() + e.packId.slice(1)} Mastery ${e.to}!`, detail: names ? `Unlocked: ${names}` : `Mastery ${e.to}`, cta: 'View champions', ctaAction: () => { window.location.href = '/profile#champions'; }, duration: 6000 });
@@ -2369,9 +2436,10 @@ function updateVoteCountsUI() {
         console.error('Element not found: competitor1-percentage');
     }
 
-  // ✅ HIDE vote count, only show percentage
+    // The real count under the percentage: with a handful of votes, 75% is only 3 of 4
     if (comp1VotesEl) {
-        comp1VotesEl.style.display = 'none';
+        comp1VotesEl.textContent = `${comp1Votes} of ${total} vote${total === 1 ? '' : 's'}`;
+        comp1VotesEl.style.display = '';
     }
 
      // Update Competitor 2
@@ -2379,10 +2447,12 @@ function updateVoteCountsUI() {
         comp2Percentage.textContent = comp2Percent;
     }
 
-    // ✅ HIDE vote count, only show percentage
     if (comp2VotesEl) {
-        comp2VotesEl.style.display = 'none';
+        comp2VotesEl.textContent = `${comp2Votes} of ${total} vote${total === 1 ? '' : 's'}`;
+        comp2VotesEl.style.display = '';
     }
+
+    showResultInBanner();
 
     // Update total
     if (totalVotesEl) {
@@ -2566,7 +2636,7 @@ if (isEarlyVoting) {
             </p>
             <div class="share-buttons">
                 <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'early')">
-        <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+        <span class="btn-icon"><svg class="x-logo" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></span> Tweet
                 </button>
                 <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'early')">
         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
@@ -2610,7 +2680,7 @@ else if (voteDiff === 0) {
             </p>
             <div class="share-buttons">
                 <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'tied')">
-        <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+        <span class="btn-icon"><svg class="x-logo" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></span> Tweet
                 </button>
                 <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'tied')">
         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
@@ -2654,7 +2724,7 @@ else if (voteDiff <= 2) {
             </p>
             <div class="share-buttons">
                 <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'nailbiter')">
-        <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+        <span class="btn-icon"><svg class="x-logo" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></span> Tweet
                 </button>
                 <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'nailbiter')">
         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
@@ -2698,7 +2768,7 @@ else if (userPct < opponentPct && voteDiff <= 5) {
             </p>
             <div class="share-buttons">
                 <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'losing-close')">
-        <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+        <span class="btn-icon"><svg class="x-logo" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></span> Tweet
                 </button>
                 <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'losing-close')">
         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
@@ -2742,7 +2812,7 @@ else if (userPct < opponentPct) {
             </p>
             <div class="share-buttons">
                 <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'losing-bad')">
-        <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+        <span class="btn-icon"><svg class="x-logo" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></span> Tweet
                 </button>
                 <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'losing-bad')">
         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
@@ -2786,7 +2856,7 @@ else if (pctDiff <= 10) {
             </p>
             <div class="share-buttons">
                 <button class="share-btn twitter" onclick="shareToTwitter('${songName}', 'winning-close')">
-        <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+        <span class="btn-icon"><svg class="x-logo" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></span> Tweet
                 </button>
                 <button class="share-btn reddit" onclick="shareToReddit('${songName}', 'winning-close')">
         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
@@ -2821,7 +2891,7 @@ else {
             </p>
             <div class="share-buttons">
                 <button class="share-btn twitter" data-song="${escapeHtml(songName)}" onclick="shareToTwitter(this.dataset.song, 'dominating')">
-        <span class="btn-icon"><i class="fa-brands fa-twitter"></i></span> Tweet
+        <span class="btn-icon"><svg class="x-logo" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></span> Tweet
                 </button>
                 <button class="share-btn reddit" data-song="${escapeHtml(songName)}" onclick="shareToReddit(this.dataset.song, 'dominating')">
         <span class="btn-icon"><i class="fa-brands fa-reddit"></i></span> Reddit
@@ -2983,7 +3053,8 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.g
             const songId = button.dataset.competitor;
 
             if (songId && currentMatch) {
-                await submitVote(songId);
+                if (hasVoted) return;
+                askToConfirmVote(button, songId);      // votes are final: a second, deliberate tap records it
             }
         }
     });
@@ -3003,26 +3074,18 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.g
         }
     });
 
-    // Video control handlers - Fullscreen
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('fullscreen-btn') || e.target.closest('.fullscreen-btn')) {
-            const button = e.target.classList.contains('fullscreen-btn') ? e.target : e.target.closest('.fullscreen-btn');
-            const videoId = button.dataset.video;
-            const iframe = document.getElementById(`${videoId}-video`);
-
-            if (iframe) {
-                if (iframe.requestFullscreen) {
-                    iframe.requestFullscreen();
-                } else if (iframe.webkitRequestFullscreen) {
-                    iframe.webkitRequestFullscreen();
-                } else if (iframe.mozRequestFullScreen) {
-                    iframe.mozRequestFullScreen();
-                } else if (iframe.msRequestFullscreen) {
-                    iframe.msRequestFullscreen();
-                }
-                console.log('⛶ Fullscreen requested:', videoId);
-            }
-        }
+    // Video control handlers - Expand: the same focused, autoplaying player the gallery uses
+    document.addEventListener('click', async (e) => {
+        const button = e.target.closest?.('.expand-btn');
+        if (!button || !currentMatch) return;
+        const side = button.dataset.video;                                   // 'competitor1' | 'competitor2'
+        const comp = currentMatch[side];
+        if (!comp?.videoId) return;
+        const ratio = (await editAspects()).get(comp.videoId) ?? DEFAULT_RATIO;
+        // only a voted (or closed) match may name the creator: the dialog follows the same rule as the page behind it
+        const meta = document.body.classList.contains('pre-vote') ? '' : (comp.source || '');
+        ['competitor1', 'competitor2'].forEach(k => pausePlayer(document.getElementById(`${k}-video`)));
+        openWatchDialog({ videoId: comp.videoId, title: cleanTitle(comp.name || ''), meta, ratio, trigger: button });
     });
 
     // (Share buttons: js/share-box.js. The old delegated .twitter/.reddit/.copy handler was removed: it opened a second, old-wording tab on top of the new box.)

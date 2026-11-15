@@ -6,6 +6,9 @@ import { db, auth } from './firebase-config.js';
 import { previewEditsTournament, writeEditsTournament, getStoredDraw } from './init-edits-tournament.js';
 import { previewGroupTournament, writeGroupTournament, getStoredGroupDraw, previewKnockoutBuild, writeKnockoutBuild } from './init-group-tournament.js';
 import { allGroupStandings } from './group-builder.js';
+import { deadlineInfo } from './vote-closed.js';
+import { groupReports, reasonSummary } from './moderation-model.js';
+import { votePostText } from './vote-post-text.js';
 
 import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, deleteField, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -32,6 +35,7 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById('login-container').style.display = 'none';
         document.getElementById('admin-content').style.display = 'block';
         loadMatches();
+        loadReports();
     } else {
         console.log('❌ Not authenticated');
         document.getElementById('login-container').style.display = 'flex';
@@ -476,6 +480,13 @@ async function loadMatches() {
                   })
                 : 'Not scheduled';
             
+            // a live match shows its real deadline: red once it has passed (voters see "Voting closed"), "No deadline" if none was set
+            const fmt = ms => new Date(ms).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const dl = deadlineInfo(match);
+            const dateCell = !dl ? dateStr
+                : dl.kind === 'none' ? '<span class="deadline-none">No deadline</span>'
+                : dl.kind === 'expired' ? `<span class="deadline-expired" title="The deadline has passed. Voters see 'Voting closed' until you close or re-open this match.">Ended ${fmt(dl.ms)}</span>`
+                : `<span class="deadline-open">Ends ${fmt(dl.ms)}</span>`;
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${match.stage === 'group' ? `${match.group} · day ${match.matchday}` : `R${match.round}M${match.matchNumber}`} <span class="batch-tag">(B${match.batch})</span></td>
@@ -483,10 +494,10 @@ async function loadMatches() {
                 <td>${match.song1.votes || 0}</td>
                 <td><span class="edit-title-cell" title="${esc(match.song2.title || match.song2.shortTitle)}">${esc(match.song2.shortTitle || match.song2.title)}</span></td>
                 <td>${match.song2.votes || 0}</td>
-                <td>${dateStr}</td>
+                <td>${dateCell}</td>
                 <td>
                     <span class="status-badge ${match.status}">
-                        ${match.status}
+                        ${dl && dl.kind === 'expired' ? 'live · ended' : match.status}
                     </span>
                 </td>
                 <td>
@@ -805,3 +816,82 @@ window.recountRound1 = async function() {
         alert(`Error: ${error.message}`);
     }
 };
+
+// ========================================
+// REPORTS (posts and comments reported from the feed)
+// ========================================
+
+async function loadReports() {
+    const list = document.getElementById('reportsList');
+    if (!list) return;
+    list.textContent = 'Loading...';
+    try {
+        const snap = await getDocs(collection(db, 'reports'));
+        const reports = [];
+        snap.forEach(d => { const r = d.data(); reports.push({ ...r, id: d.id, timestamp: r.timestamp?.toMillis?.() ?? r.timestamp ?? 0 }); });
+        const rows = groupReports(reports);
+        document.getElementById('reportsCount').textContent = rows.length ? `(${rows.length} open)` : '';
+        if (!rows.length) { list.textContent = 'No open reports.'; return; }
+        list.innerHTML = '';
+        for (const g of rows) {
+            let target = null;
+            try { const t = await getDoc(doc(db, g.targetType === 'post' ? 'posts' : 'comments', g.targetId)); target = t.exists() ? t.data() : null; } catch (e) { /* shown as unavailable */ }
+            const text = target ? (target.content || target.text || '(no text: a vote or shared match)') : '(already deleted)';
+            const el = document.createElement('div');
+            el.className = 'report-row';
+            el.innerHTML = `
+                <div class="report-head"><strong>${esc(g.targetType === 'post' ? 'Post' : 'Comment')}</strong> by <strong>${esc(g.authorName || g.authorId)}</strong>
+                    <span class="report-meta">${g.count} report${g.count === 1 ? '' : 's'}: ${esc(reasonSummary(g.reasons))}${target?.moderationCleared ? ' · already cleared once' : ''}</span></div>
+                <p class="report-text">${esc(String(text).slice(0, 600))}</p>
+                <div class="report-actions">
+                    ${target ? '<button type="button" class="btn btn-danger" data-act="delete">Delete it</button><button type="button" class="btn btn-info" data-act="keep">Keep it up</button>' : ''}
+                    <button type="button" class="btn" data-act="done">Mark as dealt with</button>
+                </div>`;
+            el.addEventListener('click', async e => {
+                const act = e.target.closest('button')?.dataset.act; if (!act) return;
+                try {
+                    if (act === 'delete') {
+                        if (!confirm('Delete this ' + g.targetType + '? This cannot be undone.')) return;
+                        await deleteDoc(doc(db, g.targetType === 'post' ? 'posts' : 'comments', g.targetId));
+                    } else if (act === 'keep') {
+                        // cleared: further reports no longer hide it automatically
+                        await updateDoc(doc(db, g.targetType === 'post' ? 'posts' : 'comments', g.targetId), { moderationCleared: true });
+                    }
+                    await Promise.all(g.reportIds.map(id => updateDoc(doc(db, 'reports', id), { handled: true })));
+                    loadReports();
+                } catch (err) { alert('Error: ' + err.message); }
+            });
+            list.appendChild(el);
+        }
+    } catch (error) {
+        console.error('Could not load reports:', error);
+        list.textContent = 'Could not load reports: ' + error.message;
+    }
+}
+document.getElementById('reportsRefresh')?.addEventListener('click', loadReports);
+
+
+// ========================================
+// ONE-OFF: tidy old vote posts (neutral sentence, no stored standings)
+// ========================================
+document.getElementById('tidyPostsBtn')?.addEventListener('click', async () => {
+    const out = document.getElementById('tidyPostsResult'), btn = document.getElementById('tidyPostsBtn');
+    if (!confirm('Rewrite old vote posts to the plain sentence and remove their stored standings?')) return;
+    btn.disabled = true; out.textContent = 'Working...';
+    try {
+        const snap = await getDocs(query(collection(db, 'posts'), where('type', '==', 'vote')));
+        let changed = 0;
+        for (const d of snap.docs) {
+            const p = d.data();
+            const text = votePostText(p);
+            if (!('matchState' in p) && p.text === text) continue;
+            await updateDoc(doc(db, 'posts', d.id), { text, matchState: deleteField() });
+            changed++;
+        }
+        out.textContent = `Done. ${changed} of ${snap.size} vote posts rewritten.`;
+    } catch (e) {
+        console.error(e);
+        out.textContent = 'It stopped part way: ' + (e.message || e) + '. Run it again to carry on.';
+    }
+    btn.disabled = false;
+});

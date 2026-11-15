@@ -66,7 +66,7 @@ t('pair, stack and toast render the pieces', () => {
     assert.ok(pairHtml({ theirSrc: null, theirName: 'Kai', yourSrc: null, relationship: 'ally', size: 40, accent: '#4ade80' }).includes('>=<'));
     assert.equal((stackHtml([null, null, null, null], ['A', 'B', 'C', 'D']).match(/nv-stacked/g) || []).length, 3);
     const t1 = toastHtml({ relationship: 'opponent', triggerUsername: 'Kai' }, { theirSrc: null, yourSrc: null, jinxSrc: 'https://x/j.jpg', accent: '#ff69b4', headline: 'Kai voted against you', quip: 'Boom <3', cta: 'Challenge' });
-    assert.ok(t1.includes('Kai') && t1.includes('voted against you') && t1.includes('Boom &lt;3') && t1.includes('handleBulletinCTA') && t1.includes('openBulletinMatch'));
+    const T1 = t1.toLowerCase(); assert.ok(t1.includes('Kai') && T1.includes('voted against you') && t1.includes('Boom &lt;3') && t1.includes('handleBulletinCTA') && t1.includes('openBulletinMatch'));
 });
 t('toast headline puts the name on one line and the action under it', () => {
     const h = toastHeadlineHtml('FierceWatcher229 voted against you', 'https://x/a.png', 'FierceWatcher229', '#ff69b4');
@@ -81,7 +81,7 @@ t('follow row and toast: name, quip, right button, safe text', () => {
     const already = followRowHtml(n, { headline: 'Kai followed you', quip: '', timeAgo: '', championPack: null, alreadyFollowing: true });
     assert.ok(already.includes('data-action="navigate"') && already.includes('View profile') && !already.includes('follow-back'));
     const toast = followToastHtml(n, { theirSrc: null, jinxSrc: 'https://x/j.png', accent: '#ff69b4', quip: 'Another one joins the chaos!', cta: 'Follow back', headline: 'Kai followed you back' });
-    assert.ok(toast.includes('handleBulletinCTA') && toast.includes('followed you back') && toast.includes('Another one joins the chaos!') && toast.includes('nv-follow-face'));
+    assert.ok(toast.includes('handleBulletinCTA') && toast.toLowerCase().includes('followed you back') && toast.includes('Another one joins the chaos!') && toast.includes('nv-card-x'));
 });
 t('content row and toast: faces, headline, quote escaped, one button that opens the post', () => {
     const n = { id: 'a', ids: ['a', 'b', 'c'], type: 'like', triggerUsername: 'Kai', targetUrl: '/feed.html#post-1', read: false };
@@ -93,7 +93,9 @@ t('content row and toast: faces, headline, quote escaped, one button that opens 
     const solo = contentRowHtml({ ...n, ids: ['a'] }, { parts: { who: 'Kai', action: 'liked your post', headline: 'Kai liked your post', names: '' }, quote: '', icon: '❤️', cta: 'View post', timeAgo: '', championPack: null, srcs: [null], names: ['Kai'] });
     assert.ok(!solo.includes('nv-stack') && !solo.includes('class="nv-content"'));
     const toast = contentToastHtml(n, { parts, quote: 'Great <i>edit</i>', icon: '❤️', cta: 'View post', accent: '#ff69b4', srcs: [null, null, null], names: ['Kai', 'Rex', 'Mia'] });
-    assert.ok(toast.includes('handleBulletinCTA') && toast.includes('3 people') && toast.includes('liked your post') && toast.includes('Great &lt;i&gt;edit&lt;/i&gt;') && toast.includes('View post'));
+    assert.ok(toast.includes('handleBulletinCTA') && toast.includes('3 people') && toast.toLowerCase().includes('liked your post') && toast.includes('Great &lt;i&gt;edit&lt;/i&gt;') && toast.includes('View post') && toast.includes('+0') === false);
+    const crowd = contentToastHtml(n, { parts, quote: '', icon: '', cta: 'View post', accent: '#ff69b4', srcs: [null, null, null, null, null], names: ['A', 'B', 'C', 'D', 'E'] });
+    assert.equal((crowd.match(/nv-stacked/g) || []).length, 3); assert.ok(crowd.includes('nv-more') && crowd.includes('+2'));
 });
 t('rows never use bare class names the feed stylesheet styles (a "comment" class turned the bell row into a flex row)', () => {
     const tokens = html => new Set([...html.matchAll(/class="([^"]*)"/g)].flatMap(m => m[1].split(/\s+/)));

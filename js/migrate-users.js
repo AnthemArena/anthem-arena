@@ -20,7 +20,7 @@ async function migrateUsers() {
                 uniqueUsers.set(data.userId, {
                     userId: data.userId,
                     username: data.username,
-                    avatar: data.avatar || { type: 'emoji', value: '🎵' }
+                    avatar: data.avatar || { type: 'emoji', value: '👤' }
                 });
             }
         });

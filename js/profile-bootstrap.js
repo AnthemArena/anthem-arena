@@ -5,7 +5,8 @@
 // get a made-up id (IP + fingerprint) and the profile write for that id was refused, so they stayed Anonymous.
 import { getChampionImageUrl } from './arcane-config.js';
 
-const CHAMPIONS = ['Jinx', 'Vi', 'Caitlyn', 'Ekko', 'Jayce', 'Viktor', 'Heimerdinger'];
+// New accounts start as one of the champions that have a pack (levels, skins, voice); more join this list when they get one.
+const CHAMPIONS = ['Jinx', 'Vi', 'Caitlyn'];
 const ADJECTIVES = ['Epic', 'Legendary', 'Supreme', 'Elite', 'Mystic', 'Shadow', 'Golden', 'Silver', 'Royal', 'Grand', 'Swift', 'Fierce', 'Noble', 'Brave', 'Mighty'];
 const NOUNS = ['Summoner', 'Champion', 'Voter', 'Fan', 'Hunter', 'Legend', 'Warrior', 'Scout', 'Ranger', 'Guardian', 'Hero', 'Seeker', 'Watcher', 'Striker', 'Sentinel'];
 

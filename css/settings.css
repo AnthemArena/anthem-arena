@@ -481,6 +481,14 @@
     display: flex;
     gap: 1rem;
     margin-top: 1rem;
+    /* Save stays in reach however far the window is scrolled */
+    position: sticky;
+    bottom: calc(-1 * var(--modal-pad, 2rem));   /* flush with the window's bottom edge: nothing scrolls past under it */
+    margin-bottom: calc(-1 * var(--modal-pad, 2rem));
+    padding: 0.75rem 0 calc(0.75rem + var(--modal-pad, 2rem) / 2);
+    background: #0a0a0a;
+    box-shadow: 0 -10px 14px -6px rgba(0, 0, 0, 0.9);
+    z-index: 5;
 }
 
 .btn-save {
@@ -825,7 +833,7 @@
 }
 
 .social-input-row input::placeholder {
-    color: rgba(240, 230, 210, 0.4);
+    color: rgba(240, 230, 210, 0.6);
 }
 /* ========================================
    CHAMPION PACK SELECTOR
@@ -1277,7 +1285,11 @@
 .yc-level { font-size: .8rem; font-weight: 700; color: var(--pink-bright, #ff69b4); }
 .yc-text small { display: block; font-size: .72rem; line-height: 1.35; color: rgba(255,255,255,.65); }
 .yc-label { margin: 14px 0 6px; text-align: left; font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.6); }
-.yc-skins { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+.yc-skins { display: grid; grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); gap: 8px; }
+.yc-skin { position: relative; }
+.yc-skin.on::after { content: '\2713'; position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; border-radius: 50%; background: var(--pink, #ff2d95); color: #fff; font-size: 12px; font-weight: 800; line-height: 20px; text-align: center; }
+.popup-sub { margin-left: 18px; padding-left: 12px; border-left: 2px solid rgba(255,255,255,.12); }
+.popup-sub.is-off { opacity: .5; }
 .yc-skin { font: inherit; font-size: .68rem; color: inherit; cursor: pointer; padding: 5px 5px 7px; border-radius: 10px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.15); }
 .yc-skin img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 7px; margin-bottom: 4px; }
 .yc-skin span { display: block; min-height: 2.4em; line-height: 1.2; }
@@ -1285,3 +1297,14 @@
 .yc-skin.on { border-color: var(--pink, #ff2d95); box-shadow: 0 0 0 1px var(--pink, #ff2d95) inset; }
 .yc-note { margin: 10px 0 12px; text-align: left; font-size: .72rem; color: rgba(255,255,255,.6); }
 .yc-preview { width: auto; padding: 8px 16px; }
+
+
+/* Phones: Save and Cancel side by side (44px+), the window uses the visible viewport, and site alerts move up out of Save's way */
+@media (max-width: 768px) {
+    .settings-modal-body { --modal-pad: 1.5rem; }
+    .settings-modal-container { max-height: 95vh; max-height: 95dvh; }
+    .form-actions { flex-direction: row !important; gap: .75rem; }
+    .form-actions .btn-save, .form-actions .btn-cancel { flex: 1 1 0; min-height: 48px; }
+    body:has(.settings-modal-overlay.active) .bulletin-banner,
+    body:has(.settings-modal-overlay.active) .versus-toast { bottom: auto !important; top: 64px !important; }
+}

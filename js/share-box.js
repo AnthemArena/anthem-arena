@@ -16,12 +16,12 @@ export function mountShareBox(box, { getShare, onShare = () => {}, notify = () =
         ${showText ? '<p class="share-quote"></p>' : ''}
         <div class="share-buttons">
             ${typeof navigator !== 'undefined' && navigator.share ? '<button type="button" class="share-btn" data-share="native">Share…</button>' : ''}
-            <button type="button" class="share-btn twitter" data-share="x">X</button>
+            <button type="button" class="share-btn twitter" data-share="x" aria-label="Share on X" title="Share on X"><svg class="x-logo" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></button>
             <button type="button" class="share-btn reddit" data-share="reddit">Reddit</button>
             <button type="button" class="share-btn whatsapp" data-share="whatsapp">WhatsApp</button>
             <button type="button" class="share-btn facebook" data-share="facebook">Facebook</button>
             <button type="button" class="share-btn copy" data-share="copy">Copy link</button>
-            <button type="button" class="share-btn reword" data-share="reword" title="Another line">New line</button>
+            <button type="button" class="share-btn reword" data-share="reword" title="Get another caption"><i class="fa-solid fa-shuffle" aria-hidden="true"></i> New caption</button>
         </div>`;
     const quote = box.querySelector('.share-quote');
 

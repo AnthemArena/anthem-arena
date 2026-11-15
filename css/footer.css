@@ -500,6 +500,7 @@
     color: #C8AA6E;
     margin: 0 0 0.5rem 0;
     letter-spacing: 0.02em;
+    text-wrap: balance;      /* no single word left alone on the last line */
 }
 
 .cta-text p {
@@ -699,3 +700,33 @@
         width: 100%;
     }
 }
+/* phones: a smaller share band (two buttons per row instead of a tall stack) */
+@media (max-width: 480px) {
+    .footer-cta-banner { padding: 1.1rem 0; }
+    .footer-cta-banner .cta-content { gap: .9rem; }
+    .footer-cta-banner .cta-icon { font-size: 1.8rem; }
+    .footer-cta-banner .cta-actions { flex-direction: row; flex-wrap: wrap; gap: .5rem; }
+    .footer-cta-banner .cta-actions button { flex: 1 1 calc(50% - .25rem); width: auto; min-width: 0; min-height: 44px; }
+}
+
+/* The Ko-fi ask is a quiet outlined button, so it does not compete with the share buttons above it */
+body .cta-support .btn-support,
+body.theme-arcane .cta-support .btn-support {
+    background: transparent;
+    color: inherit;
+    border: 1px solid rgba(255, 255, 255, .35);
+    box-shadow: none;
+    font-weight: 700;
+}
+body .cta-support .btn-support:hover,
+body.theme-arcane .cta-support .btn-support:hover { transform: none; border-color: #fff; box-shadow: none; color: inherit; }
+body .cta-support .btn-support:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+/* Share band: icon above the heading, then text and buttons on one centred axis (the icon beside the heading pushed it off-centre) */
+.footer-cta-banner .cta-content { flex-direction: column; gap: .9rem; }
+.footer-cta-banner .cta-icon { flex: none; animation: none; font-size: 2.2rem; line-height: 1; }
+.footer-cta-banner .cta-text { flex: none; width: 100%; max-width: 600px; min-width: 0; text-align: center; }
+.footer-cta-banner .cta-actions { justify-content: center; }
+.footer-cta-banner .cta-support { justify-content: center; text-align: center; flex-wrap: wrap; }
+.footer-cta-banner .cta-support .support-text { flex: 0 1 auto; }
+.footer-cta-banner .cta-support .support-icon { display: none; }

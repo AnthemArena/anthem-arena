@@ -20,7 +20,10 @@ export function groupNotifications(list, followingIds = new Set()) {
         const stranger = isSocialNotification(n) && !followingIds.has(n.triggerUserId);
         // Likes / comments / replies / mentions group per POST and kind, whoever did them ("3 people liked your post").
         const key = content ? `c|${n.type}|${n.eventType || ''}|${n.targetUrl || n.matchId || ''}`
-            : stranger ? `m|${n.matchId}|${n.relationship}` : `u|${n.triggerUserId || 'system'}|${n.relationship || n.type}`;
+            : stranger ? `m|${n.matchId}|${n.relationship}`
+            // Notifications from the site itself (achievements, level-ups, mastery, match alerts) have no person behind them: each stays its
+            // own row. Grouped under one "system" key, two achievements became a row reading "null voted in 2 matches".
+            : n.triggerUserId ? `u|${n.triggerUserId}|${n.relationship || n.type}` : `s|${n.id}`;
         const entry = { matchId: n.matchId, matchTitle: n.matchTitle, detail: n.detail };
         const g = groups.get(key);
         if (!g) groups.set(key, { ...n, groupKind: content ? 'content' : stranger ? 'match' : 'user', count: 1, matches: [entry], ids: [n.id], users: [n.triggerUsername].filter(Boolean), avatars: n.triggerUsername ? [n.thumbnailUrl || null] : [], userIds: n.triggerUsername ? [n.triggerUserId || null] : [] });
@@ -269,4 +272,52 @@ export function streakView(n) {
         headline: `${who} has voted ${ally ? 'with' : 'against'} you ${run}`,
         profileUrl: `/profile.html?user=${encodeURIComponent(who)}`
     };
+}
+
+// Several achievements unlocked together become ONE toast ("3 achievements unlocked"), not three stacked or replacing each other.
+// prev = the achievement toast on screen, next = the one that just arrived. Returns the toast to show (prev itself when next adds nothing new).
+const achievementXp = n => Number.isFinite(Number(n?.xp)) ? Number(n.xp) : Number((/\+(\d+)\s*XP/i.exec(String(n?.detail || '')) || [])[1]) || 0;
+export const achievementItems = n => Array.isArray(n?.achievements) && n.achievements.length
+    ? n.achievements
+    : [{ name: n?.achievementName || 'Achievement', description: n?.description || '', xp: achievementXp(n), rarity: n?.rarity || '' }];
+// ---------- Waiting alerts ----------
+// While a reward card is up, other alerts wait. Order when they are shown: rewards (level up, mastery up), then alerts about a match,
+// then people, then everything else. Rewards are never dropped; of the rest only the best one waits (the newest of its tier), since
+// the bell keeps a copy of every alert anyway.
+const REWARD_TYPES = ['level-up', 'mastery-up'];
+const SOCIAL_TYPES = ['live-activity', 'streak', 'new-follower', 'like', 'comment', 'reply', 'mention', 'emote-received'];
+const MATCH_TYPES = ['danger', 'nailbiter', 'comeback', 'winning', 'novotes', 'lowvotes', 'closing', 'match-won', 'match-lost', 'tiebreaker'];
+export function alertTier(type) {
+    if (REWARD_TYPES.includes(type)) return 0;
+    if (MATCH_TYPES.includes(type) || String(type || '').startsWith('closing')) return 1;
+    if (SOCIAL_TYPES.includes(type)) return 2;
+    return 3;
+}
+// The pop-up switches in Settings. Off only hides the pop-up: the bell keeps its copy. Rewards (level up, mastery up, achievement) follow
+// the master switch only; a champion just chosen, and the sample alerts in Settings, always show.
+const CHATTER_TYPES = ['welcome', 'encouragement'];
+export function popupAllowed(prefs, notification) {
+    const type = notification?.type;
+    if (notification?._preview || type === 'champion-selected') return true;
+    if (prefs.popups === false) return false;
+    if (SOCIAL_TYPES.includes(type) && prefs.socialPopups === false) return false;
+    if (CHATTER_TYPES.includes(type) && prefs.chatterPopups === false) return false;
+    return true;
+}
+export function holdAlert(held, incoming) {
+    const list = Array.isArray(held) ? held : [];
+    if (alertTier(incoming.type) === 0) return [...list, incoming];
+    const rewards = list.filter(h => alertTier(h.type) === 0);
+    const others = list.filter(h => alertTier(h.type) !== 0);
+    const best = others[0];
+    const keep = best && alertTier(best.type) < alertTier(incoming.type) ? best : incoming;     // a lower tier number wins; the same tier: the newer
+    return [...rewards, keep];
+}
+
+export function mergeAchievementToasts(prev, next) {
+    const have = achievementItems(prev);
+    const fresh = achievementItems(next).filter(x => !have.some(y => y.name === x.name));
+    if (!fresh.length) return prev;
+    const all = [...have, ...fresh];
+    return { ...next, achievements: all, achievementName: `${all.length} achievements`, description: '' };
 }

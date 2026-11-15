@@ -21,7 +21,7 @@ async function setupCurrentUser() {
         try {
             avatar = JSON.parse(avatarJson);
         } catch {
-            avatar = { type: 'emoji', value: '🎵' };
+            avatar = { type: 'emoji', value: '👤' };
         }
         
         // Check if user doc already exists

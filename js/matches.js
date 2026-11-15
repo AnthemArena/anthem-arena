@@ -3,6 +3,7 @@
 // ========================================
 
 // Import API Client (uses Netlify Edge cache)
+import { isExpiredLive } from './vote-closed.js';
 import { getAllMatches } from './api-client.js';
 
 // Keep Firebase for stats only
@@ -46,14 +47,20 @@ function hideLoadingSpinner() {
 // VOTE TRACKING HELPERS
 // ========================================
 
+// A vote is remembered under userVotes (the vote page and My Votes) and under vote_<cup>_<match> (the vote page and Brackets).
+// Both are checked, so a match counts as voted wherever the vote was cast.
+function readUserVotes() {
+    try { return JSON.parse(localStorage.getItem('userVotes') || '{}') || {}; } catch (e) { return {}; }
+}
+function storedChoice(matchId) {
+    try { return localStorage.getItem(`vote_${ACTIVE_TOURNAMENT}_${matchId}`); } catch (e) { return null; }
+}
 function hasUserVoted(matchId) {
-    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-    return !!userVotes[matchId];
+    return !!readUserVotes()[matchId] || !!storedChoice(matchId);
 }
 
 function getUserVotedSongId(matchId) {
-    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-    return userVotes[matchId]?.songId || null;
+    return readUserVotes()[matchId]?.songId || storedChoice(matchId) || null;
 }
 
 import { ARCANE_CONFIG } from './arcane-config.js';
@@ -91,21 +98,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Load matches from Firebase
         await loadMatchesFromFirebase();
         
-        // Load tournament stats
-        await loadTournamentStats();
-        
         // Populate filter dropdowns with actual data
         populateTournamentFilter();
         populateRoundFilter();
         
         // Setup filter event listeners
         setupFilterListeners();
+        setupStatusChips();
+        setupFilterPanel();
 
-        // ✅ SET STATUS FILTER TO 'LIVE' BY DEFAULT
-        const statusFilter = document.getElementById('status-filter');
-        if (statusFilter) {
-            statusFilter.value = 'live';
-        }
+        // Open on what needs the visitor's vote; when nothing does, on what is live, then on everything
+        applyDefaultStatus();
         
         // Apply initial filtering and sorting
         if (allMatches.length > 0) {
@@ -240,12 +243,13 @@ allMatches.push({
     round: roundName,                       // filter value, e.g. "round-1"
     roundNumber: match.round,               // for ordering the round filter
     roundLabel: match.roundLabel || null,   // the round's own name, e.g. "Final", "Semi-finals", "Round of 16"
-    status: match.status || 'upcoming',
+    // a match left live after its deadline shows as closed here too, like on the vote page
+    status: isExpiredLive(match) ? 'completed' : (match.status || 'upcoming'),
     date: match.date || null,
         endDate: match.endDate || null,  // ✅ ADD THIS LINE
 
     totalVotes: totalVotes,
-    timeLeft: match.status === 'live' ? 'Voting Open' : 'Not Started',
+    timeLeft: isExpiredLive(match) ? 'Voting closed' : match.status === 'live' ? 'Voting Open' : 'Not Started',
     hasVoted: hasVoted,
     competitor1: {
         seed: match.song1.seed,
@@ -309,8 +313,6 @@ function getRoundName(roundNumber, match) {
 
 function sortMatchesByVotePriority(matches) {
     // Get user's votes from localStorage
-    const userVotes = JSON.parse(localStorage.getItem('userVotes') || '{}');
-    
     // Separate matches into categories
     const liveNotVoted = [];
     const liveAlreadyVoted = [];
@@ -318,7 +320,7 @@ function sortMatchesByVotePriority(matches) {
     const completed = [];
     
     matches.forEach(match => {
-        const hasVoted = userVotes.hasOwnProperty(match.id);
+        const hasVoted = hasUserVoted(match.id);
         
         if (match.status === 'live') {
             if (hasVoted) {
@@ -383,6 +385,9 @@ function populateTournamentFilter() {
     // Clear existing options (except "All")
     tournamentFilter.innerHTML = '<option value="all">All Tournaments</option>';
     
+    const group = document.getElementById('tournament-group');
+    if (group) group.hidden = tournaments.filter(Boolean).length <= 1;
+
     // Add tournament options
     tournaments.forEach(tournament => {
         if (tournament) {
@@ -449,112 +454,6 @@ function exportToGlobalDatabase() {
     console.log(`✅ Exported ${allMatches.length} matches to global database`);
 }
 
-// ========================================
-// LOAD TOURNAMENT STATS
-// ========================================
-// ========================================
-// LOAD TOURNAMENT STATS
-// ========================================
-async function loadTournamentStats() {
-    try {
-        console.log('📊 Loading tournament stats from Firebase...');
-        
-        // ✅ USE EDGE CACHE (same as homepage.js)
-        const allMatches = await getAllMatches();
-        
-        let totalMatches = 0;
-        let completedMatches = 0;
-        let liveMatches = 0;
-        let upcomingMatches = 0;
-        let totalVotes = 0;
-        let uniqueSongs = new Set();
-        let uniqueTournaments = new Set();
-        
-        allMatches.forEach(match => {
-            // Count all matches (including TBD for total count)
-            totalMatches++;
-            
-            // Count by status
-            if (match.status === 'completed') {
-                completedMatches++;
-            } else if (match.status === 'live') {
-                liveMatches++;
-            } else if (match.status === 'upcoming') {
-                upcomingMatches++;
-            }
-            
-            // ✅ USE PRE-CALCULATED totalVotes (same as homepage.js)
-            totalVotes += (match.totalVotes || 0);
-            
-            // Track unique songs (only if they're real, not TBD)
-            if (match.song1?.id && match.song1.id !== 'TBD' && !String(match.song1.id).includes('TBD')) {
-                uniqueSongs.add(match.song1.id);
-            }
-            if (match.song2?.id && match.song2.id !== 'TBD' && !String(match.song2.id).includes('TBD')) {
-                uniqueSongs.add(match.song2.id);
-            }
-            
-            // Track unique tournaments
-            if (match.tournament) {
-                uniqueTournaments.add(match.tournament);
-            }
-        });
-        
-        // ✅ UPDATE DOM - Using YOUR actual HTML IDs (with hyphens!)
-        const totalMatchesEl = document.getElementById('total-matches');
-        if (totalMatchesEl) {
-            totalMatchesEl.textContent = totalMatches;
-            console.log(`✅ Updated total-matches: ${totalMatches}`);
-        } else {
-            console.warn('⚠️ #total-matches element not found');
-        }
-        
-        const totalVotesEl = document.getElementById('total-votes');
-        if (totalVotesEl) {
-            totalVotesEl.textContent = totalVotes.toLocaleString();
-            console.log(`✅ Updated total-votes: ${totalVotes}`);
-        } else {
-            console.warn('⚠️ #total-votes element not found');
-        }
-        
-        const tournamentsEl = document.getElementById('tournaments');
-        if (tournamentsEl) {
-            tournamentsEl.textContent = uniqueTournaments.size || 1;
-            console.log(`✅ Updated tournaments: ${uniqueTournaments.size || 1}`);
-        } else {
-            console.warn('⚠️ #tournaments element not found');
-        }
-        
-        const uniqueVideosEl = document.getElementById('unique-videos');
-        if (uniqueVideosEl) {
-            uniqueVideosEl.textContent = uniqueSongs.size;
-            console.log(`✅ Updated unique-videos: ${uniqueSongs.size}`);
-        } else {
-            console.warn('⚠️ #unique-videos element not found');
-        }
-        
-        console.log('✅ Tournament stats loaded:', {
-            totalMatches,
-            completedMatches,
-            liveMatches,
-            upcomingMatches,
-            totalVotes,
-            uniqueSongs: uniqueSongs.size,
-            uniqueTournaments: uniqueTournaments.size
-        });
-        
-    } catch (error) {
-        console.error('❌ Error loading tournament stats:', error);
-        
-        // Show error state - use correct IDs with hyphens
-        const statElements = ['total-matches', 'total-votes', 'tournaments', 'unique-videos'];
-        statElements.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = '—';
-        });
-    }
-}
-
 // Show "no matches" state
 function showNoMatches() {
     const grid = document.getElementById('matches-grid');
@@ -610,7 +509,7 @@ function filterMatches() {
         const roundMatch = roundValue === 'all' || match.round === roundValue;
 
         // Status filter
-        const statusMatch = statusValue === 'all' || match.status === statusValue;
+        const statusMatch = matchesStatus(match, statusValue);
 
         return searchMatch && tournamentMatch && roundMatch && statusMatch;
     });
@@ -620,6 +519,7 @@ function filterMatches() {
 
     displayMatches(filteredMatches);
     updateResultsCount(filteredMatches.length);
+    renderStatusChips();
 
     // Show empty state if no results
     if (filteredMatches.length === 0) {
@@ -653,7 +553,11 @@ case 'recent':
         
         // If both are live, maintain vote priority order (don't re-sort)
         if (aIsLive && bIsLive) {
-            return 0; // Keep existing order from sortMatchesByVotePriority
+            // unvoted first, then the match that closes soonest
+            if (a.hasVoted !== b.hasVoted) return a.hasVoted ? 1 : -1;
+            const ea = Date.parse(a.endDate || ''), eb = Date.parse(b.endDate || '');
+            if (Number.isFinite(ea) && Number.isFinite(eb)) return ea - eb;
+            return Number.isFinite(ea) ? -1 : Number.isFinite(eb) ? 1 : 0;
         }
         
         // For non-live matches, sort by date
@@ -707,56 +611,150 @@ function clearFilters() {
     if (searchInput) searchInput.value = '';
     if (tournamentFilter) tournamentFilter.value = 'all';
     if (roundFilter) roundFilter.value = 'all';
-    if (statusFilter) statusFilter.value = 'live'; // ✅ Changed from 'all' to 'live'
     if (sortFilter) sortFilter.value = 'recent';
 
     currentFilters = {
         search: '',
         tournament: 'all',
         round: 'all',
-        status: 'live', // ✅ Changed from 'all' to 'live'
+        status: defaultStatus(),
         sort: 'recent'
     };
+    if (statusFilter) statusFilter.value = currentFilters.status;
+    caughtUpFallback = false;
 
     filterMatches();
 }
 
+const PAGE_SIZE = 24;
+let pendingMatches = [];
+let shownCount = 0;
+
 function displayMatches(matches) {
     const grid = document.getElementById('matches-grid');
-    
     if (!grid) {
         console.error('❌ matches-grid element not found');
         return;
     }
-    
+    // every card in these views is live: the Live pill would say nothing, so it is only shown where states are mixed
+    grid.classList.toggle('hide-live-pill', ['needs', 'live'].includes(currentFilters.status));
+    pendingMatches = matches;
+    shownCount = 0;
     if (matches.length === 0) {
+        updateShowMore();
         showNoResults();
         return;
     }
-
-    // ✅ Clear grid and append DOM elements
     grid.innerHTML = '';
-    
-    matches.forEach(match => {
-        const card = createMatchCard(match);
-        grid.appendChild(card);
-    });
-    
-    updateLoadMoreButton(matches);
+    appendMatches(PAGE_SIZE);
 }
 
+function appendMatches(n) {
+    const grid = document.getElementById('matches-grid');
+    pendingMatches.slice(shownCount, shownCount + n).forEach(match => grid.appendChild(createMatchCard(match)));
+    shownCount = Math.min(pendingMatches.length, shownCount + n);
+    updateShowMore();
+}
 
-
-
-
-
+function updateShowMore() {
+    const wrap = document.getElementById('show-more-wrap');
+    if (!wrap) return;
+    const left = pendingMatches.length - shownCount;
+    wrap.hidden = left <= 0 || shownCount === 0;
+    if (wrap.hidden) return;
+    document.getElementById('show-more-info').textContent = `Showing ${shownCount} of ${pendingMatches.length}`;
+    document.getElementById('show-more-btn').textContent = `Show ${Math.min(PAGE_SIZE, left)} more`;
+}
 
 // Update results count
+const STATUS_NOUN = { needs: ['match needs your vote', 'matches need your vote'], live: ['live match', 'live matches'], voted: ['voted match', 'voted matches'], completed: ['finished match', 'finished matches'], all: ['match', 'matches'] };
 function updateResultsCount(count) {
     const resultsCount = document.getElementById('results-count');
-    if (resultsCount) {
-        resultsCount.textContent = `Showing ${count} ${count === 1 ? 'match' : 'matches'}`;
+    if (!resultsCount) return;
+    const status = currentFilters.status;
+    const noun = (STATUS_NOUN[status] || STATUS_NOUN.all)[count === 1 ? 0 : 1];
+    const chipTotal = statusCounts()[status] ?? allMatches.length;
+    resultsCount.textContent = count === 0 ? 'No matches'
+        : count < chipTotal ? `${count} of ${chipTotal} ${noun}`
+        : `${count} ${noun}`;
+    updateFilterControls();
+    const note = document.getElementById('caught-up');
+    if (note) {
+        const show = caughtUpFallback && currentFilters.status === 'live';
+        note.hidden = !show;
+        note.textContent = show ? "You're all caught up: you've voted in every open match." : '';
     }
+}
+
+// ----------------------------------------
+// STATUS CHIPS: Needs your vote / Live / Voted / Finished / All
+// ----------------------------------------
+let caughtUpFallback = false;
+
+// "Filters" button badge (Tournament, Round, Sort set to something other than the default) and the Reset link (anything non-default)
+function updateFilterControls() {
+    const f = currentFilters;
+    const extras = (f.tournament !== 'all' ? 1 : 0) + (f.round !== 'all' ? 1 : 0) + (f.sort !== 'recent' ? 1 : 0);
+    const badge = document.getElementById('filters-badge');
+    if (badge) { badge.hidden = !extras; badge.textContent = String(extras); }
+    const reset = document.getElementById('reset-btn');
+    if (reset) reset.hidden = !(extras || f.search || f.status !== defaultStatus());
+}
+function setupFilterPanel() {
+    const btn = document.getElementById('filters-toggle'), panel = document.getElementById('filters-panel');
+    if (btn && panel) btn.addEventListener('click', () => {
+        const open = panel.classList.toggle('open');
+        btn.setAttribute('aria-expanded', String(open));
+    });
+    const more = document.getElementById('show-more-btn');
+    if (more) more.addEventListener('click', () => appendMatches(PAGE_SIZE));
+}
+const STATUS_CHIPS = [['needs', 'Needs your vote'], ['live', 'Live'], ['voted', 'Voted'], ['completed', 'Finished'], ['all', 'All']];
+
+function matchesStatus(match, status) {
+    switch (status) {
+        case 'needs': return match.status === 'live' && !match.hasVoted;
+        case 'live': return match.status === 'live';
+        case 'voted': return !!match.hasVoted;
+        case 'completed': return match.status === 'completed';
+        default: return true;
+    }
+}
+function statusCounts() {
+    const c = {};
+    STATUS_CHIPS.forEach(([k]) => { c[k] = allMatches.filter(m => matchesStatus(m, k)).length; });
+    return c;
+}
+function defaultStatus() {
+    const c = statusCounts();
+    return c.needs ? 'needs' : c.live ? 'live' : 'all';
+}
+function applyDefaultStatus() {
+    const c = statusCounts();
+    const status = defaultStatus();
+    caughtUpFallback = !c.needs && !!c.live;
+    currentFilters.status = status;
+    const input = document.getElementById('status-filter');
+    if (input) input.value = status;
+}
+function renderStatusChips() {
+    const box = document.getElementById('status-chips');
+    if (!box) return;
+    const c = statusCounts(), cur = currentFilters.status;
+    box.innerHTML = STATUS_CHIPS.map(([k, label]) =>
+        `<button type="button" class="mt-chip${k === cur ? ' active' : ''}" data-status="${k}" aria-pressed="${k === cur}">${label} <span class="mt-chip-count">${c[k]}</span></button>`).join('');
+}
+function setupStatusChips() {
+    const box = document.getElementById('status-chips');
+    if (!box) return;
+    box.addEventListener('click', e => {
+        const chip = e.target.closest('.mt-chip');
+        if (!chip) return;
+        const input = document.getElementById('status-filter');
+        if (input) input.value = chip.dataset.status;
+        caughtUpFallback = false;
+        filterMatches();
+    });
 }
 
 // Show no results state
@@ -764,24 +762,24 @@ function showNoResults() {
     const grid = document.getElementById('matches-grid');
     if (!grid) return;
     
+    const status = document.getElementById('status-filter')?.value;
+    if (status === 'needs' && !currentFilters.search && currentFilters.tournament === 'all' && currentFilters.round === 'all') {
+        grid.innerHTML = `
+        <div class="no-results">
+            <h3 class="no-results-title">You're all caught up</h3>
+            <p class="no-results-text">You've voted in every open match. Look at your picks under Voted, or see what's finished.</p>
+        </div>`;
+        return;
+    }
     grid.innerHTML = `
         <div class="no-results">
             <div class="no-results-icon">🔍</div>
             <h3 class="no-results-title">No Matches Found</h3>
             <p class="no-results-text">Try adjusting your filters or search terms</p>
-            <button class="clear-filters-btn" onclick="clearFilters()">Clear All Filters</button>
+            <button class="clear-filters-btn" onclick="clearFilters()">Reset</button>
         </div>
     `;
     
-    const loadMoreContainer = document.querySelector('.load-more-container');
-    if (loadMoreContainer) {
-        loadMoreContainer.style.display = 'none';
-    }
-}
-
-// Load more matches (pagination)
-function loadMoreMatches() {
-    showNotification('All matches loaded', 'info');
 }
 
 // AFTER:
@@ -810,19 +808,6 @@ function showMatchDetails(matchId) {
     setTimeout(() => {
         window.location.href = `vote?match=${matchId}`;
     }, 500);
-}
-
-// Update load more button visibility
-function updateLoadMoreButton(matches) {
-    const loadMoreContainer = document.querySelector('.load-more-container');
-    
-    if (!loadMoreContainer) return;
-    
-    if (matches.length >= allMatches.length) {
-        loadMoreContainer.style.display = 'none';
-    } else {
-        loadMoreContainer.style.display = 'flex';
-    }
 }
 
 /**
@@ -939,7 +924,6 @@ function showMatchesError(error) {
 window.filterMatches = filterMatches;
 window.sortMatches = sortMatches;
 window.clearFilters = clearFilters;
-window.loadMoreMatches = loadMoreMatches;
 window.voteNow = voteNow;
 window.showMatchDetails = showMatchDetails;
 

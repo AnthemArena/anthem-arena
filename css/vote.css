@@ -276,7 +276,7 @@
 .vote-count {
     font-family: 'Lora', serif;
     font-size: 0.95rem;
-    color: #777;
+    color: #b7b2bc;
 }
 
 /* Leading Competitor Highlight */
@@ -3089,15 +3089,16 @@
 /* ========================================
    PORTRAIT PLAYERS FOR SHORTS (14 Oct)
    The players were 16:9, so a vertical Short filled only the middle half of the box between two black bars.
-   They are now 9:16 (like the gallery player in css/arcane-player.css), capped so a player, its buttons and its vote
+   They are now the edit's own shape (9:16 until it is known), capped so a player, its buttons and its vote
    button come close to fitting one screen.
    ======================================== */
 .video-wrapper {
     --player-h: min(64vh, 640px);
     height: auto;
     padding-bottom: 0;
-    aspect-ratio: 9 / 16;
-    width: min(100%, calc(var(--player-h) * 9 / 16));
+    --ar: .5625;                       /* the edit's own shape (js/watch-dialog.js sets it from data/edits.json); 9:16 until known */
+    aspect-ratio: var(--ar);
+    width: min(100%, calc(var(--player-h) * var(--ar)));
     margin: 0 auto;
 }
 @supports (height: 1dvh) {
@@ -3150,7 +3151,11 @@
 }
 .next-bar-btn:focus-visible { outline: 2px solid var(--pink-bright, #ff70c3); outline-offset: 3px; }
 /* keep the end of the page clear of the bar */
-body.has-next-bar { padding-bottom: 5.5rem; }
+body.has-next-bar { padding-bottom: 8rem; }
+html:has(body.has-next-bar) { scroll-padding-bottom: 8rem; }   /* focus and anchors scroll clear of the bar */
+.next-match-bar { transition: transform .25s ease, opacity .25s ease; }
+.next-match-bar.is-tucked { transform: translateY(110%); opacity: 0; visibility: hidden; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .next-match-bar { transition: none; } }
 @media (max-width: 480px) {
     .next-match-bar { gap: .6rem; padding-left: .8rem; padding-right: .8rem; }
     .next-bar-text strong { font-size: .85rem; }
@@ -3173,7 +3178,7 @@ body.has-next-bar { padding-bottom: 5.5rem; }
 }
 
 /* ========================================
-   PHONE ORDER (<= 968 px, one column): player A, vote A, VS, player B, vote B, THEN the "About" blocks.
+   PHONE ORDER (<= 968 px, one column): player A, VS, player B, THEN both vote buttons (so nobody votes before seeing both), then the "About" blocks.
    The About block of edit A used to sit between A's vote button and edit B's player, so B's video was about
    three screens below A's. The columns become transparent (display: contents) so their parts can be re-ordered.
    ======================================== */
@@ -3183,13 +3188,14 @@ body.has-next-bar { padding-bottom: 5.5rem; }
     #competitor-1-column, #competitor-2-column { display: contents; }
     #competitor-1-column .competitor-header { order: 1; }
     #competitor-1-column .video-container   { order: 2; }
-    #competitor-1-column .vote-section      { order: 3; }
-    .competitors-grid > .vs-divider         { order: 4; }
-    #competitor-2-column .competitor-header { order: 5; }
-    #competitor-2-column .video-container   { order: 6; }
-    #competitor-2-column .vote-section      { order: 7; }
-    #competitor-1-column .moment-details    { order: 8; }
-    #competitor-2-column .moment-details    { order: 9; }
+    .competitors-grid > .vs-divider         { order: 3; }
+    #competitor-2-column .competitor-header { order: 4; }
+    #competitor-2-column .video-container   { order: 5; }
+    .competitors-grid > .vote-final-note    { order: 6; }
+    #competitor-1-column .vote-section      { order: 7; }
+    #competitor-2-column .vote-section      { order: 8; }
+    #competitor-1-column .moment-details    { order: 9; }
+    #competitor-2-column .moment-details    { order: 10; }
     .details-for { display: block; margin: 0 0 .5rem; font-weight: 800; font-size: .95rem; color: var(--pink-bright, #ff70c3); overflow-wrap: anywhere; }
 }
 
@@ -3241,3 +3247,105 @@ body.has-next-bar { padding-bottom: 5.5rem; }
     text-align: center;
 }
 .pvm-share-box .share-quote { max-width: none; margin-bottom: .6rem; font-size: .92rem; text-align: left; }
+
+/* while a pop-up alert is showing, the inline champion bubble steps aside (hidden, not removed, so the page does not jump when it returns) */
+#champion-bubble { transition: opacity .2s ease; }
+html.toast-up #champion-bubble { opacity: 0; visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { #champion-bubble { transition: none; } }
+
+
+/* ========================================
+   AFTER VOTING: statuses read as statuses, and one share block per page
+   ======================================== */
+html body.theme-arcane .vote-btn.voted,
+html body .vote-btn.voted {
+    background: rgba(255, 79, 180, .14) !important;
+    border: 2px solid var(--pink, #ff4fb4) !important;
+    box-shadow: none !important;
+    color: #fff !important;
+    cursor: default;
+}
+html body.theme-arcane .vote-btn.not-selected,
+html body.theme-arcane .vote-btn.not-selected[disabled],
+html body .vote-btn.not-selected,
+html body .vote-btn.not-selected[disabled] {
+    opacity: 1 !important;
+    filter: none !important;
+    background: transparent !important;
+    border: 1px dashed rgba(255, 255, 255, .28) !important;
+    box-shadow: none !important;
+    color: #c9c4cc !important;      /* 4.5:1+ on the near-black page */
+    cursor: default;
+}
+/* The page already has its own share box under the result: the site-wide share row in the footer would be a second one.
+   The support line (Ko-fi) stays, as a quiet outlined button. */
+.page-vote .footer-cta-banner .cta-icon,
+.page-vote .footer-cta-banner .cta-text,
+.page-vote .footer-cta-banner .cta-actions,
+.page-vote .footer-cta-banner .cta-divider { display: none; }
+.page-vote .btn-support {
+    background: transparent;
+    color: inherit;
+    border: 1px solid rgba(255, 255, 255, .35);
+    box-shadow: none;
+}
+.page-vote .btn-support:hover { border-color: #fff; box-shadow: none; }
+.match-card .stat.timer { white-space: nowrap; }
+.share-btn .x-logo { vertical-align: -2px; }
+
+
+/* ========================================
+   BEFORE VOTING: the page is only about the vote (body.pre-vote, set in js/vote.js)
+   ======================================== */
+.vote-final-note { display: none; grid-column: 1 / -1; grid-row: 5; margin: 1.25rem auto 0; padding: 0 1rem; max-width: 40rem; text-align: center; font-size: .95rem; color: #d8d3dc; }
+@media (max-width: 968px) { .vote-final-note { grid-row: auto; margin: 0 auto; } }
+body.pre-vote .vote-final-note { display: block; }
+/* seeds are hidden until you have voted, so nobody just backs the higher seed */
+body.pre-vote .seed-badge,
+body.pre-vote .meta-item.seed { display: none !important; }
+/* the share block and the other matches wait until the vote is in */
+body.pre-vote #share-section,
+body.pre-vote #other-matches-section,
+body.pre-vote .after-voting-section,
+body.pre-vote .footer-cta-banner { display: none !important; }
+/* the vote buttons repeat the entry's name in sentence case: long titles wrap instead of shouting or running off */
+html body.theme-arcane .vote-btn,
+html body .vote-btn { text-transform: none; letter-spacing: .01em; }
+.vote-btn .vote-text { overflow-wrap: anywhere; text-wrap: balance; }
+
+/* Inline confirm under the tapped vote button */
+.vote-confirm { margin-top: .75rem; padding: .9rem 1rem; border: 2px solid var(--pink, #ff4fb4); border-radius: 12px; background: rgba(255, 79, 180, .1); text-align: center; }
+.vote-confirm-text { margin: 0 0 .75rem; font-size: 1rem; line-height: 1.35; overflow-wrap: anywhere; }
+.vote-confirm-actions { display: flex; gap: .6rem; }
+.vote-confirm-actions button { flex: 1; min-height: 48px; border-radius: 10px; font: 700 1rem var(--font, system-ui, sans-serif); cursor: pointer; }
+.vote-confirm-yes { background: var(--pink, #ff4fb4); border: 2px solid var(--pink, #ff4fb4); color: #160814; }
+.vote-confirm-no { background: transparent; border: 2px solid rgba(255, 255, 255, .4); color: #fff; }
+.vote-confirm-actions button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+
+/* ========================================
+   AFTER VOTING ON A PHONE: each result card names its entry; touch targets
+   ======================================== */
+.vote-result-name { display: none; }
+@media (max-width: 968px) {
+    .vote-stats .vote-result-name { display: block; margin: 0 0 .35rem; font-weight: 700; font-size: .95rem; line-height: 1.25; overflow-wrap: anywhere; color: #fff; }
+    .control-btn, #share-panel .share-btn, .next-bar-btn, .other-matches-section .vote-btn, .other-matches-section .btn { min-height: 44px; }
+}
+
+
+/* "What's Next?" is four links, not a section of its own: one short row (2 x 2 on a phone) */
+html body .after-voting-section { padding: 1.75rem 0; margin-top: 2rem; }
+html body .after-voting-section .section-title { font-size: 1.5rem; margin-bottom: 1rem; }
+html body .after-voting-section .section-subtitle { display: none; }
+html body .after-voting-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+html body .after-voting-card { padding: 1.1rem 1rem; border-radius: 12px; }
+html body .after-voting-card:hover { transform: none; }
+html body .after-voting-card .card-icon { font-size: 1.6rem; margin-bottom: .5rem; }
+html body .after-voting-card h3 { font-size: 1.15rem; margin-bottom: .35rem; }
+html body .after-voting-card p { font-size: .82rem; line-height: 1.4; margin-bottom: 0; }
+html body .after-voting-card .card-arrow { display: none; }
+@media (max-width: 768px) {
+    html body .after-voting-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+    html body .after-voting-card p { display: none; }
+    html body .after-voting-card { min-height: 44px; align-items: center; }
+}

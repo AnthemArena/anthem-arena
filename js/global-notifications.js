@@ -1,6 +1,7 @@
 console.log('🔔 global-notifications.js loaded');
 
 // ✅ ADD THIS LINE:
+import { getChampionImageUrl } from './arcane-config.js';
 import './champion-loader.js';
 
 import { getActivityFeed } from './api-client.js';
@@ -8,8 +9,8 @@ import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from './no
 import { fillWelcomeText } from './champion-lines.js';
 import { getFollowingIds } from './follow-system.js';
 import { EMOTES_ENABLED, withoutEmoteCta } from './features.js';
-import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY, isEventNotification, isStripAlert, tieBreakerCandidates, eventKind, eventTag, eventGlyph, eventChips, eventUrl, isStreakNotification, streakView, eventButtonUrl, achievementButtonUrl, dangerShouldAlert, onceKey, wasShownOnce, markShownOnce, encouragementDue } from './notification-model.js';
-import { setCenteredSplash, avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, eventToastHtml, levelBadgeHtml, hexToRgba, darken, toastSplashUrl, profileSplashUrl, splashFromAvatarSrc, ensureVersusStyles } from './notification-visuals.js';
+import { socialHeadline, isFollowNotification, isFollowBack, followHeadline, followQuip, groupNotifications, isContentNotification, contentHeadline, contentQuote, contentIcon, contentCta, CONTENT_TYPES, CONTENT_PRIORITY, isEventNotification, isStripAlert, tieBreakerCandidates, eventKind, eventTag, eventGlyph, eventChips, eventUrl, isStreakNotification, streakView, eventButtonUrl, achievementButtonUrl, dangerShouldAlert, onceKey, wasShownOnce, markShownOnce, encouragementDue, mergeAchievementToasts, achievementItems, holdAlert, popupAllowed } from './notification-model.js';
+import { avatarSrc, viewerAvatarSrc, fallbackAvatarFor, championBadgeUrl, accentFor, toastHtml, followToastHtml, contentToastHtml, achievementToastHtml, eventToastHtml, levelBadgeHtml, hexToRgba, darken, toastSplashUrl, profileSplashUrl, splashFromAvatarSrc, ensureVersusStyles, levelUpToastHtml, masteryToastHtml } from './notification-visuals.js';
 import { socialContextFor, eventContextFor } from './notification-social-context.js';
 import { checkNewReactions, markReactionSeen } from './emote-system.js';
 import { 
@@ -20,6 +21,7 @@ import {
 
 // ✅ Import Firestore functions separately
 import { db } from './firebase-config.js';
+import { escapeHtml, safeImageUrl } from './html-escape.js';
 import { 
     collection, 
     query, 
@@ -1267,7 +1269,7 @@ const isAlly = userVoteData.songId === activity.choice;
 
             // Settings: only people I follow?
             const followed = followingIds.has(activity.userId);
-            if (!shouldSaveSocial(prefs, followed)) {
+            if (!shouldSaveSocial(prefs, followed, isAlly)) {
                 lastSeenActivityIds.add(activity.activityId);
                 continue;
             }
@@ -1283,7 +1285,7 @@ const savedId = await saveNotification(userId, {
 });                savedCount++;
                 // Pop the toast too (one per check, only for votes from the last hour). This was missing: the row was saved
                 // to the bell but nothing ever showed the toast while the page was open.
-                if (savedId && !toastShown && activity.timestamp > toastCutoff && !document.hidden && shouldToastSocial(prefs, followed)) {
+                if (savedId && !toastShown && activity.timestamp > toastCutoff && !document.hidden && shouldToastSocial(prefs, followed, isAlly)) {
                     toastShown = true;
                     const nv = await socialContextFor(notificationData);     // avatars + edit pictures (never blocks long)
                     showBulletin({
@@ -1888,7 +1890,7 @@ async function showEncouragementToast(type = 'gentle') {
         
         const voiced = type === 'gentle' ? window.championLoader?.getChampionMessage?.('encouragement', {}) : null;
         const plain = {
-            gentle: { message: 'Still deciding? Pick your favourite edit.', detail: 'See the results in real time once you have voted.', cta: 'Vote now' },
+            gentle: { message: 'Still deciding? Pick your favorite edit.', detail: 'See the results in real time once you have voted.', cta: 'Vote now' },
             urgent: { message: 'Matches are closing soon.', detail: "Don't miss your chance to influence the winners.", cta: 'Cast your votes' }
         };
         const config = (voiced && voiced.message && voiced) || plain[type] || plain.gentle;
@@ -1955,8 +1957,26 @@ function deferForVoteModal(notification) {
     modalWatcher.observe(modal, { attributes: true, attributeFilter: ['class'] });
 }
 
+// One alert at a time, achievements first: while an achievement is on screen, another achievement joins it ("2 achievements unlocked")
+// and any other alert waits (the newest one) until it closes. Callers save their own bell copy, so a held alert is never lost from the history.
+let heldWhileAchievement = [];     // level-ups and mastery-ups all wait (in order); any other alert keeps only the newest
+
 function showBulletin(notification) {
     notification = withoutEmoteCta(notification);      // emotes are off: a thanks / challenge button becomes "View match"
+    if (!popupAllowed(readNotificationPrefs(), notification)) return;      // Settings > Notifications: the pop-up is off (the bell keeps its copy)
+
+    const achievementUp = currentBulletin?.type === 'achievement' && document.getElementById('bulletin-banner')?.classList.contains('show');
+    if (achievementUp && !notification._afterAchievement) {
+        const incomingType = notification.type;
+        if (incomingType === 'achievement' && notification.achievementName && currentBulletin.achievementName) {
+            notification = mergeAchievementToasts(currentBulletin, notification);      // joins the one on screen
+        } else if (incomingType !== 'achievement') {
+            heldWhileAchievement = holdAlert(heldWhileAchievement, notification);      // waits its turn: rewards first, then match, people, the rest
+            return;
+        } else {
+            return;     // an unnamed achievement note (e.g. the Founding Member XP line) adds nothing to the card already up
+        }
+    }
 
     // ✅ Final safety net
     if (!notification.matchId) {
@@ -1987,6 +2007,12 @@ function showBulletin(notification) {
         banner = document.createElement('div');
         banner.id = 'bulletin-banner';
         banner.className = 'bulletin-banner';
+        banner.setAttribute('role', 'status');          // read out politely; focus is never moved to the alert
+        banner.setAttribute('aria-live', 'polite');
+        banner.addEventListener('mouseenter', pauseBulletinTimer);
+        banner.addEventListener('mouseleave', resumeBulletinTimer);
+        banner.addEventListener('focusin', pauseBulletinTimer);
+        banner.addEventListener('focusout', resumeBulletinTimer);
         document.body.appendChild(banner);
         
         // Inject styles only once
@@ -2492,15 +2518,11 @@ function showBulletin(notification) {
     currentBulletin = notification;
     currentBulletinShownAt = Date.now();
 
-    // ✅ ESC key handler
-const escapeHandler = (e) => {
-    if (e.key === 'Escape' && currentBulletin) {
-        hideBulletin();
-        document.removeEventListener('keydown', escapeHandler);
+    // Escape closes the alert (same as the ×): one listener for the page, not one per alert
+    if (!window.__bulletinEscape) {
+        window.__bulletinEscape = true;
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && currentBulletin) window.dismissBulletin(); });
     }
-};
-
-document.addEventListener('keydown', escapeHandler);
 
 
 // ✅ Apply champion pack theme
@@ -2586,14 +2608,28 @@ if (championPack && championPack.theme) {
         banner.style.setProperty('--nv-tint', hexToRgba(accent, 0.14));
         banner.style.setProperty('--nv-line', hexToRgba(accent, 0.4));
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
-        setCenteredSplash(banner);
-        banner.innerHTML = eventToastHtml(notification, {
-            tag: { 'mastery-up': 'Mastery up', 'champion-selected': 'Your champion' }[notification.type] || 'Level up', accent, jinxSrc: championBadgeUrl(pack),
-            ...(notification.type === 'champion-selected' ? { glyph: '' } : { leadHtml: levelBadgeHtml(level, accent) }),
-            strip: notification.strip || null,
-            quip: notification.message, detail: notification.detail, cta: notification.cta || (notification.type === 'level-up' ? 'View progress' : 'View champions')
-        });
-        banner.className = 'bulletin-banner versus-toast event level-up-card';
+        if (notification.type === 'champion-selected') {
+            banner.innerHTML = eventToastHtml(notification, {
+                tag: 'Your champion', accent, jinxSrc: championBadgeUrl(pack), glyph: '', strip: notification.strip || null,
+                quip: notification.message, detail: notification.detail, cta: notification.cta || 'View champions'
+            });
+            banner.className = 'bulletin-banner versus-toast event level-up-card';
+        } else if (notification.type === 'mastery-up') {
+            // per champion: their face and name, the new mastery number, and the skins it unlocked (only when there were some)
+            const champ = notification.packId ? notification.packId.charAt(0).toUpperCase() + notification.packId.slice(1) : (pack?.name || '');
+            banner.innerHTML = masteryToastHtml(notification, {
+                level, champion: champ, unlocked: /^Unlocked:/i.test(notification.detail || '') ? notification.detail : '',
+                faceSrc: (notification.packId && championBadgeUrl({ id: notification.packId, icon: getChampionImageUrl(champ) })) || championBadgeUrl(pack), line: notification.message, jinxSrc: championBadgeUrl(pack), accent, cta: notification.cta
+            });
+            banner.className = 'bulletin-banner versus-toast opponent reward-card';
+        } else {
+            // account level: the number is the picture; rank title and the XP to the next level only when they are known
+            banner.innerHTML = levelUpToastHtml(notification, {
+                level, rank: notification.rankTitle || '', nextText: notification.xpToNext ? `${notification.xpToNext} XP to Level ${notification.nextLevel || Number(level) + 1}` : '',
+                line: notification.message, jinxSrc: championBadgeUrl(pack), accent, cta: notification.cta
+            });
+            banner.className = 'bulletin-banner versus-toast opponent reward-card';
+        }
     } 
    // ✅ DEFAULT STYLING (for match alerts, welcome, etc.)
 // ✅ DEFAULT STYLING (for match alerts, welcome, etc.)
@@ -2612,15 +2648,15 @@ else {
             thumbnailHtml = `
                 <div class="bulletin-thumbnail" style="position: relative; width: 64px; height: 64px;">
                     <!-- User avatar (large background) -->
-                    <img src="${notification.thumbnailUrl}" 
-                         alt="${username}"
+                    <img src="${safeImageUrl(notification.thumbnailUrl)}" 
+                         alt="${escapeHtml(username)}"
                          class="thumbnail-img" 
                          style="width: 100%; height: 100%; border-radius: 12px; object-fit: cover; border: 2px solid rgba(200, 170, 110, 0.3); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);">
                     
                     <!-- Song thumbnail (small overlay bottom-right) -->
                     ${notification.secondaryThumbnail ? `
-                        <img src="${notification.secondaryThumbnail}"
-                             alt="${notification.song || 'Song'}"
+                        <img src="${safeImageUrl(notification.secondaryThumbnail)}"
+                             alt="${escapeHtml(notification.song || 'Song')}"
                              style="
                                  position: absolute;
                                  bottom: -6px;
@@ -2665,7 +2701,7 @@ else {
                     
                     <!-- Song thumbnail (small overlay bottom-right) -->
                     ${notification.secondaryThumbnail ? `
-                        <img src="${notification.secondaryThumbnail}"
+                        <img src="${safeImageUrl(notification.secondaryThumbnail)}"
                              alt="${notification.song || 'Song'}"
                              style="
                                  position: absolute;
@@ -2687,7 +2723,7 @@ else {
     else if (notification.thumbnailUrl) {
         thumbnailHtml = `
             <div class="bulletin-thumbnail">
-                <img src="${notification.thumbnailUrl}" 
+                <img src="${safeImageUrl(notification.thumbnailUrl)}" 
                      alt="${notification.song || 'Match'}" 
                      class="thumbnail-img">
                 <div class="thumbnail-overlay">${icon}</div>
@@ -2731,7 +2767,6 @@ else {
         banner.style.setProperty('--nv-glow', 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', 'rgba(255,105,180,0.14)');
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
-        setCenteredSplash(banner);
         banner.innerHTML = followToastHtml(notification, {
             theirSrc: notification.nv?.theirSrc || avatarSrc(notification.thumbnailUrl) || fallbackAvatarFor(notification.triggerUsername || notification.username),
             jinxSrc: championBadgeUrl(pack),
@@ -2740,7 +2775,7 @@ else {
             headline: followHeadline(notification),
             cta: notification.ctaText || 'Follow back'
         });
-        banner.className = 'bulletin-banner versus-toast opponent';
+        banner.className = 'bulletin-banner versus-toast opponent reward-card';
     } else if (notification.contentGroup && isContentNotification(notification.contentGroup)) {
         // Like / comment / reply / mention (possibly a crowd): same card family, shows the words, opens the post
         ensureVersusStyles();
@@ -2756,9 +2791,8 @@ else {
         // No champion speaking here: the backdrop is the splash of the person's own champion avatar (a crowd uses the first
         // face); someone without a champion avatar falls back to the viewer's profile banner
         banner.style.setProperty('--nv-splash', `url("${splashFromAvatarSrc(srcs[0]) || profileSplashUrl(pack)}")`);
-        setCenteredSplash(banner);
         banner.innerHTML = contentToastHtml(g, { parts: contentHeadline(g), quote: contentQuote(g), icon: contentIcon(g), cta: contentCta(g), accent, srcs, names });
-        banner.className = 'bulletin-banner versus-toast opponent';
+        banner.className = 'bulletin-banner versus-toast opponent reward-card';
     } else if (notification.type === 'achievement') {
         // Achievement: same pop-up family as the social alerts (splash backdrop, champion bubble)
         ensureVersusStyles();
@@ -2769,19 +2803,22 @@ else {
         banner.style.setProperty('--nv-glow', 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', 'rgba(255,105,180,0.14)');
         banner.style.setProperty('--nv-splash', `url("${toastSplashUrl(pack)}")`);
-        setCenteredSplash(banner);
+        const items = achievementItems(notification);
         const xpMatch = /\+(\d+)\s*XP/i.exec(`${notification.detail || ''}`);
+        const xpTotal = items.length > 1 ? items.reduce((t, i) => t + (Number(i.xp) || 0), 0) : (xpMatch ? Number(xpMatch[1]) : (Number(notification.xp) || 0));
         banner.innerHTML = achievementToastHtml(notification, {
             icon: notification.thumbnailUrl,
             name: notification.achievementName || 'Achievement',
             line: String(notification.detail || '').replace(/\s*[•·-]?\s*\+\d+\s*XP.*$/i, '').trim() || notification.message,
-            xp: xpMatch ? xpMatch[1] : '',
+            xp: xpTotal ? String(xpTotal) : '',
             rarity: notification.rarity,
+            description: notification.description || '',
+            items,
             jinxSrc: championBadgeUrl(pack),
             accent,
             cta: notification.cta
         });
-        banner.className = 'bulletin-banner versus-toast opponent';
+        banner.className = 'bulletin-banner versus-toast opponent reward-card';
     } else if (isStreakNotification(notification)) {
         // A streak with one person: the ally / rival card with a View profile button
         ensureVersusStyles();
@@ -2794,17 +2831,16 @@ else {
         banner.style.setProperty('--nv-glow', ally ? 'rgba(74,222,128,0.3)' : 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', ally ? 'rgba(74,222,128,0.14)' : 'rgba(255,105,180,0.14)');
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
-        setCenteredSplash(banner);
         const who = notification.triggerUsername || notification.username;
         const drawStreak = () => {
             banner.innerHTML = toastHtml({ ...notification, relationship: view.relationship, targetUrl: view.profileUrl }, {
                 theirSrc: notification.nv?.theirSrc || fallbackAvatarFor(who),
                 yourSrc: notification.nv?.yourSrc || viewerAvatarSrc() || fallbackAvatarFor(localStorage.getItem('username')),
-                jinxSrc: championBadgeUrl(pack), accent, headline: view.headline, quip: notification.message, cta: 'View profile'
+                jinxSrc: championBadgeUrl(pack), accent, headline: view.headline, quip: notification.detail || notification.message, cta: 'View profile'
             });
         };
         drawStreak();
-        banner.className = `bulletin-banner versus-toast ${view.relationship}`;
+        banner.className = `bulletin-banner versus-toast ${view.relationship} reward-card`;
         if (!notification.nv) {
             socialContextFor({ triggerUserId: notification.triggerUserId, triggerUsername: who }).then(nv => {
                 notification.nv = nv;
@@ -2823,7 +2859,6 @@ else {
         banner.style.setProperty('--nv-tint', hexToRgba(accent, 0.14));
         banner.style.setProperty('--nv-line', hexToRgba(accent, 0.4));
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
-        setCenteredSplash(banner);
         const drawEvent = () => {
             banner.innerHTML = eventToastHtml(notification, {
                 tag: eventTag(notification), glyph: eventGlyph(notification), edits: notification.nv?.edits || null, strip: notification.nv?.strip || null, accent, jinxSrc: championBadgeUrl(pack),
@@ -2849,7 +2884,6 @@ else {
         banner.style.setProperty('--nv-glow', notification.relationship === 'ally' ? 'rgba(74,222,128,0.3)' : 'rgba(255,105,180,0.35)');
         banner.style.setProperty('--nv-tint', notification.relationship === 'ally' ? 'rgba(74,222,128,0.14)' : 'rgba(255,105,180,0.14)');
         banner.style.setProperty('--nv-splash', `url(\"${toastSplashUrl(pack)}\")`);
-        setCenteredSplash(banner);
         banner.innerHTML = toastHtml(notification, {
             theirSrc: notification.nv?.theirSrc || avatarSrc(notification.thumbnailUrl) || fallbackAvatarFor(notification.triggerUsername || notification.username),
             yourSrc: notification.nv?.yourSrc || viewerAvatarSrc() || fallbackAvatarFor(localStorage.getItem('username')),
@@ -2859,14 +2893,14 @@ else {
             quip: notification.detail,
             cta: notification.ctaText || notification.cta || 'View match'
         });
-        banner.className = `bulletin-banner versus-toast ${notification.relationship}`;
+        banner.className = `bulletin-banner versus-toast ${notification.relationship} reward-card`;
     } else {
     banner.innerHTML = `
         <div class="bulletin-toast-content">
             ${thumbnailHtml}
             <div class="bulletin-toast-text">
-                <div class="bulletin-message">${notification.message}</div>
-                <div class="bulletin-detail">${notification.detail}</div>
+                <div class="bulletin-message">${escapeHtml(notification.message)}</div>
+                <div class="bulletin-detail">${escapeHtml(notification.detail)}</div>
             </div>
             <button class="bulletin-close" onclick="window.dismissBulletin()">×</button>
         </div>
@@ -2877,6 +2911,10 @@ else {
     }
 }
 
+// On the match's own page the pill has nowhere new to go: it stops looking tappable (the × still closes it)
+banner.classList.toggle('nv-here', pillGoesHere(notification));
+document.documentElement.classList.add('toast-up');     // the vote page's inline champion bubble steps aside while an alert speaks
+armBulletinTimer();
 setTimeout(() => banner.classList.add('show'), 10);
 
 console.log(`📢 Bulletin shown: ${notification.type}`);
@@ -2888,10 +2926,42 @@ window.lastShownBulletin = { type: notification.type, matchId: notification.matc
 // BULLETIN ACTIONS
 // ========================================
 
+// Alerts close themselves after a few seconds (the same as pressing the ×, so the same alert does not come straight back). Hovering
+// or tabbing into the alert pauses the clock; a card with a button to press stays a little longer.
+const BULLETIN_MS = 9000, BULLETIN_MS_ACTION = 14000, BULLETIN_MS_ACHIEVEMENT = 20000;   // an achievement has more to read, so it stays longest
+let bulletinTimer = null, bulletinPaused = false;
+function armBulletinTimer() {
+    clearTimeout(bulletinTimer);
+    bulletinPaused = false;
+    const b = currentBulletin;
+    if (!b) return;
+    const ms = ['achievement', 'level-up', 'mastery-up'].includes(b.type) ? BULLETIN_MS_ACHIEVEMENT : b.cta || b.ctaText ? BULLETIN_MS_ACTION : BULLETIN_MS;
+    bulletinTimer = setTimeout(() => { if (!bulletinPaused && currentBulletin === b) window.dismissBulletin(); }, ms);
+}
+function pauseBulletinTimer() { bulletinPaused = true; clearTimeout(bulletinTimer); }
+function resumeBulletinTimer() { if (currentBulletin) armBulletinTimer(); }
+
+// true when the pill's target is the vote page that is already open for the same match
+function pillGoesHere(b) {
+    try {
+        const here = new URL(window.location.href);
+        const to = new URL(isEventNotification(b) ? eventUrl(b) : (b.targetUrl || ''), here);
+        const isVote = u => /\/vote(\.html)?\/?$/.test(u.pathname);
+        const id = to.searchParams.get('match');
+        return isVote(here) && isVote(to) && !!id && id === here.searchParams.get('match') && !to.searchParams.get('share');
+    } catch { return false; }
+}
+
 function hideBulletin() {
+    clearTimeout(bulletinTimer);
+    document.documentElement.classList.remove('toast-up');
     const banner = document.getElementById('bulletin-banner');
     if (banner) {
         banner.classList.remove('show');
+    }
+    if (heldWhileAchievement.length) {                // the alert(s) that waited for the achievement card, one at a time
+        const held = heldWhileAchievement.shift();
+        setTimeout(() => showBulletin(Object.assign({}, held, { _afterAchievement: true })), 700);
     }
 }
 
@@ -2952,6 +3022,9 @@ window.dismissBulletin = function() {
 // Clicking the body of a versus toast opens its match (its button opens the other voter's profile).
 window.openBulletinMatch = function() {
     const b = currentBulletin;
+    if (document.getElementById('bulletin-banner')?.classList.contains('nv-here')) return;   // already on that match
+    // An alert whose only job is to say hello (action 'dismiss') has nowhere to go: tapping it closes it (its button used to do that)
+    if (b && b.action === 'dismiss') { window.dismissBulletin(); return; }
     if (isStreakNotification(b)) { hideBulletin(); window.location.href = streakView(b).profileUrl; return; }
     if (!b) return;
     // Level-up, mastery, champion-selected: the card does what the button does
@@ -3084,7 +3157,6 @@ function initBulletinSystem() {
         'vote.html',
         'matches.html',
         'feed.html',
-        'activity.html',
         'brackets.html',
         'profile.html',
             'profile',        // ✅ Add this for /profile URLs without .html

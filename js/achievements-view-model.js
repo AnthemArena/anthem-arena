@@ -56,17 +56,20 @@ export function buildAchievementsView({ unlockedIds = [], own = false, stats = n
     return { sections, unlockedTotal: unlockedKnown };
 }
 
+import { achievementBadgeHtml, hasAchievementIcon } from './achievement-icons.js';
+
 // ---------- HTML (pure, so it is tested without a browser) ----------
 const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 export function achievementCardHtml(it) {
     const isUrl = typeof it.icon === 'string' && /^(https?:)?\//.test(it.icon);
-    const icon = isUrl
+    const drawn = hasAchievementIcon(it.id) ? achievementBadgeHtml(it.id, it.rarity, { size: 56, locked: !it.unlocked }) : '';
+    const icon = drawn || (isUrl
         ? `<img src="${esc(it.icon)}" alt="" class="achievement-icon-img" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.style.display='none'; this.parentElement.textContent='\u{1F3C6}';">`
-        : esc(it.icon);
+        : esc(it.icon));
     const skinNote = it.skins.length ? `<div class="ach-skin-note">Unlocks the ${it.skins.map(s => esc(s.name)).join(', ')} skin</div>` : '';
     const progress = !it.unlocked && it.progress
-        ? `<div class="ach-progress" role="progressbar" aria-valuenow="${it.progress.current}" aria-valuemin="0" aria-valuemax="${it.progress.target}"><span style="width:${Math.round((it.progress.current / it.progress.target) * 100)}%"></span></div>
+        ? `<div class="ach-progress" role="progressbar" aria-label="${esc(it.name)} progress" aria-valuenow="${it.progress.current}" aria-valuemin="0" aria-valuemax="${it.progress.target}"><span style="width:${Math.round((it.progress.current / it.progress.target) * 100)}%"></span></div>
            <div class="ach-progress-text">${it.progress.current} / ${it.progress.target}</div>`
         : '';
     return `
@@ -79,9 +82,11 @@ export function achievementCardHtml(it) {
                 </div>
             </div>
             <div class="achievement-description">${esc(it.skins.length ? it.description.replace(/\.?\s*Unlocks .*$/, '') : it.description)}</div>
+            <div class="ach-foot">
             ${progress}
             ${skinNote}
             <div class="achievement-xp">${it.unlocked ? '+' + it.xp + ' XP' : it.xp + ' XP to earn'}</div>
+            </div>
         </div>`;
 }
 

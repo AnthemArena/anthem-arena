@@ -19,7 +19,8 @@ function draw(host) {
     host.innerHTML = championsHtml(view, { own, filters });
 }
 
-export async function loadChampionsTab(profile, own) {
+// excludeIds: matches still open. A visitor's votes in them are left out, so no champion count gives away a live pick.
+export async function loadChampionsTab(profile, own, excludeIds = null) {
     const host = document.getElementById('championsContent');
     if (!host || !profile?.userId) return;
     host.innerHTML = '<p class="cm-empty">Loading champions…</p>';
@@ -32,7 +33,7 @@ export async function loadChampionsTab(profile, own) {
         shown = {
             userId: profile.userId, own,
             data: {
-                votes: votesSnap.docs.map(d => d.data()),
+                votes: votesSnap.docs.map(d => d.data()).filter(v => !(excludeIds && excludeIds.has(v.matchId))),
                 packXp: backfillPackXp(own ? mergePackXp(readPackXp(), saved.packXp) : (saved.packXp || {}), Math.max(Number(saved.xp) || 0, own ? Number(localStorage.getItem('userTotalXP')) || 0 : 0), saved.companionId || saved.championPackId || (own ? activePackId() : 'jinx')),
                 achievements: saved.unlockedAchievements || [],
                 activePack: saved.companionId || saved.championPackId || (own ? activePackId() : null),

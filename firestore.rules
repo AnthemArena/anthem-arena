@@ -50,6 +50,16 @@ service cloud.firestore {
       return signedIn() && request.auth.uid in ['T3tYzd29FseCMWwBSBzH3IHURej2'];
     }
 
+    // A username that is written into a document must be plain text: no angle brackets, quotes, ampersands or backticks, and a
+    // sane length. The pages escape names when they draw them; this stops markup from being stored at all.
+    function cleanUsername(d) {
+      return !('username' in d)
+        || (d.username is string
+            && d.username.size() <= 40
+            && !d.username.matches('.*[<>"&`].*')
+            && !d.username.matches(".*'.*"));
+    }
+
     // A counter field on a post moves by exactly +1 or -1 and nothing else
     // changes. Used for likeCount / commentCount on other people's posts.
     function isCounterBump(field) {
@@ -96,6 +106,22 @@ service cloud.firestore {
         );
     }
 
+    // A report counter on a post or comment goes up by exactly 1, and only in the same batch that creates the reporter's report
+    // document (same trick as isVoteIncrement), so one person cannot push it up twice. js/moderation.js writes both together.
+    // `kind` is 'post' or 'comment'; the report document id is "<kind>_<targetId>_<uid>".
+    function isReportBump(kind, targetId) {
+      let reportPath = /databases/$(database)/documents/reports/$(kind + '_' + targetId + '_' + request.auth.uid);
+      let before = resource.data.get('reportCount', 0);
+      return signedIn()
+        && resource.data.userId != request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reportCount'])
+        && request.resource.data.reportCount == before + 1
+        && !exists(reportPath)
+        && existsAfter(reportPath)
+        && getAfter(reportPath).data.targetId == targetId
+        && getAfter(reportPath).data.targetType == kind;
+    }
+
     // ---------------------------------------------------------------------
     // Tournaments and matches
     // Public to read. Only the admin can create, edit or delete them; a
@@ -124,6 +150,7 @@ service cloud.firestore {
 
       allow create: if signedIn()
         && request.resource.data.userId == request.auth.uid
+        && cleanUsername(request.resource.data)
         && request.resource.data.matchId is string
         && voteId == request.resource.data.matchId + '_' + request.auth.uid
         && request.resource.data.tournament == activeTournament()
@@ -163,7 +190,8 @@ service cloud.firestore {
       allow read: if true;
 
       allow create: if signedIn()
-        && request.resource.data.userId == request.auth.uid;
+        && request.resource.data.userId == request.auth.uid
+        && cleanUsername(request.resource.data);
 
       // Lets a username/avatar change refresh the user's old activity rows
       // (settings-modal.js already tries this; it was being rejected).
@@ -185,7 +213,8 @@ service cloud.firestore {
 
     match /profiles/{userId} {
       allow read: if true;
-      allow write: if isOwner(userId) || isAdmin();
+      allow create, update: if (isOwner(userId) && cleanUsername(request.resource.data)) || isAdmin();
+      allow delete: if isOwner(userId) || isAdmin();
     }
 
     // ---------------------------------------------------------------------
@@ -198,14 +227,18 @@ service cloud.firestore {
 
       allow create: if signedIn()
         && request.resource.data.userId == request.auth.uid
+        && cleanUsername(request.resource.data)
         && request.resource.data.privacy == 'public';
 
       // The author may edit or delete their post. Anyone signed in may move
       // likeCount or commentCount by exactly one (liking / commenting on
       // someone else's post), and nothing else.
+      // The admin may also update a post (to clear a report hold). A report adds exactly 1 to reportCount (see isReportBump).
       allow update: if (signedIn() && resource.data.userId == request.auth.uid)
+        || isAdmin()
         || isCounterBump('likeCount')
-        || isCounterBump('commentCount');
+        || isCounterBump('commentCount')
+        || isReportBump('post', postId);
 
       allow delete: if (signedIn() && resource.data.userId == request.auth.uid)
         || isAdmin();
@@ -327,6 +360,7 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.commentId == commentId
+        && cleanUsername(request.resource.data)
         && request.resource.data.postId is string
         && request.resource.data.content is string
         && request.resource.data.content.size() > 0
@@ -337,8 +371,39 @@ service cloud.firestore {
              'avatar', 'content', 'timestamp', 'createdAt'
            ]);
 
+      // No edit feature, so the only updates are the admin clearing a report hold and a report adding exactly 1 to reportCount.
+      allow update: if isAdmin() || isReportBump('comment', commentId);
+
       allow delete: if (signedIn() && resource.data.userId == request.auth.uid)
         || isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
+    // Reports (js/moderation.js). Document id is "<post|comment>_<targetId>_<reporter uid>", so each person can report
+    // each post or comment once. Nobody but the admin can read them (they hold who reported whom), and they cannot be edited.
+    // ---------------------------------------------------------------------
+
+    match /reports/{reportId} {
+      allow read: if isAdmin();
+
+      allow create: if signedIn()
+        && request.resource.data.reporterId == request.auth.uid
+        && request.resource.data.targetType in ['post', 'comment']
+        && request.resource.data.targetId is string
+        && request.resource.data.targetId.size() > 0
+        && request.resource.data.targetId.size() <= 200
+        && request.resource.data.authorId is string
+        && request.resource.data.authorId != request.auth.uid
+        && request.resource.data.reason in ['spam', 'abuse', 'inappropriate', 'other']
+        && reportId == request.resource.data.targetType + '_' + request.resource.data.targetId + '_' + request.auth.uid
+        && request.resource.data.keys().hasAll(['reporterId', 'targetType', 'targetId', 'authorId', 'reason'])
+        && request.resource.data.keys().hasOnly([
+             'reporterId', 'targetType', 'targetId', 'authorId', 'authorName', 'reason', 'timestamp', 'postId'
+           ]);
+
+      // The admin marks a report as dealt with.
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
 
     // ---------------------------------------------------------------------

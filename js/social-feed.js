@@ -6,6 +6,7 @@
 import { db } from './firebase-config.js';
 import { ARCANE_CONFIG } from './arcane-config.js';
 import { shortTitle } from './title-clean.js';
+import { votePostText } from './vote-post-text.js';
 import { 
     collection, 
     doc, 
@@ -33,69 +34,6 @@ import {
  * Called from vote.js after successful vote submission
  */
 /**
- * Generate engaging, context-aware post text based on vote impact
- */
-function generateVotePostText(voteData, matchState) {
-    const { votedSongName, opponentSongName, round } = voteData;
-    const { voteDiff, userPct, wasClose, isWinning, isDominating, tippedScale } = matchState;
-    
-    // 🎯 TIPPED THE SCALES - Vote changed the leader or made it close
-    if (tippedScale) {
-        return `just tipped the scales in the ${votedSongName} vs ${opponentSongName} match! ⚖️`;
-    }
-    
-    // 🔥 NAILBITER - Very close match
-    if (wasClose && voteDiff <= 3) {
-        const templates = [
-            `voted in a nail-biter! ${votedSongName} vs ${opponentSongName} separated by just ${voteDiff} vote${voteDiff === 1 ? '' : 's'}! 🔥`,
-            `just cast a deciding vote! ${votedSongName} vs ${opponentSongName} is TOO close! ⚔️`,
-            `made it even closer! ${votedSongName} vs ${opponentSongName} - only ${voteDiff} vote${voteDiff === 1 ? '' : 's'} apart! 😱`
-        ];
-        return templates[Math.floor(Math.random() * templates.length)];
-    }
-    
-    // 💪 REINFORCED LEAD - Voted for already-winning song
-    if (isDominating && userPct >= 65) {
-        const templates = [
-            `rallied behind ${votedSongName}! Now dominating at ${userPct}%! 🚀`,
-            `joined the ${votedSongName} momentum train! Leading ${userPct}% to ${100 - userPct}%! 🔥`,
-            `backed the favorite ${votedSongName} - now crushing it at ${userPct}%! 💪`
-        ];
-        return templates[Math.floor(Math.random() * templates.length)];
-    }
-    
-    // 🎭 UNDERDOG SUPPORT - Voted for losing song
-    if (!isWinning && userPct < 45) {
-        const templates = [
-            `stood with the underdog ${votedSongName}! Fighting at ${userPct}%! 🛡️`,
-            `backed ${votedSongName} against the odds! Behind but not out! ⚔️`,
-            `supports ${votedSongName} in the comeback attempt! Currently ${userPct}% vs ${100 - userPct}%! 🎭`
-        ];
-        return templates[Math.floor(Math.random() * templates.length)];
-    }
-    
-    // ⚖️ BALANCED MATCH - Neither side dominating
-    if (userPct >= 45 && userPct <= 60) {
-        const templates = [
-            `voted ${votedSongName} in a balanced battle vs ${opponentSongName}! ${userPct}% to ${100 - userPct}%! ⚖️`,
-            `picked ${votedSongName} over ${opponentSongName} - anyone's game at ${userPct}%! 🎯`,
-            `chose ${votedSongName} in this even matchup! ${userPct}% vs ${100 - userPct}%! 🔥`
-        ];
-        return templates[Math.floor(Math.random() * templates.length)];
-    }
-    
-    // 🎵 DEFAULT - Standard vote message
-    const defaultTemplates = [
-        `just voted for ${votedSongName} over ${opponentSongName}! 🎵`,
-        `picked ${votedSongName} in Round ${round}! Let's go! 🚀`,
-        `chose ${votedSongName} - ${opponentSongName} put up a good fight though! 😅`,
-        `Team ${votedSongName} all the way! 🏆`
-    ];
-    
-    return defaultTemplates[Math.floor(Math.random() * defaultTemplates.length)];
-}
-
-/**
  * Create a vote post with smart context-aware messaging
  */
 export async function createVotePost(voteData) {
@@ -116,67 +54,13 @@ if (isPublic === false || !userId) {
         try {
             avatar = JSON.parse(avatarJson);
         } catch {
-            avatar = { type: 'emoji', value: '🎵' };
+            avatar = { type: 'emoji', value: '👤' };
         }
         
-        // ========================================
-        // ✅ FETCH MATCH STATE FOR CONTEXT
-        // ========================================
-        let matchState = {
-            voteDiff: 0,
-            userPct: 50,
-            wasClose: false,
-            isWinning: false,
-            isDominating: false,
-            tippedScale: false
-        };
-        
-        try {
-            // Fetch current match data to determine context
-            const matchResponse = await fetch(`/api/matches`);
-            const allMatches = await matchResponse.json();
-            const match = allMatches.find(m => (m.matchId || m.id) === voteData.matchId);
-            
-           if (match) {
-    const votedSong = voteData.choice === 'song1' ? match.song1 : match.song2;
-    const opponentSong = voteData.choice === 'song1' ? match.song2 : match.song1;
-    
-    // ✅ FIX: Add 1 to voted song (our vote isn't reflected in cache yet)
-    const votedVotes = (votedSong?.votes || 0) + 1;  // ← ADD +1 HERE
-    const opponentVotes = opponentSong?.votes || 0;
-    const totalVotes = votedVotes + opponentVotes;
-    
-    matchState.voteDiff = Math.abs(votedVotes - opponentVotes);
-    matchState.userPct = totalVotes > 0 ? Math.round((votedVotes / totalVotes) * 100) : 50;
-    matchState.wasClose = matchState.voteDiff <= 5;
-    matchState.isWinning = votedVotes >= opponentVotes;
-    matchState.isDominating = matchState.userPct >= 65;
-    
-    // Tipped the scale = was tied/losing, now winning
-    const previousVotedVotes = votedVotes - 1; // Before our vote
-    const wasPreviouslyLosing = previousVotedVotes < opponentVotes;
-    const wasPreviouslyTied = previousVotedVotes === opponentVotes;
-    
-    matchState.tippedScale = (
-        (wasPreviouslyLosing && matchState.isWinning) ||  // Was losing, now winning
-        (wasPreviouslyTied && matchState.voteDiff === 1)   // Was tied, now leading by 1
-    );
-    
-    console.log('📊 Match context (with our vote):', matchState);
-}
-        } catch (error) {
-            console.warn('⚠️ Could not fetch match state for context:', error);
-        }
-        
-        // ========================================
-        // GENERATE CONTEXT-AWARE POST TEXT
-        // ========================================
-        const postText = generateVotePostText({
-            votedSongName: shortTitle(voteData.votedSongName || voteData.songTitle, 60),
-            opponentSongName: shortTitle(voteData.opponentSongName, 60),
-            matchTitle: voteData.matchTitle,
-            round: voteData.round
-        }, matchState);
+        // The text is neutral on purpose (js/vote-post-text.js): nothing about how the match stands is written into a post.
+        const votedName = shortTitle(voteData.votedSongName || voteData.songTitle, 60);
+        const opponentName = shortTitle(voteData.opponentSongName, 60);
+        const postText = votePostText({ votedSongName: votedName, opponentSongName: opponentName });
         
         // Generate post ID
         const postId = `vote_${voteData.matchId}_${userId}_${Date.now()}`;
@@ -206,7 +90,6 @@ const post = {
     choice: voteData.choice,
     tournamentId: voteData.tournamentId || ARCANE_CONFIG.tournamentId,
     round: voteData.round || 1,
-    matchState: matchState,
     timestamp: Date.now(),
     privacy: 'public',
     likeCount: 0,

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Community | Arcane Moments</title>
+<title>Feed | Arcane Moments</title>
     <!-- Fonts (Arcane look) -->
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
@@ -65,9 +65,6 @@
         </div>
     </div>
     
-    <!-- ✅ NEW: Round Progress Widget -->
-    <div id="roundProgressWidget" class="sidebar-widget"></div>
-    
     <!-- ✅ NEW: Featured Achievement Widget -->
     <div id="featuredAchievementWidget" class="sidebar-widget"></div>
     
@@ -80,27 +77,33 @@
         <!-- CENTER FEED -->
         <section class="feed-center">
             <div class="feed-header">
-                <h1 class="feed-title"><i class="fa-solid fa-users"></i> Community Feed</h1>
+                <div class="feed-title-row">
+                    <h1 class="feed-title"><i class="fa-solid fa-users"></i> Feed</h1>
+                    <button type="button" class="feed-search-toggle" id="feedSearchToggle" aria-label="Search" aria-expanded="false" aria-controls="feedSearchContainer">
+                        <i class="fa-solid fa-search"></i>
+                    </button>
+                </div>
+
+                <!-- Pinned announcement + closing-soon reminder (js/feed-widgets.js) -->
+                <div id="feedStrips" class="feed-strips"></div>
 
                 <!-- Search Bar -->
-<div class="feed-search-container">
+<div class="feed-search-container" id="feedSearchContainer">
     <div class="search-box">
         <i class="fa-solid fa-search"></i>
         <input 
             type="text" 
             id="feedSearchInput" 
             class="feed-search-input" 
-placeholder="Search posts, users, moments..."
+            aria-label="Search posts, users and edits"
+            placeholder="Search posts, users, edits..."
             autocomplete="off"
         >
-        <button class="clear-search-btn" id="clearSearchBtn" style="display: none;">
+        <button class="clear-search-btn" id="clearSearchBtn" style="display: none;" aria-label="Clear search">
             <i class="fa-solid fa-times"></i>
         </button>
     </div>
 </div>
-                
-                <!-- Pinned announcement + closing-soon reminder (js/feed-widgets.js) -->
-                <div id="feedStrips" class="feed-strips"></div>
 
                 <!-- Filter Tabs -->
                 <div class="feed-filters">
@@ -132,10 +135,10 @@ placeholder="Search posts, users, moments..."
     class="post-input" 
     placeholder="Share your thoughts..." 
     maxlength="280"
-    rows="3"
+    rows="2"
 ></textarea>                </div>
                 <div class="post-actions">
-                    <span id="charCount" class="char-count">280</span>
+                    <span id="charCount" class="char-count" aria-live="polite"></span>
                     <button id="submitPostBtn" class="post-btn" disabled>
                         <i class="fa-solid fa-paper-plane"></i> Post
                     </button>
@@ -159,6 +162,8 @@ placeholder="Search posts, users, moments..."
                 </div>
             </div>
 
+            <p id="feedEnd" class="feed-end" hidden>You're all caught up</p>
+
             <!-- Load More -->
             <div id="loadMoreContainer" class="load-more-container" style="display: none;">
                 <button id="loadMoreBtn" class="load-more-btn">
@@ -176,37 +181,6 @@ placeholder="Search posts, users, moments..."
                 </div>
                 <div id="liveMatchesWidget" class="widget-content">
                     <p class="widget-loading">Loading matches...</p>
-                </div>
-            </div>
-
-            <!-- Recent Activity -->
-            <div class="sidebar-widget recent-activity-widget">
-                <div class="widget-header">
-                    <h3><i class="fa-solid fa-bolt"></i> Recent Activity</h3>
-                </div>
-                <div id="recentActivityWidget" class="widget-content">
-                    <p class="widget-loading">Loading activity...</p>
-                </div>
-            </div>
-
-            <!-- Tournament Stats -->
-            <div class="sidebar-widget stats-widget">
-                <div class="widget-header">
-                    <h3><i class="fa-solid fa-chart-bar"></i> Tournament Stats</h3>
-                </div>
-                <div class="widget-content">
-                    <div class="stat-row">
-                        <span class="stat-label">Total Votes</span>
-                        <span class="stat-value" id="widgetTotalVotes">-</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-label">Matches Live</span>
-                        <span class="stat-value" id="widgetLiveMatches">-</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-label">Matches Completed</span>
-                        <span class="stat-value" id="widgetCompletedMatches">-</span>
-                    </div>
                 </div>
             </div>
         </aside>

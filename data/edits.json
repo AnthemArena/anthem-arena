@@ -499,13 +499,15 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
     "aspect": "1:1",
     "aspectSource": "api",
-    "notes": "",
+    "notes": "Entered in jinx-cup-1 on 2026-11-15 as the replacement for M_3X5IbhuPk: the next edit in the seed ranking that was in no group.",
     "status": "ok",
     "flags": [],
     "lastChecked": "2026-10-16"
@@ -3317,16 +3319,14 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [
-      "jinx-cup-1"
-    ],
+    "tournaments": [],
     "tags": [],
     "category": "edit",
     "seed": null,
     "aspect": "1:1",
     "aspectSource": "api",
-    "notes": "",
-    "status": "ok",
+    "notes": "Removed from YouTube by its creator (seen 2026-11-15). Withdrawn from jinx-cup-1 before its group opened; replaced by lEQ_gK1UtXI.",
+    "status": "removed",
     "flags": [],
     "lastChecked": "2026-10-16"
   },
@@ -6452,13 +6452,15 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [],
+    "tournaments": [
+      "jinx-cup-1"
+    ],
     "tags": [],
     "category": "edit",
     "seed": null,
     "aspect": "1:1",
     "aspectSource": "api",
-    "notes": "",
+    "notes": "Entered in jinx-cup-1 on 2026-11-15 as the replacement for rBIIn6fbNso: the next edit in the seed ranking that was in no group.",
     "status": "ok",
     "flags": [],
     "lastChecked": "2026-10-16"
@@ -6714,16 +6716,14 @@
       "Jinx"
     ],
     "charactersSource": "heading",
-    "tournaments": [
-      "jinx-cup-1"
-    ],
+    "tournaments": [],
     "tags": [],
     "category": "edit",
     "seed": null,
     "aspect": "1:1",
     "aspectSource": "api",
-    "notes": "",
-    "status": "ok",
+    "notes": "Removed from YouTube by its creator (seen 2026-11-15). Withdrawn from jinx-cup-1 before its group opened; replaced by uBnaLEcEOJY.",
+    "status": "removed",
     "flags": [],
     "lastChecked": "2026-10-16"
   },

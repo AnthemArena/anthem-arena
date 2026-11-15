@@ -24,4 +24,20 @@ t('html: shows cups, lifetime and escapes names', () => { const h = buildCupHist
 t('html: empty history explains itself', () => { assert.ok(renderCupHistory(buildCupHistory()).includes('No cup history yet')); });
 t('matches not opened yet do not count against participation', () => { const h = buildCupHistory({ votes: [v('y1', 'c2', 'song1')], cups, matchesByCup }); assert.equal(h.cups[0].totalMatches, 2); assert.equal(h.cups[0].participation, 50); });
 t('under 1% shows one decimal, not 0%', () => { const big = { c2: Array.from({ length: 400 }, (_, i) => m('b' + i, 'live', null)) }; const h = buildCupHistory({ votes: [v('b1', 'c2', 'song1')], cups, matchesByCup: big }); assert.equal(h.cups[0].participation, 0.3); assert.equal(h.lifetime.avgParticipation, 0.3); });
+t('visitor view: a live pick never reaches the history data or the HTML', () => {
+    const votes = [v('x1', 'c1', 'song1', 5), v('x3', 'c1', 'song2', 9)];
+    const mm = { c1: [m('x1', 'completed', 'a', { matchNumber: 1 }), m('x2', 'completed', 'b', { matchNumber: 2 }), m('x3', 'live', null, { matchNumber: 3 })] };
+    const viewer = { isOwner: false, viewerVoted: () => false };
+    const h = buildCupHistory({ votes, cups, matchesByCup: mm, viewer });
+    const locked = h.cups[0].picks.filter(p => p.locked);
+    assert.equal(locked.length, 1); assert.equal(locked[0].title, undefined); assert.equal(locked[0].matchNumber, 3);
+    const html = renderCupHistory(h, { own: false });
+    assert.ok(!html.includes('Beta') && html.includes('Voted in Cup 1 · Group A · Match 3') && html.includes('Their pick') && !html.includes('Your pick'));
+    const own = renderCupHistory(buildCupHistory({ votes, cups, matchesByCup: mm, viewer: { isOwner: true } }), { own: true });
+    assert.ok(own.includes('Beta') && own.includes('Your pick'));
+    const voted = renderCupHistory(buildCupHistory({ votes, cups, matchesByCup: mm, viewer: { isOwner: false, viewerVoted: id => id === 'x3' } }), { own: false });
+    assert.ok(voted.includes('Beta') && voted.includes('Their pick'));
+    // one cup: the row carries "N of M voted" and its own bar; "Cup entered" is not shown until there are two
+    assert.ok(/\d+ of \d+ voted/.test(own) && own.includes('role="progressbar"') && !own.includes('Cup entered') && !own.includes('Cups entered'));
+});
 console.log(`${n} passed`);

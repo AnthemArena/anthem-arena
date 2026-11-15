@@ -45,10 +45,15 @@ export function makeDigest(run) {
 }
 
 export function digestSummary(d) {
-    const shown = d.names.slice(0, 2);
-    const more = d.names.length - shown.length;
-    const who = more > 0 ? `${shown.join(', ')} and ${more} ${more === 1 ? 'other' : 'others'}` : shown.join(' and ');
-    return `${who} cast ${d.count} votes`;
+    // Up to two people are named; more than that, lead with the count so the part that says what the row is survives a narrow screen
+    if (d.names.length > 2) return `${d.names.length} people cast ${d.count} votes`;
+    return `${d.names.join(' and ')} cast ${d.count} votes`;
+}
+// The names behind a "6 people cast 9 votes" row ("A, B and 4 others"); empty when the summary already names everyone.
+export function digestWho(d) {
+    if (d.names.length <= 2) return '';
+    const shown = d.names.slice(0, 2), more = d.names.length - shown.length;
+    return `${shown.join(', ')} and ${more} ${more === 1 ? 'other' : 'others'}`;
 }
 
 // Trending: likes + 2 x comments, only items from the last `windowMs` (default 7 days) with some engagement; ties go to the newer one.

@@ -8,6 +8,8 @@
 // A pack without a "modal" block uses the plain lines below, so any champion works on day one.
 
 import { fillPlaceholders } from './champion-bubble.js';
+import { rankBadgeHtml, cleanRankTitle } from './rank-badges.js';
+import { achievementBadgeHtml, hasAchievementIcon } from './achievement-icons.js';
 
 export const MODAL_KEYS = ['first-vote', 'streak', 'underdog', 'early', 'close', 'behind', 'ahead', 'default'];
 
@@ -77,7 +79,7 @@ export function buildProgressHtml(progress, championName = '') {
     if (!progress) return '';
     const parts = [];
     if (progress.levelUp) {
-        parts.push(`<div class="pvm-up pvm-up--level"><span class="pvm-up-tag">Level up</span> <strong>Level ${progress.levelUp.from} &rarr; ${progress.levelUp.to}</strong> <span class="pvm-up-sub">${esc(progress.levelUp.title)}</span></div>`);
+        parts.push(`<div class="pvm-up pvm-up--level"><span class="pvm-up-tag">Level up</span> <strong>Level ${progress.levelUp.from} &rarr; ${progress.levelUp.to}</strong> <span class="pvm-up-sub">${esc(cleanRankTitle(progress.levelUp.title))}</span></div>`);
     }
     const m = progress.mastery;
     if (m) {
@@ -95,12 +97,12 @@ export function buildProgressHtml(progress, championName = '') {
         for (const sk of mu.skins || []) {
             items.push(`<li class="pvm-unlock pvm-unlock--skin">
                 ${sk.thumb ? `<img class="pvm-unlock-img" src="${esc(sk.thumb)}" alt="" width="44" height="44" loading="lazy">` : '<span class="pvm-unlock-icon" aria-hidden="true">&#127917;</span>'}
-                <span class="pvm-unlock-text"><strong>New skin: ${esc(sk.name)}</strong><small>${esc(capital(mu.packId))} mastery ${mu.to}</small></span>
+                <span class="pvm-unlock-text"><strong>New skin: ${esc(sk.name)}</strong><small>${esc(capital(mu.packId))} mastery ${sk.mastery ?? mu.to}</small></span>
                 <button type="button" class="pvm-wear" data-wear-pack="${esc(mu.packId)}" data-wear-skin="${Number(sk.num)}">Wear it</button></li>`);
         }
     }
     for (const a of progress.achievements || []) {
-        const icon = isUrl(a.icon) ? `<img class="pvm-unlock-img" src="${esc(a.icon)}" alt="" width="44" height="44" loading="lazy" onerror="this.outerHTML='<span class=&quot;pvm-unlock-icon&quot; aria-hidden=&quot;true&quot;>&#127942;</span>'">` : `<span class="pvm-unlock-icon" aria-hidden="true">${esc(a.icon || '\u{1F3C6}')}</span>`;
+        const icon = hasAchievementIcon(a.id) ? achievementBadgeHtml(a.id, a.rarity, { size: 44 }) : isUrl(a.icon) ? `<img class="pvm-unlock-img" src="${esc(a.icon)}" alt="" width="44" height="44" loading="lazy" onerror="this.outerHTML='<span class=&quot;pvm-unlock-icon&quot; aria-hidden=&quot;true&quot;>&#127942;</span>'">` : `<span class="pvm-unlock-icon" aria-hidden="true">${esc(a.icon || '\u{1F3C6}')}</span>`;
         const skinLine = (a.skins || []).map(sk => `Unlocks the ${esc(sk.name)} skin for ${esc(capital(sk.packId))}`).join('; ');
         const wear = (a.skins || [])[0];
         items.push(`<li class="pvm-unlock pvm-unlock--achievement${a.rarity ? ` pvm-unlock--${esc(a.rarity)}` : ''}">
@@ -152,7 +154,7 @@ export function buildPostVoteModalHtml(view) {
                 <p class="pvm-voted">You voted for <strong>${esc(view.voteTitle)}</strong>${view.tag ? ` <span class="pvm-tag">${esc(view.tag)}</span>` : ''}</p>
                 <div class="pvm-xp">
                     <div class="pvm-xp-row"><span class="pvm-xp-total">+${shownXp} XP</span><span class="pvm-chips">${chips}</span></div>
-                    <div class="pvm-level"><span class="pvm-level-title">${esc(rank.currentLevel.title)} <small>Level ${rank.currentLevel.level}</small></span></div>
+                    <div class="pvm-level">${rankBadgeHtml(rank.currentLevel.level, 36)}<span class="pvm-level-title">${esc(cleanRankTitle(rank.currentLevel.title))} <small>Level ${rank.currentLevel.level}</small></span></div>
                     ${level}
                     ${buildProgressHtml(progress, view.championName)}
                 </div>

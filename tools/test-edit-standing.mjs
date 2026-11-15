@@ -61,6 +61,20 @@ test('a live match shows "Live now" with the match to vote in', () => {
     assert.equal(s.kind, 'live'); assert.equal(s.liveMatch, live);
 });
 
+test('a live group match is badged "Group A · Live" and the group is exposed for sorting', () => {
+    const live = { ...gm(1, 'p', 'q'), status: 'live' };
+    const s = standingFor({ id: 'p' }, [live]);
+    assert.equal(s.label, 'Group A · Live'); assert.equal(s.group, 'A'); assert.equal(s.groupIndex, 1);
+});
+
+test('a live knockout match is badged with its round, a not-live group edit keeps just the group', () => {
+    const ko = { matchId: 'c-r2-1', stage: 'knockout', round: 2, roundLabel: 'Quarterfinal', status: 'live', song1: song('p'), song2: song('q') };
+    assert.equal(standingFor({ id: 'p' }, [ko]).label, 'Quarterfinal · Live');
+    assert.equal(standingFor({ id: 'p' }, [gm(1, 'p', 'q')]).label, 'Group A');
+    assert.equal(standingFor({ id: 'p' }, [gm(1, 'p', 'q')]).group, 'A');
+    assert.equal(standingFor({ id: 'z' }, [gm(1, 'p', 'q')]).group, undefined);
+});
+
 test('a plain knockout cup (no groups): one loss ends the run, worded as progress', () => {
     const m = { matchId: 'c-r1', round: 1, roundLabel: 'Round of 32', status: 'completed', winnerId: 'x', song1: song('a'), song2: song('x') };
     assert.equal(standingFor({ id: 'a' }, [m]).label, 'Reached the Round of 32');

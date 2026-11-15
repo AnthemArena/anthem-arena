@@ -14,9 +14,10 @@
 .page-stats .stats-tab { flex: 1 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; padding: .55rem 1.1rem;
     background: var(--card); border: 1px solid var(--border); border-radius: 999px; color: var(--muted); font: 600 .95rem var(--font); cursor: pointer; white-space: nowrap; }
 .page-stats .stats-tab:hover { color: var(--text); background: var(--pink-soft); }
-.page-stats .stats-tab.is-active { color: var(--text); background: var(--pink-soft); border-color: var(--pink-bright); }
-.page-stats .stats-tab:focus-visible, .page-stats .next-link:focus-visible, .page-stats .record-card:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
-.page-stats .stats-pane[hidden] { display: none; }
+.page-stats .stats-tab[hidden], .page-stats .stats-cup-pick[hidden] { display: none; }   /* the display rules above would otherwise win over the hidden attribute */
+.page-stats .stats-tab.is-active { color: var(--bg); background: linear-gradient(135deg, var(--pink-bright) 0%, #e85aae 100%); border-color: var(--pink-bright); box-shadow: 0 4px 12px rgba(255, 79, 180, .3); }   /* solid pink, same as the Feed tabs */
+.page-stats .stats-tab.is-active:hover { color: var(--bg); background: var(--pink-bright); }
+.page-stats .stats-tab:focus-visible, .page-stats .stats-pane[hidden] { display: none; }
 .page-stats .stats-message { text-align: center; color: var(--muted); padding: 2.5rem 1rem; }
 .page-stats .stats-retry { margin-left: .5rem; padding: .4rem .9rem; background: var(--pink-soft); border: 1px solid var(--pink-bright); border-radius: 999px; color: var(--text); font: 600 .9rem var(--font); cursor: pointer; }
 .page-stats .stats-note { color: var(--muted); text-align: center; margin: 1rem 0; }
@@ -82,10 +83,6 @@ a.record-card:hover { background: var(--pink-soft); }
 .page-stats .record-label { color: var(--text-dim); font-size: .82rem; }
 
 /* next links */
-.page-stats .stats-next { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: .8rem; margin-top: 2.5rem; }
-.page-stats .next-link { display: flex; align-items: center; justify-content: center; gap: .6rem; min-height: 48px; padding: .75rem 1rem; background: var(--card); border: 1px solid var(--border); border-radius: 14px; color: var(--text); text-decoration: none; font-weight: 600; }
-.page-stats .next-link i { color: var(--pink-bright); }
-.page-stats .next-link:hover { background: var(--pink-soft); }
 
 @media (max-width: 760px) {
     .page-stats .stats-page { padding: 1.75rem 1rem 2.5rem; }
@@ -119,3 +116,29 @@ a.record-card:hover { background: var(--pink-soft); }
 .page-stats .cup-row-nums b { display: block; color: var(--pink-bright); }
 @media (max-width: 600px) { .page-stats .cup-row { grid-template-columns: 1fr 1fr 1fr; } .page-stats .cup-row-main { grid-column: 1 / -1; } .page-stats .cup-row-nums { text-align: left; } }
 .page-stats #pane-allcups .record-grid { margin-top: 16px; }
+
+/* edits ranking: share label, show more */
+.page-stats .share-label { display: block; margin-top: 2px; color: var(--muted); font-size: .78rem; }
+.page-stats .show-more { display: flex; justify-content: center; margin-top: 1.25rem; }
+.page-stats .show-more-btn { min-height: 48px; padding: .7rem 1.8rem; background: var(--pink-soft); color: var(--pink-bright); border: 1px solid var(--pink-bright); border-radius: 999px; font: 700 .95rem var(--font); cursor: pointer; }
+.page-stats .show-more-btn:hover { background: var(--pink); color: #fff; }
+.page-stats .stats-note a { color: var(--pink-bright); }
+
+/* tiles that are links */
+.page-stats a.stat-link { text-decoration: none; color: inherit; transition: border-color .2s, background .2s; }
+.page-stats a.stat-link:hover { border-color: var(--pink-bright); background: var(--pink-soft); }
+.page-stats a.stat-link:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
+/* stages not started yet, and a track you can see when it is empty */
+.page-stats .round-row.is-ahead { opacity: .65; }
+.page-stats .round-row.is-ahead .round-count { grid-column: 2 / -1; text-align: right; }
+.page-stats .round-bar { background: rgba(255, 255, 255, .14); }
+/* Edits / Records not available yet */
+.page-stats .stats-tab.is-soon:not(.is-active) { opacity: .6; }
+/* empty states */
+.page-stats .empty-card { display: flex; flex-direction: column; align-items: center; gap: .6rem; text-align: center; max-width: 520px; margin: .5rem auto 0; padding: 1.5rem 1.25rem; background: var(--card); border: 1px solid var(--border); border-radius: 18px; }
+.page-stats .empty-card i { font-size: 1.6rem; color: var(--pink-bright); }
+.page-stats .empty-card h2 { margin: 0; font-size: 1.1rem; color: var(--text); text-wrap: balance; }
+.page-stats .empty-card p { margin: 0; color: var(--muted); }
+.page-stats .empty-action { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; margin-top: .4rem; padding: .7rem 1.5rem; border-radius: 999px; background: var(--pink); color: #fff; font-weight: 700; text-decoration: none; }
+.page-stats .empty-action:hover { background: var(--pink-bright); }
+.page-stats .empty-action:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }

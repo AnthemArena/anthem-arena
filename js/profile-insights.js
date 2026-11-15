@@ -5,6 +5,11 @@
 // list as an argument instead of reading page-level state.
 // ========================================
 
+import { standingBand } from './vote-facts.js';
+
+// Voting Style needs this many closed (decided) votes before its numbers mean anything
+export const MIN_CLOSED_VOTES_FOR_STYLE = 5;
+
 // ----------------------------------------
 // HELPERS
 // ----------------------------------------
@@ -56,9 +61,7 @@ export function enrichVotes(votes) {
             const chosenVotes = v.choice === 'song1' ? s1 : s2;
             const pct = total > 0 ? Math.round((chosenVotes / total) * 100) : 50;
 
-            let voteType = 'closeCall';
-            if (pct < 40) voteType = 'underdog';
-            else if (pct > 60) voteType = 'mainstream';
+            const voteType = standingBand(pct, total);   // the one set of bands (js/vote-facts.js)
 
             const isCompleted = m.status ? m.status === 'completed' : !!m.winnerId;   // a re-opened match may keep an old winnerId
 
@@ -71,6 +74,7 @@ export function enrichVotes(votes) {
                 matchId: v.matchId,
                 timestamp: toMs(v.timestamp),
                 round: toRoundNumber(m.round),
+                roundLabel: m.roundLabel || '',
                 editId: chosen.id,
                 editName: chosen.shortTitle || chosen.title || 'Unknown edit',
                 videoId: chosen.videoId,
@@ -159,11 +163,18 @@ export function getTasteProfile(majorityAlignment, totalVotes, underdogPicks) {
     };
 }
 
+/** "Group stage" for round 1 of a group cup, otherwise "Round N" (a bare number reads as a count). */
+export function roundText(round, label = '') {
+    if (/^group/i.test(label || '')) return 'Group stage';
+    return `Round ${round}`;
+}
+
 export function computeInsights(enriched) {
     const totalVotes = enriched.length;
     const underdogPicks = enriched.filter(v => v.voteType === 'underdog').length;
     const mainstreamPicks = enriched.filter(v => v.voteType === 'mainstream').length;
-    const closeCalls = enriched.filter(v => v.pct >= 45 && v.pct <= 55).length;
+    const closeCalls = enriched.filter(v => v.voteType === 'closeCall').length;
+    const unclassified = enriched.filter(v => v.voteType === 'unclassified').length;   // nobody had voted in the match yet
     const influentialVotes = enriched.filter(
         v => v.isCompleted && v.marginPct !== null && v.marginPct <= 5
     ).length;
@@ -193,6 +204,18 @@ export function computeInsights(enriched) {
 
     const roundsParticipated = new Set(enriched.map(v => v.round)).size;
     const furthestRound = enriched.length ? Math.max(...enriched.map(v => v.round)) : 0;
+    const furthestLabel = roundText(furthestRound, enriched.find(v => v.round === furthestRound)?.roundLabel);
+
+    // Votes in matches still open: Underdog / Mainstream / Close call use the standings right now, so they can still move
+    const liveVotes = enriched.filter(v => !v.isCompleted).length;
+
+    // The shared image never names a pick from a match that is still open
+    const closedEdits = new Map();
+    enriched.filter(v => v.isCompleted).forEach(v => {
+        const e = closedEdits.get(v.editId) || { id: v.editId, name: v.editName, videoId: v.videoId, count: 0 };
+        e.count++; closedEdits.set(v.editId, e);
+    });
+    const shareFavoriteEdit = [...closedEdits.values()].sort((a, b) => b.count - a.count)[0] || null;
 
     const majorityAlignment = totalVotes > 0
         ? Math.round((mainstreamPicks / totalVotes) * 100)
@@ -203,13 +226,18 @@ export function computeInsights(enriched) {
         underdogPicks,
         mainstreamPicks,
         closeCalls,
+        unclassified,
+        closedVotes: enriched.filter(v => v.isCompleted).length,
         influentialVotes,
         votingStreak: calculateVotingStreak(enriched),
         editsStillAlive,
         editsAdvanced,
         roundsParticipated,
         furthestRound,
+        furthestLabel,
+        liveVotes,
         favoriteEdit,
+        shareFavoriteEdit,
         tasteProfile: getTasteProfile(majorityAlignment, totalVotes, underdogPicks)
     };
 }
@@ -237,24 +265,24 @@ function loadStatsImageGenerator() {
     return generatorPromise;
 }
 
-async function shareStatsImage(insights) {
+async function shareStatsImage(insights, streak = insights.votingStreak) {
     // Shape expected by generateAndShareStats() in stats-image-generator.js
     const statsData = {
         totalVotes: insights.totalVotes,
         underdogPicks: insights.underdogPicks,
         mainstreamPicks: insights.mainstreamPicks,
         songsStillAlive: insights.editsStillAlive, // key name kept for the generator
-        votingStreak: insights.votingStreak,
+        votingStreak: streak,
         roundsParticipated: insights.roundsParticipated,
         tasteProfile: {
             icon: insights.tasteProfile.emoji, // canvas can't draw Font Awesome
             title: insights.tasteProfile.title,
             description: insights.tasteProfile.description
         },
-        favoriteSong: insights.favoriteEdit ? {
-            name: insights.favoriteEdit.name,
-            thumbnailUrl: `https://img.youtube.com/vi/${insights.favoriteEdit.videoId}/mqdefault.jpg`,
-            voteCount: insights.favoriteEdit.count
+        favoriteSong: insights.shareFavoriteEdit ? {
+            name: insights.shareFavoriteEdit.name,
+            thumbnailUrl: `https://img.youtube.com/vi/${insights.shareFavoriteEdit.videoId}/mqdefault.jpg`,
+            voteCount: insights.shareFavoriteEdit.count
         } : null
     };
 
@@ -266,14 +294,22 @@ async function shareStatsImage(insights) {
 // RENDER
 // ----------------------------------------
 
-function statTile(icon, value, label) {
+function statTile(icon, value, label, isText = false) {
     return `
         <div class="insight-tile">
             <i class="fas ${icon}"></i>
-            <div class="insight-value">${value}</div>
+            <div class="insight-value${isText ? ' is-text' : ''}">${value}</div>
             <div class="insight-label">${label}</div>
         </div>
     `;
+}
+
+/** Above the tiles: which numbers are still moving, and why the three pick types may not add up to your votes. */
+export function provisionalNote(i) {
+    const bits = [];
+    if (i.liveVotes) bits.push(`${i.liveVotes} of your votes ${i.liveVotes === 1 ? 'is' : 'are'} in a live match, so Underdog, Mainstream, Close call and Influential vote counts can still change until it closes.`);
+    if (i.unclassified) bits.push(`${i.unclassified} ${i.unclassified === 1 ? "isn't" : "aren't"} counted in any of the three pick types yet, because nobody has voted in ${i.unclassified === 1 ? 'that match' : 'those matches'}.`);
+    return bits.length ? `<p class="insights-note">Provisional: ${bits.join(' ')}</p>` : '';
 }
 
 /**
@@ -293,17 +329,25 @@ export function renderOwnerInsights(container, votes) {
 
     const insights = computeInsights(enriched);
 
+    const unlocked = insights.closedVotes >= MIN_CLOSED_VOTES_FOR_STYLE;
+    // The shared image is built from closed matches only (as the copy says); it needs at least one to show anything real.
+    const closedInsights = computeInsights(enriched.filter(v => v.isCompleted));
+    const canShare = insights.closedVotes >= 1;
+    const waiting = insights.liveVotes ? ` · ${insights.liveVotes} ${insights.liveVotes === 1 ? 'vote' : 'votes'} waiting` : '';
+
     container.innerHTML = `
         <div class="insights-header">
             <div class="insights-title">
                 <h3 class="section-title"><i class="fas fa-chart-pie"></i> Your Voting Style</h3>
-                <p class="insights-subtitle">Only you can see this section.</p>
+                <p class="insights-subtitle">Only you can see this section. "Generate Stats Image" makes a picture you can share; picks from live matches are left out of it.</p>
             </div>
-            <button type="button" class="share-stats-btn" id="shareStatsBtn">
+            <button type="button" class="share-stats-btn" id="shareStatsBtn"${canShare ? '' : ' aria-disabled="true" aria-describedby="shareStatsHint"'}>
                 <i class="fas fa-share-alt"></i> Generate Stats Image
             </button>
+            ${canShare ? '' : '<p class="share-stats-hint" id="shareStatsHint">Available after your first match closes.</p>'}
         </div>
 
+        ${unlocked ? `
         <div class="insights-taste">
             <span class="insights-taste-icon">${insights.tasteProfile.icon}</span>
             <div>
@@ -311,27 +355,33 @@ export function renderOwnerInsights(container, votes) {
                 <div class="insights-taste-desc">${insights.tasteProfile.description}</div>
             </div>
         </div>
-
+        ${provisionalNote(insights)}
         <div class="insights-grid">
             ${statTile('fa-mask', insights.underdogPicks, 'Underdog picks')}
-            ${statTile('fa-bullseye', insights.mainstreamPicks, 'Mainstream picks')}
-            ${statTile('fa-hand-holding-heart', insights.closeCalls, 'Close calls')}
+            ${statTile('fa-bullseye', insights.mainstreamPicks, insights.mainstreamPicks === 1 ? 'Mainstream pick' : 'Mainstream picks')}
+            ${statTile('fa-hand-holding-heart', insights.closeCalls, insights.closeCalls === 1 ? 'Close call' : 'Close calls')}
             ${statTile('fa-bolt', insights.influentialVotes, 'Influential votes')}
             ${statTile('fa-fire', insights.votingStreak, 'Day streak')}
             ${statTile('fa-circle-check', insights.editsStillAlive, 'Edits still alive')}
             ${statTile('fa-arrow-up', insights.editsAdvanced, 'Edits advanced')}
-            ${statTile('fa-layer-group', insights.furthestRound, 'Furthest round')}
-        </div>
+            ${statTile('fa-layer-group', insights.furthestLabel, 'Furthest round', true)}
+        </div>` : `
+        <div class="insights-locked" role="status">
+            <strong>Voting Style unlocks after ${MIN_CLOSED_VOTES_FOR_STYLE} closed matches.</strong>
+            <span>${insights.closedVotes} of ${MIN_CLOSED_VOTES_FOR_STYLE} closed${waiting}</span>
+            <span class="insights-locked-bar" role="progressbar" aria-label="Closed matches voted" aria-valuenow="${insights.closedVotes}" aria-valuemin="0" aria-valuemax="${MIN_CLOSED_VOTES_FOR_STYLE}"><span style="width:${Math.round(Math.min(insights.closedVotes, MIN_CLOSED_VOTES_FOR_STYLE) / MIN_CLOSED_VOTES_FOR_STYLE * 100)}%"></span></span>
+        </div>`}
     `;
     container.hidden = false;
 
     const btn = container.querySelector('#shareStatsBtn');
     btn.addEventListener('click', async () => {
+        if (btn.getAttribute('aria-disabled') === 'true') return;
         const original = btn.innerHTML;
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
         try {
-            await shareStatsImage(insights);
+            await shareStatsImage(closedInsights, insights.votingStreak);
         } catch (error) {
             console.error('❌ Stats image failed:', error);
             alert('Could not generate the stats image. Please refresh and try again.');

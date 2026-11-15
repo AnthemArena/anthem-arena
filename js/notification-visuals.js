@@ -2,7 +2,8 @@ import { fixAvatarUrl, splashFromAvatar } from './avatar-url.js';
 import { songThumb } from './song-thumb.js';
 import { getChampionSplashUrl, getChampionTileUrl, ddragonUrl } from './arcane-config.js';
 import { lookSkin } from './companion-look.js';
-import { readToastStyle } from './notification-prefs.js';
+import { rankBadgeHtml, cleanRankTitle, RANK_BADGE_CSS } from './rank-badges.js';
+import { achievementBadgeHtml, hasAchievementIcon, ACHIEVEMENT_BADGE_CSS } from './achievement-icons.js';
 // Shared look for ally / rival alerts: the pop-up toast and the bell-list row are the same design at two sizes.
 //   [their avatar] VS [your avatar]   (= instead of VS when they voted with you)
 //   [avatar] FireReaper voted against you
@@ -13,6 +14,8 @@ import { readToastStyle } from './notification-prefs.js';
 export const ALLY_ACCENT = '#4ade80';
 const DEFAULT_ACCENT = '#ff69b4';
 
+// Notification ids go into attributes and inline handlers: keep only characters an id can have.
+const safeIds = s => String(s ?? '').replace(/[^\w,.:-]/g, '');
 export const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 export function emojiAvatar(emoji) {
@@ -69,17 +72,60 @@ export function bubbleHtml(text, jinxSrc, accent) {
     return `<div class="nv-jinx">${jinxSrc ? circleHtml(jinxSrc, 'J', 52, { accent, cls: 'nv-jinx-face' }) : ''}<div class="nv-bubble">${escapeHtml(text)}<button class="nv-bubble-x" aria-label="Dismiss" onclick="event.stopPropagation(); window.dismissBulletin && window.dismissBulletin()">×</button></div></div>`;
 }
 
-// Achievement pop-up in the same family as the other alerts: icon, "Achievement unlocked", name, the champion's line, button.
-export function achievementToastHtml(n, { icon, name, line, xp, rarity, jinxSrc, accent, cta }) {
+// Reward pop-ups (achievement, level up, mastery up): ONE solid card in the same layout. The news comes first (a small label, then the
+// biggest text, what it was for, what it paid or unlocked); the champion's line sits underneath as commentary; the × is on the card's corner.
+//   lead = HTML for the round picture (icon, number badge or champion face)
+export function rewardCardHtml({ label, title, sub, subClass = '', meta, lead, line, jinxSrc, accent, cta, ctaDefault, small }) {
     return `
-    <div class="nv-body" onclick="window.openBulletinMatch()">
-        <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
-        <div class="nv-head-row"><div class="nv-follow-face">${circleHtml(icon, name, 64, { accent })}</div>
-        <div class="nv-headline nv-toast-headline" style="justify-content:center;text-align:center"><span class="nv-headline-text"><span class="nv-toast-action">ACHIEVEMENT UNLOCKED</span><span class="nv-toast-name" style="white-space:normal">${escapeHtml(name)}</span></span></div></div>
-        ${xp || rarity ? `<div class="nv-chips">${xp ? `<span class="nv-chip">+${escapeHtml(xp)} XP</span>` : ''}${rarity ? `<span class="nv-chip">${escapeHtml(rarity)}</span>` : ''}</div>` : ''}
-        ${bubbleHtml(line, jinxSrc, accent)}
+    <div class="nv-body nv-ach-body" onclick="window.openBulletinMatch()">
+        <button class="nv-card-x" aria-label="Dismiss" onclick="event.stopPropagation(); window.dismissBulletin && window.dismissBulletin()">\u00d7</button>
+        <div class="nv-ach-head">
+            <span class="nv-ach-icon">${lead}</span>
+            <span class="nv-ach-text">
+                <span class="nv-ach-label">${escapeHtml(label)}</span>
+                <span class="nv-ach-name${small ? ' nv-ach-name-many' : ''}">${escapeHtml(title)}</span>
+                ${sub ? `<span class="nv-ach-desc ${subClass}">${escapeHtml(sub)}</span>` : ''}
+                ${meta ? `<span class="nv-ach-meta">${escapeHtml(meta)}</span>` : ''}
+            </span>
+        </div>
+        ${line ? bubbleHtml(line, jinxSrc, accent) : ''}
     </div>
-    <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta || 'View achievements')}</button>`;
+    <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta || ctaDefault || 'View')}</button>`;
+}
+
+// Achievement: the icon, the label, the name, what it was for, XP and rarity. `items` has more than one entry when several unlocked together.
+export function achievementToastHtml(n, { icon, name, line, xp, rarity, description, items, jinxSrc, accent, cta }) {
+    const many = Array.isArray(items) && items.length > 1;
+    return rewardCardHtml({
+        label: many ? `${items.length} ACHIEVEMENTS UNLOCKED` : 'ACHIEVEMENT UNLOCKED',
+        title: many ? items.map(i => i.name).join(' \u00b7 ') : name,
+        sub: many ? '' : description,
+        meta: [xp ? `+${xp} XP` : '', !many && rarity ? String(rarity).charAt(0).toUpperCase() + String(rarity).slice(1) : ''].filter(Boolean).join(' \u00b7 '),
+        lead: (!many && hasAchievementIcon(n?.achievementId)) ? `<span class="nv-av" role="img" aria-label="${escapeHtml(name || 'Achievement')}">${achievementBadgeHtml(n.achievementId, rarity, { size: 52 })}</span>` : circleHtml(icon, many ? 'Achievements' : name, 52, { accent }),
+        line, jinxSrc, accent, cta, ctaDefault: 'View achievements', small: many
+    });
+}
+
+// The round number badge for level up / mastery up: the number, with an up arrow built in.
+export function levelLeadHtml(level, accent, size = 52) {
+    // the level's badge (icon in a tier-coloured ring) with the up arrow; the number is in the card title ("Level 5") and the label here
+    return `<span class="nv-av" role="img" aria-label="Level ${escapeHtml(String(level ?? ''))}">${rankBadgeHtml(level, size)}<span class="nv-level-arrow" aria-hidden="true">\u25b2</span></span>`;
+}
+
+// Level up: account-wide, so the number is the picture. rank = the rank title, nextText = "N XP to Level 6" (only when it exists).
+export function levelUpToastHtml(n, { level, rank, nextText, line, jinxSrc, accent, cta }) {
+    return rewardCardHtml({
+        label: 'LEVEL UP', title: `Level ${level}`, sub: cleanRankTitle(rank), meta: nextText,
+        lead: levelLeadHtml(level, accent), line, jinxSrc, accent, cta, ctaDefault: 'View progress'
+    });
+}
+
+// Mastery up: per champion, so the champion's face is the picture and the label names them. unlocked = "Unlocked: A, B" when skins came with it.
+export function masteryToastHtml(n, { level, champion, unlocked, faceSrc, line, jinxSrc, accent, cta }) {
+    return rewardCardHtml({
+        label: `MASTERY UP \u00b7 ${String(champion || '').toUpperCase()}`.trim(), title: `Mastery ${level}`, sub: unlocked, meta: '',
+        lead: circleHtml(faceSrc, champion || 'Champion', 52, { accent }), line, jinxSrc, accent, cta, ctaDefault: 'View champions'
+    });
 }
 
 // The companion's face: the tile of the skin it wears (see companion-look.js), otherwise its plain icon.
@@ -90,7 +136,7 @@ export function championBadgeUrl(pack, storage = globalThis.localStorage) {
 }
 
 // Someone with no picture gets a stable Arcane champion (same pick every time for the same name), like new accounts do.
-const FALLBACK_CHAMPIONS = ['Vi', 'Caitlyn', 'Ekko', 'Jayce', 'Viktor', 'Heimerdinger', 'Jinx'];
+const FALLBACK_CHAMPIONS = ['Vi', 'Caitlyn', 'Jinx'];   // champions that have a pack; more join when they get one
 export function fallbackAvatarFor(name) {
     const s = String(name || '?');
     let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
@@ -159,16 +205,19 @@ export function toastHeadlineHtml(headline, src, name, accent, { avatar = true }
     return `<div class="nv-headline nv-toast-headline">${avatar ? circleHtml(src, name, 34, { accent }) : ''}<span class="nv-headline-text"><span class="nv-toast-name">${escapeHtml(who)}</span><span class="nv-toast-action">${escapeHtml(action)}</span></span></div>`;
 }
 
+// Person alerts (ally / rival / streak / new follower / likes and comments) use the same solid card as the reward alerts:
+// the person's face and name lead (their action in small capitals above), the champion's line sits underneath as commentary.
+const splitWho = (headline, name) => {
+    const text = String(headline || ''), who = String(name || '');
+    return { who, action: who && text.startsWith(who) ? text.slice(who.length).trim() : text };
+};
+
 export function toastHtml(n, { theirSrc, yourSrc, jinxSrc, accent, headline, quip, cta }) {
-    return `
-    <div class="nv-body" ${n.matchTitle ? `title="${escapeHtml(n.matchTitle)}"` : ''} onclick="window.openBulletinMatch && window.openBulletinMatch()">
-        <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
-        ${n.nv?.edits ? editsPairHtml({ edits: n.nv.edits, theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent }) : pairHtml({ theirSrc, theirName: n.triggerUsername || n.username, yourSrc, relationship: n.relationship, size: 60, accent })}
-        ${n.matchTitle ? `<div class="nv-caption">${escapeHtml(n.matchTitle)}</div>` : ''}
-        ${toastHeadlineHtml(headline, theirSrc, n.triggerUsername || n.username, accent)}
-        ${bubbleHtml(quip, jinxSrc, accent)}
-    </div>
-    <button class="bulletin-toast-cta nv-cta ${n.relationship}" onclick="window.handleBulletinCTA()">${escapeHtml(cta)}</button>`;
+    const { who, action } = splitWho(headline, n.triggerUsername || n.username);
+    return rewardCardHtml({
+        label: action.toUpperCase(), title: who, sub: n.matchTitle || '', subClass: 'nv-one-line',
+        lead: circleHtml(theirSrc, who, 52, { accent }), line: quip, jinxSrc, accent, cta, ctaDefault: 'View match'
+    });
 }
 
 // Ally / rival rows: the same "versus" look as the toast (js/notification-visuals.js), compact.
@@ -178,7 +227,7 @@ export function socialRowHtml(n, { headline, timeAgo, championPack }) {
     const ally = n.relationship === 'ally';
     const accent = accentFor(n.relationship, championPack);
     const crowd = n.groupKind === 'match' && n.count > 1;
-    const idList = n.ids ? n.ids.join(',') : n.id;
+    const idList = safeIds(n.ids ? n.ids.join(',') : n.id);
     const headText = headline ? headline.message : socialHeadlineFor(n);
     const nv = n.nv || {};
     const theirSrc = nv.theirSrc || avatarSrc(n.thumbnailUrl) || fallbackAvatarFor(n.triggerUsername);
@@ -198,7 +247,7 @@ export function socialRowHtml(n, { headline, timeAgo, championPack }) {
         <div class="notification-item-footer">
             <button class="notification-item-cta"
                     style="background: linear-gradient(135deg, ${accent}, ${ally ? '#22c55e' : '#ff1493'}); border: 0; color: ${ally ? '#0f0b18' : '#fff'};"
-                    data-id="${idList}" data-action="${n.ctaAction}"
+                    data-id="${idList}" data-action="${escapeHtml(n.ctaAction)}"
                     ${n.ctaAction === 'send-emote' ? `data-target-user="${escapeHtml(n.triggerUserId)}"` : ''}
                     data-url="${escapeHtml(n.ctaUrl || n.targetUrl || '')}">${n.ctaAction === 'send-emote' ? '<span class="cta-loading">Checking...</span>' : escapeHtml(n.ctaText || 'View match')}</button>
         </div>`;
@@ -230,7 +279,7 @@ export function followRowHtml(n, { headline, quip, timeAgo, championPack, theirS
     const jinxSrc = championBadgeUrl(championPack);
     const name = n.triggerUsername || 'Someone';
     const src = theirSrc || avatarSrc(n.thumbnailUrl) || fallbackAvatarFor(name);
-    const idList = n.ids ? n.ids.join(',') : n.id;
+    const idList = safeIds(n.ids ? n.ids.join(',') : n.id);
     const unread = !n.read && !n.dismissed ? 'unread' : '';
     const url = n.targetUrl || `/profile.html?user=${encodeURIComponent(name)}`;
     const button = alreadyFollowing
@@ -256,14 +305,10 @@ export function followRowHtml(n, { headline, quip, timeAgo, championPack, theirS
 // The pop-up version: their face large, name + action, Jinx's line, and the button bar.
 export function followToastHtml(n, { theirSrc, jinxSrc, accent, quip, cta, headline }) {
     const name = n.triggerUsername || n.username || 'Someone';
-    return `
-    <div class="nv-body" onclick="window.openBulletinMatch && window.openBulletinMatch()">
-        <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
-        <div class="nv-head-row"><div class="nv-follow-face">${circleHtml(theirSrc, name, 64, { accent })}</div>
-        ${toastHeadlineHtml(headline || `${name} followed you`, null, name, accent, { avatar: false })}</div>
-        ${bubbleHtml(quip, jinxSrc, accent)}
-    </div>
-    <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta)}</button>`;
+    const { who, action } = splitWho(headline || `${name} followed you`, name);
+    return rewardCardHtml({
+        label: action.toUpperCase(), title: who, lead: circleHtml(theirSrc, name, 52, { accent }), line: quip, jinxSrc, accent, cta, ctaDefault: 'View profile'
+    });
 }
 
 // Likes / comments / replies / mentions. One card for all four: face (or stacked faces for a crowd), "who + action", the words
@@ -272,7 +317,7 @@ export function followToastHtml(n, { theirSrc, jinxSrc, accent, quip, cta, headl
 export function contentRowHtml(n, { parts, quote, icon, cta, timeAgo, championPack, srcs = [], names = [] }) {
     ensureVersusStyles();
     const accent = championPack?.color || DEFAULT_ACCENT;
-    const idList = n.ids ? n.ids.join(',') : n.id;
+    const idList = safeIds(n.ids ? n.ids.join(',') : n.id);
     const unread = !n.read && !n.dismissed ? 'unread' : '';
     const url = n.targetUrl || '/feed.html';
     const crowd = names.length > 1;
@@ -297,17 +342,20 @@ export function contentRowHtml(n, { parts, quote, icon, cta, timeAgo, championPa
 }
 
 // The pop-up version of the same card.
+// Up to three faces overlapped, then a "+N" chip for the rest, so "4 people" never sits over three faces that look like a miscount.
+export function faceStackHtml(srcs, names, size = 40, accent = DEFAULT_ACCENT) {
+    const shown = names.slice(0, 3), more = names.length - shown.length;
+    return `<div class="nv-stack">${shown.map((nm, i) => circleHtml(srcs[i], nm, size, { accent, cls: 'nv-stacked' })).join('')}${more > 0 ? `<span class="nv-more" style="width:${size}px;height:${size}px">+${more}</span>` : ''}</div>`;
+}
+
 export function contentToastHtml(n, { parts, quote, icon, cta, accent, srcs = [], names = [] }) {
     const crowd = names.length > 1;
-    const face = crowd ? stackHtml(srcs, names, 52, accent) : circleHtml(srcs[0], names[0] || n.triggerUsername, 64, { accent });
-    return `
-    <div class="nv-body" onclick="window.openBulletinMatch && window.openBulletinMatch()">
-        <button class="bulletin-close" onclick="event.stopPropagation(); window.dismissBulletin()">×</button>
-        <div class="nv-follow-face">${face}</div>
-        ${toastHeadlineHtml(parts.headline, null, parts.who, accent, { avatar: false })}
-        ${quote ? `<div class="nv-content nv-content-toast"><span class="nv-kind">${escapeHtml(icon || '')}</span>${escapeHtml(quote)}</div>` : ''}
-    </div>
-    <button class="bulletin-toast-cta nv-cta follow" onclick="window.handleBulletinCTA()">${escapeHtml(cta || 'View')}</button>`;
+    const { who, action } = splitWho(parts.headline, parts.who);
+    return rewardCardHtml({
+        label: action.toUpperCase(), title: who, sub: quote ? `${icon ? icon + ' ' : ''}${quote}` : '', subClass: 'nv-quote',
+        lead: crowd ? faceStackHtml(srcs, names, 40, accent) : circleHtml(srcs[0], names[0] || n.triggerUsername, 52, { accent }),
+        line: '', jinxSrc: '', accent, cta, ctaDefault: 'View'
+    });
 }
 
 // ---------- match-event alerts ----------
@@ -394,7 +442,7 @@ export function eventToastHtml(n, { tag, glyph, edits, strip = null, accent, jin
 // Bell-list row: the same card, compact. The whole row opens the match; the button does the same.
 export function eventRowHtml(n, { tag, glyph, edits, strip = null, accent, jinxSrc, quip, timeAgo, championPack, cta, url }) {
     ensureVersusStyles();
-    const idList = n.ids ? n.ids.join(',') : n.id;
+    const idList = safeIds(n.ids ? n.ids.join(',') : n.id);
     const unread = !n.read && !n.dismissed ? 'unread' : '';
     const lead = eventLeadHtml({ glyph, label: tag, edits, accent, size: 40 });
     const sub = [timeAgo, n.matchTitle].filter(Boolean).map(escapeHtml).join(' · ');
@@ -425,26 +473,10 @@ function socialHeadlineFor(n) {
 
 
 let stylesAdded = false;
-// The viewer's chosen toast style goes on <html> so the CSS below can restyle every pop-up without touching their markup.
-// Side art wants the splash cropped around the champion (Data Dragon's "centered" version of the same skin); falls back to the normal splash if that file is missing.
-export function setCenteredSplash(banner) {
-    const normal = banner?.style?.getPropertyValue('--nv-splash') || '';
-    const m = /url\(["']?([^"')]+)["']?\)/.exec(normal);
-    if (!m || typeof Image === 'undefined') return;
-    const centered = m[1].replace('/champion/splash/', '/champion/centered/');
-    if (centered === m[1]) { banner.style.setProperty('--nv-splash-c', normal); return; }
-    banner.style.setProperty('--nv-splash-c', normal);
-    const img = new Image();
-    img.onload = () => banner.style.setProperty('--nv-splash-c', `url("${centered}")`);
-    img.src = centered;
-}
-
-export function applyToastStyle(style = readToastStyle()) {
-    if (typeof document !== 'undefined') document.documentElement.dataset.toastStyle = style;
-}
 
 export function ensureVersusStyles() {
-    applyToastStyle();
+    // there is one pop-up style (the old Classic / Full art / Side art styles were removed); the attribute stays so the rules below keep their selector
+    if (typeof document !== 'undefined') document.documentElement.dataset.toastStyle = 'minimal';
     if (stylesAdded || typeof document === 'undefined' || document.getElementById('versus-styles')) { stylesAdded = true; return; }
     stylesAdded = true;
     const s = document.createElement('style');
@@ -474,36 +506,14 @@ export function ensureVersusStyles() {
 /* pop-up toast */
 .bulletin-banner.versus-toast{background:#1a1226 !important;border:1px solid var(--nv-accent);box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 24px var(--nv-glow);color:#fff}
 .bulletin-banner.versus-toast::before,.bulletin-banner.versus-toast::after{display:none !important}
-/* the splash is its own header strip (--nv-art tall, full toast width); it fades out smoothly and the content overlaps its lower part so the two read as one card */
 .versus-toast .nv-body{position:relative;cursor:pointer;padding:calc(var(--nv-art,160px) - 46px) 16px 14px;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;gap:10px;background:linear-gradient(90deg,var(--nv-tint),rgba(255,255,255,0) 50%,var(--nv-tint)),#120a18}
-.versus-toast .nv-body::before{content:'';position:absolute;top:0;left:0;right:0;height:var(--nv-art,160px);pointer-events:none;z-index:-1;background:var(--nv-splash,none) center 20%/cover no-repeat;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 38%,rgba(0,0,0,.55) 66%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 38%,rgba(0,0,0,.55) 66%,transparent 100%)}
-/* the same splash, stretched and heavily blurred, tints the card body so the fade picks up the art's own colours (kept dim so the text stays readable) */
-.versus-toast .nv-body::after{content:'';position:absolute;inset:0;z-index:-2;pointer-events:none;background:var(--nv-splash,none) center/cover no-repeat;filter:blur(26px) saturate(1.35);transform:scale(1.3);opacity:.8;-webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.45) 100%);mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.45) 100%)}
-@media (max-width:480px){.versus-toast .nv-body{--nv-art:120px}}
 /* inner colours follow the toast's own accent (green for allies, amber for tie-breakers...) so the bubble, pills and ring always match the outer border; plain pink where color-mix is unsupported */
 .bulletin-banner.versus-toast{--nv-line-auto:rgba(255,105,180,.4);--nv-chip-bg-auto:rgba(255,79,180,.18);--nv-chip-text-auto:#ffd6ee;--nv-readable-auto:#ffd6ee}
 @supports (color:color-mix(in srgb,red,blue)){.bulletin-banner.versus-toast{--nv-line-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 40%,transparent);--nv-chip-bg-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 18%,transparent);--nv-chip-text-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 30%,#fff);--nv-readable-auto:color-mix(in srgb,var(--nv-accent,#ff69b4) 42%,#fff)}}
-/* toast styles (Settings > Notifications): classic is the rules above; the others override them */
+/* the one pop-up style (the champion's portrait and words); the rules above are the shared base */
 .versus-toast .nv-head-row{display:contents}
 .versus-toast .nv-bubble-x{display:none}
 .versus-toast .nv-caption{display:none}
-/* full art: the splash is the whole card; no match thumbnails, captions, sub-lines or pills, and the champion's words in a frosted bubble over it */
-html[data-toast-style="full"] .versus-toast .nv-body{--nv-art:300px;padding-top:150px}
-html[data-toast-style="full"] .versus-toast .nv-body::before{height:100%;-webkit-mask-image:none;mask-image:none;background-position:center 14%}
-html[data-toast-style="full"] .versus-toast .nv-body::after{inset:0;z-index:-1;transform:none;filter:none;opacity:1;-webkit-mask-image:none;mask-image:none;background:linear-gradient(180deg,rgba(18,10,24,0) 0%,rgba(18,10,24,0) 42%,rgba(18,10,24,.38) 64%,rgba(18,10,24,.82) 100%)}
-html[data-toast-style="full"] .versus-toast .nv-edits,html[data-toast-style="full"] .versus-toast .nv-strip,html[data-toast-style="full"] .versus-toast .nv-lead:has(.nv-edits){display:none}
-html[data-toast-style="full"] .versus-toast .nv-caption,html[data-toast-style="full"] .versus-toast .nv-event-detail,html[data-toast-style="full"] .versus-toast .nv-chips{display:none}
-html[data-toast-style="full"] .versus-toast .nv-bubble{background:rgba(11,13,24,.55);-webkit-backdrop-filter:blur(10px) saturate(1.2);backdrop-filter:blur(10px) saturate(1.2)}
-html[data-toast-style="full"] .versus-toast .nv-bubble::before{background:rgba(11,13,24,.55)}
-html[data-toast-style="full"] .versus-toast .nv-chip{background:rgba(18,10,24,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-@media (max-width:480px){html[data-toast-style="full"] .versus-toast .nv-body{padding-top:110px}}
-/* side art: a tall column of centred art on the left (faded into the card); caption, bubble and pills on the right */
-html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:100px;padding:12px 12px 10px 114px;gap:8px;min-height:136px;justify-content:center}
-html[data-toast-style="side"] .versus-toast .nv-body::before{top:0;bottom:0;left:0;right:auto;height:auto;width:var(--nv-art);background-image:var(--nv-splash-c,var(--nv-splash,none));background-position:center top;filter:brightness(1.18) saturate(1.1);-webkit-mask-image:linear-gradient(90deg,#000 58%,transparent 100%);mask-image:linear-gradient(90deg,#000 58%,transparent 100%)}
-html[data-toast-style="side"] .versus-toast .nv-edits,html[data-toast-style="side"] .versus-toast .nv-strip,html[data-toast-style="side"] .versus-toast .nv-lead:has(.nv-edits),html[data-toast-style="side"] .versus-toast .nv-jinx .nv-av{display:none}
-html[data-toast-style="side"] .versus-toast .nv-caption,html[data-toast-style="side"] .versus-toast .nv-event-detail,html[data-toast-style="side"] .versus-toast .nv-chips{display:none}
-html[data-toast-style="side"] .versus-toast .nv-bubble::before{display:none}
-@media (max-width:480px){html[data-toast-style="side"] .versus-toast .nv-body{--nv-art:70px;padding-left:84px}}
 /* minimal: no box at all, just a larger portrait and the champion's bubble (the × sits on the bubble's corner). The whole thing opens the match;
    a small arrow says so and the match name is the hover text. */
 html[data-toast-style="minimal"] .bulletin-banner.versus-toast{width:fit-content !important;max-width:min(440px,calc(100vw - 24px)) !important;margin-left:auto !important;background:transparent !important;border:0 !important;box-shadow:none !important;overflow:visible !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
@@ -511,13 +521,15 @@ html[data-toast-style="minimal"] .versus-toast .nv-body{padding:10px 10px 10px 0
 html[data-toast-style="minimal"] .versus-toast .nv-body::before,html[data-toast-style="minimal"] .versus-toast .nv-body::after{display:none}
 html[data-toast-style="minimal"] .versus-toast .nv-pair,html[data-toast-style="minimal"] .versus-toast .nv-edits,html[data-toast-style="minimal"] .versus-toast .nv-strip,html[data-toast-style="minimal"] .versus-toast .nv-chips,html[data-toast-style="minimal"] .versus-toast .nv-caption,html[data-toast-style="minimal"] .versus-toast .nv-event-detail,html[data-toast-style="minimal"] .versus-toast .nv-lead:has(.nv-edits),html[data-toast-style="minimal"] .versus-toast .nv-cta{display:none}
 html[data-toast-style="minimal"] .versus-toast .nv-jinx{margin-top:0;gap:12px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.55))}
-html[data-toast-style="minimal"] .versus-toast .nv-jinx .nv-circle{width:78px !important;height:78px !important;font-size:32px !important}
-html[data-toast-style="minimal"] .versus-toast .nv-bubble{padding:12px 30px 12px 16px;background:rgba(14,10,24,.94)}
+html[data-toast-style="minimal"] .versus-toast .nv-jinx .nv-circle{width:64px !important;height:64px !important;font-size:26px !important}
+html[data-toast-style="minimal"] .versus-toast .nv-bubble{padding:12px 30px 12px 16px;background:rgba(14,10,24,.94);overflow-wrap:anywhere}
 html[data-toast-style="minimal"] .versus-toast .nv-bubble::after{content:'›';position:absolute;right:10px;bottom:6px;font-size:22px;line-height:1;color:var(--nv-accent,#ff69b4)}
 html[data-toast-style="minimal"] .versus-toast .nv-body{padding:10px 10px 10px 0}
 html[data-toast-style="minimal"] .versus-toast .nv-follow-face,html[data-toast-style="minimal"] .versus-toast .nv-toast-headline{order:-2}
 html[data-toast-style="minimal"] .versus-toast .bulletin-close{display:none}
 html[data-toast-style="minimal"] .versus-toast .nv-bubble-x{display:flex;position:absolute;top:-9px;right:-9px;z-index:4;width:22px;height:22px;padding:0;align-items:center;justify-content:center;border-radius:50%;font-size:14px;line-height:1;cursor:pointer;color:rgba(255,255,255,.9);background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.22)}
+html[data-toast-style="minimal"] .versus-toast .nv-bubble-x::before{content:'';position:absolute;inset:-12px}   /* 44 x 44 tap area around the small ×; the look stays small */
+html[data-toast-style="minimal"] .versus-toast .nv-bubble-x:focus-visible{outline:2px solid #fff;outline-offset:2px}
 html[data-toast-style="minimal"] .versus-toast .nv-bubble-x:hover{background:rgba(0,0,0,.85);color:#fff}
 /* the "who did what" line (ally / rival / follow / achievement): no box, just their face and the words with a shadow, lined up with the bubble's left edge */
 html[data-toast-style="minimal"] .versus-toast .nv-toast-headline{display:flex;width:fit-content;max-width:100%;align-items:center;justify-content:flex-start !important;text-align:left !important;gap:10px;margin:0 0 6px 90px;padding:0;background:none;border:0;text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 12px rgba(0,0,0,.85)}
@@ -530,7 +542,40 @@ html[data-toast-style="minimal"] .versus-toast .nv-head-row .nv-toast-headline{m
 html[data-toast-style="minimal"] .versus-toast .nv-head-row .nv-circle{width:40px !important;height:40px !important;font-size:16px !important}
 html[data-toast-style="minimal"] .versus-toast .nv-lead:has(.nv-glyph){display:none}
 /* the bubble hugs its words (the toast shrinks to fit, staying on the right edge) */
-html[data-toast-style="minimal"] .versus-toast .nv-bubble{flex:0 1 auto}
+html[data-toast-style="minimal"] .versus-toast .nv-bubble{flex:0 1 auto;text-wrap:balance}
+/* on the match's own page the pill goes nowhere: no arrow, no pointer */
+html[data-toast-style="minimal"] .versus-toast.nv-here .nv-body{cursor:default}
+html[data-toast-style="minimal"] .versus-toast.nv-here .nv-bubble::after{display:none}
+/* achievement card: a solid backing so it reads on any page; name biggest, champion line secondary, one left edge */
+html[data-toast-style="minimal"] .bulletin-banner.versus-toast.reward-card{width:fit-content !important;min-width:min(320px,calc(100vw - 24px)) !important;max-width:min(420px,calc(100vw - 24px)) !important;background:#1a1226 !important;border:1px solid var(--nv-accent,#ff69b4) !important;border-radius:14px !important;box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 24px var(--nv-glow,rgba(255,105,180,.35)) !important}
+html[data-toast-style="minimal"] .versus-toast.reward-card .nv-body.nv-ach-body{display:flex;flex-direction:column;gap:10px;padding:14px 14px 12px;cursor:pointer}
+.nv-ach-head{display:flex;align-items:center;gap:12px;min-width:0}
+.nv-ach-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.nv-ach-label{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--nv-readable-auto,#ffd6ee)}
+.nv-ach-name{font-size:22px;font-weight:800;line-height:1.15;color:#fff;overflow-wrap:anywhere}
+.nv-ach-name-many{font-size:17px}
+.nv-ach-desc{font-size:13px;color:rgba(255,255,255,.8);line-height:1.3}
+.nv-ach-desc.nv-quote{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-style:italic;overflow-wrap:anywhere}
+.nv-ach-desc.nv-one-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+.nv-more{display:inline-flex;align-items:center;justify-content:center;margin-left:-10px;border-radius:50%;background:#2a2140;border:2px solid var(--nv-accent,#ff69b4);color:#fff;font-size:13px;font-weight:700;box-sizing:border-box}
+.nv-ach-meta{font-size:12px;font-weight:700;color:var(--nv-chip-text-auto,#ffd6ee)}
+/* the card's own × sits on its top-right corner (the bubble's × is hidden here); 44 x 44 tap area around a small round button */
+.nv-card-x{position:absolute;top:8px;right:8px;z-index:4;width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;line-height:1;cursor:pointer;color:rgba(255,255,255,.9);background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.22)}
+.nv-card-x::before{content:'';position:absolute;inset:-10px}
+.nv-card-x:hover{background:rgba(0,0,0,.85);color:#fff}
+.nv-card-x:focus-visible{outline:2px solid #fff;outline-offset:2px}
+html[data-toast-style="minimal"] .versus-toast.reward-card .nv-bubble-x{display:none}
+html[data-toast-style="minimal"] .versus-toast.reward-card .nv-bubble::after{display:none}   /* the whole card is the target: no arrow inside the bubble */
+html[data-toast-style="minimal"] .versus-toast.reward-card .nv-ach-text{padding-right:26px}
+.nv-level-num{font-weight:800;color:#fff}
+${RANK_BADGE_CSS}
+${ACHIEVEMENT_BADGE_CSS}
+.nv-level-arrow{position:absolute;right:-4px;bottom:-4px;z-index:3;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#0f0b18;background:var(--nv-accent,#ff69b4);border:2px solid #1a1226}
+html[data-toast-style="minimal"] .versus-toast.reward-card .nv-jinx{margin:0;gap:10px;filter:none}
+html[data-toast-style="minimal"] .versus-toast.reward-card .nv-jinx .nv-circle{width:40px !important;height:40px !important;font-size:16px !important}
+html[data-toast-style="minimal"] .versus-toast.reward-card .nv-bubble{padding:10px 30px 10px 12px;font-size:14px}
+html[data-toast-style="minimal"] .versus-toast.reward-card.nv-here .nv-body{cursor:default}
+@media (prefers-reduced-motion:reduce){html .bulletin-banner.versus-toast{transition:opacity .15s linear !important;transform:none !important}}
 html[data-toast-style="minimal"] .versus-toast .nv-jinx{width:fit-content;max-width:100%}
 .versus-toast .bulletin-close{position:absolute;top:8px;right:10px;z-index:3;width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;line-height:1;color:rgba(255,255,255,.9);background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.22);box-shadow:none}
 .versus-toast .bulletin-close:hover{background:rgba(0,0,0,.7);color:#fff}

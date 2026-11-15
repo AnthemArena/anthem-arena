@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { homeState, newestEdits, mostWatched, countdownText, isEntered } from '../js/home-model.js';
+import { homeState, newestEdits, mostWatched, countdownText, isEntered, compactCount, hasCastVotes, needsVote, statusLine, statusParts, inLive, MIN_ROW } from '../js/home-model.js';
 let n = 0; const t = (name, fn) => { fn(); n++; console.log('  ok  ' + name); };
 const c = (id, votes = 0) => ({ id, videoId: 'v' + id, shortTitle: `Edit ${id} #jinx`, artist: 'Maker ' + id, votes });
 const m = (id, a, b, status, winner, extra = {}) => ({ matchId: id, roundLabel: 'Group A', status, winnerId: winner, song1: a, song2: b, ...extra });
@@ -39,5 +39,29 @@ t('most voted edits count finished matches only (a live match would show who is 
     const s = homeState([m('1', c('a', 50), c('b', 40), 'live', null), m('2', c('c', 7), c('d', 3), 'completed', 'c')]);
     assert.deepEqual(s.topVoted.map(e => e.id).sort(), ['c', 'd']);
     assert.deepEqual(homeState([m('1', c('a', 50), c('b', 40), 'live', null)]).topVoted, []);
+});
+t('compact counts', () => { assert.equal(compactCount(6252392), '6.3M'); assert.equal(compactCount(48200), '48K'); assert.equal(compactCount(2000000), '2M'); assert.equal(compactCount(1500), '1.5K'); assert.equal(compactCount(900), '900'); assert.equal(compactCount(undefined), '0'); });
+t('has this person voted: by votes on the device, not by sign-in', () => {
+    assert.ok(!hasCastVotes({}, [])); assert.ok(!hasCastVotes(null, ['theme'])); assert.ok(hasCastVotes({ m1: {} }, [])); assert.ok(hasCastVotes({}, ['vote_jinx_m1']));
+});
+t('need a vote counts live matches with no vote', () => { assert.equal(needsVote(['a', 'b', 'c'], { b: {} }), 2); assert.equal(needsVote([], {}), 0); assert.equal(needsVote(['a'], null), 1); });
+t('home state lists live matches and the edits in them', () => {
+    const s = homeState([m('1', c('a'), c('b'), 'live', null), m('2', c('c'), c('d'), 'completed', 'c')]);
+    assert.deepEqual(s.liveMatchIds, ['1']); assert.deepEqual(s.liveEditIds.sort(), ['a', 'b', 'va', 'vb']); assert.equal(s.liveLabel, 'Group A');
+    assert.ok(inLive({ id: 'a' }, new Set(s.liveEditIds))); assert.ok(inLive({ id: 'x', videoId: 'vb' }, new Set(s.liveEditIds))); assert.ok(!inLive({ id: 'c', videoId: 'vc' }, new Set(s.liveEditIds)));
+});
+t('most watched leaves out live-match edits, and hides the row when too few are left', () => {
+    const list = [1, 2, 3, 4, 5, 6].map(i => ed('e' + i, '2026-01-0' + i, i * 1000));
+    assert.equal(mostWatched(list, 6, new Set(['e6', 'e5'])).length, 4);
+    assert.ok(!mostWatched(list, 6, new Set(['e6', 'e5'])).some(e => e.id === 'e6'));
+    assert.deepEqual(mostWatched(list, 6, new Set(['e6', 'e5', 'e4'])), [], `fewer than ${MIN_ROW}: no row`);
+    assert.equal(mostWatched(list).length, 6);
+});
+t('status line: cup, group and countdown without seconds (the count left to vote in is said by the heading)', () => {
+    const now = Date.parse('2026-10-16T00:00:00Z'), end = now + (5 * 86400 + 22 * 3600 + 47 * 60 + 30) * 1000;
+    assert.equal(statusLine({ cup: 'Jinx Cup 1', label: 'Group A', liveCount: 6, closesAt: end }, now), 'Jinx Cup 1 · Group A is live · ends in 5d 22h');
+    assert.equal(statusLine({ cup: 'Jinx Cup 1', label: '', liveCount: 1, closesAt: now + 30 * 60e3 }, now), 'Jinx Cup 1 · 1 match live · ends in 30m');
+    assert.equal(statusLine({ cup: 'X', label: 'Final', liveCount: 1, closesAt: null }, now), 'X · Final is live');
+    assert.deepEqual(statusParts({ cup: 'Jinx Cup 1', label: 'Group A', liveCount: 6, closesAt: end }, now), ['Jinx Cup 1 · Group A is live', 'ends in 5d 22h'], 'it can wrap between the parts');
 });
 console.log(`${n} passed`);

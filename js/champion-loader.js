@@ -7,8 +7,6 @@ import {
 } from './arcane-config.js';
 import { hasChosenCompanion, resolveCompanionId } from './companion-choice.js';
 import { dialogFor } from './champion-lines.js';
-import { voiceSetFor, applyVoiceSet } from './champion-voice.js';
-import { lookSkin } from './companion-look.js';
 
 console.log('🎭 champion-loader.js loaded');
 
@@ -59,12 +57,10 @@ async function loadChampionManifest() {
 // LOAD CHAMPION PACK
 // ========================================
 
-// skinNum picks the voice set for that skin (the settings window previews a skin before it is saved); without it the skin
-// the person wears is used.
+// Every skin speaks with the champion's own (Arcane) voice, so the pack depends only on the champion. skinNum is still accepted
+// (callers pass it) and ignored.
 async function loadChampionPack(championId = 'default', skinNum = null) {
-    const wanted = skinNum ?? lookSkin({ id: championId }, localStorage);
-    const voiceId = voiceSetFor(championId, wanted);
-    const cacheKey = `${championId}:${voiceId || ''}`;
+    const cacheKey = championId;
 
     // Check cache first
     if (packCache.has(cacheKey)) {
@@ -74,7 +70,7 @@ async function loadChampionPack(championId = 'default', skinNum = null) {
     }
     
     try {
-        console.log(`📦 Loading champion pack: ${championId}${voiceId ? ` (${voiceId} voice)` : ''}`);
+        console.log(`📦 Loading champion pack: ${championId}`);
 
         // Keep "default" as an internal fallback, but validate real companions.
 if (championId !== 'default' && !getCompanionPack(championId)) {
@@ -87,7 +83,7 @@ if (championId !== 'default' && !getCompanionPack(championId)) {
             throw new Error(`Pack not found: ${championId}`);
         }
         
-        let pack = await response.json();
+        const pack = await response.json();
         pack.icon = withCurrentVersion(pack.icon);
         
         // Validate pack structure
@@ -95,12 +91,6 @@ if (championId !== 'default' && !getCompanionPack(championId)) {
             throw new Error('Invalid pack structure');
         }
 
-        // A skin with its own voice set: lay it (and the set it extends) over the base pack; missing files keep the voice below
-        if (voiceId) {
-            pack = await applyVoiceSet(pack, voiceId, async id => {
-                try { const vr = await fetch(`../champion-packs/${id}.json`); return vr.ok ? await vr.json() : null; } catch (e) { return null; }
-            });
-        }
         
         // Cache it
         packCache.set(cacheKey, pack);

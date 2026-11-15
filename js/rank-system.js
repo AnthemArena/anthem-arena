@@ -3,6 +3,7 @@ import { getChampionSplashUrl } from './arcane-config.js';
 import { activePackId, addPackXp, readPackXp, mergeXp, streakFromVotes, backfillPackXp } from './xp-ledger.js';
 import { factsOf, voteXpAward, utcDay } from './vote-facts.js';
 import { recordProgress } from './vote-progress.js';
+import { cleanRankTitle } from './rank-badges.js';
 
 // ========================================
 // RANK PROGRESSION SYSTEM
@@ -204,6 +205,12 @@ function announceMastery(packId, from, to, xp) {
     });
 }
 
+// What a level-up card can say beyond the number: the rank title and the XP to the next level (null when this is the top rank).
+export function levelUpExtras(xp) {
+    const r = getUserRank(xp);
+    return { rankTitle: r.currentLevel.title, nextLevel: r.nextLevel ? r.nextLevel.level : null, xpToNext: r.nextLevel ? Math.max(0, r.nextLevel.xpNeeded - xp) : 0 };
+}
+
 export function addXP(xpToAdd, source = 'vote') {
     const currentXP = getUserXPFromStorage();
     const oldRank = getUserRank(currentXP);
@@ -228,13 +235,14 @@ export function addXP(xpToAdd, source = 'vote') {
       // ✅ Show level-up toast notification (during a vote the post-vote modal says it instead)
         if (window.showBulletin && !captured) {
             const voiced = window.championLoader?.getAchievementMessage('level-up', {
-                rank: newRank.currentLevel.title, xp: xpToAdd
+                rank: cleanRankTitle(newRank.currentLevel.title), xp: xpToAdd
             });
             window.showBulletin({
                 type: 'level-up',
                 level: newLevel,
+                ...levelUpExtras(newXP),
                 message: voiced?.message || `⬆️ New Arcane Rank!`,
-detail: voiced?.detail || `You've reached ${newRank.currentLevel.title}! +${xpToAdd} XP earned`,
+detail: voiced?.detail || `You've reached ${cleanRankTitle(newRank.currentLevel.title)}! +${xpToAdd} XP earned`,
 cta: voiced?.cta || 'View Progress',
                 ctaAction: () => window.location.href = '/profile#overview',
                 duration: 5000
@@ -330,7 +338,7 @@ export async function syncProfileStatsToFirestore() {
             // Create profile if doesn't exist
             const username = localStorage.getItem('username') || localStorage.getItem('tournamentUsername') || 'Anonymous';
             const avatarJson = localStorage.getItem('avatar');
-            let avatar = { type: 'emoji', value: '🎵' };
+            let avatar = { type: 'emoji', value: '👤' };
             
             try {
                 avatar = JSON.parse(avatarJson) || avatar;

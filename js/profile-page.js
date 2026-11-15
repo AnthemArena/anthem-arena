@@ -3,6 +3,11 @@
 // ========================================
 
 import { db } from './firebase-config.js';
+import { hiddenByReports } from './moderation-model.js';
+// a post reported enough times is held back from everyone but its author until the admin has looked (js/moderation.js)
+// Votes already have their own tab, so the Posts tab and its count are only what people typed
+const isTypedPost = p => p.type !== 'vote';
+const notHeld = p => !hiddenByReports(p, localStorage.getItem('tournamentUserId') || '');
 import { 
     collection, 
     doc, 
@@ -13,16 +18,21 @@ import {
     orderBy, 
     limit 
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { achievementBadgeHtml, hasAchievementIcon } from './achievement-icons.js';
 import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { getUnlockedAchievementsFromFirebase, calculateAchievementStats } from './achievement-tracker.js';
 import { ACHIEVEMENTS } from './achievements.js';
 import { buildAchievementsView, renderAchievementsHtml } from './achievements-view-model.js';
 import { achievementVote } from './vote-facts.js';
 import { ARCANE_CONFIG, ddragonUrl, getCompanionPack } from './arcane-config.js';
-import { tidyNames } from './title-clean.js';
+import { tidyNames, shortTitle } from './title-clean.js';
+import { votePostText } from './vote-post-text.js';
+import { cupDisplayName } from './bracket-builder.js';
+import { arrangeVotes, lockedLabel, backedMost, voteLocked, matchLabel, lockedVoteText, isClosed } from './profile-visibility.js';
 import { hasSeed, renderOwnerInsights } from './profile-insights.js';
 import { loadCupHistory } from './cup-history.js';
 import { loadChampionsTab } from './champions-tab.js';
+import { openReportDialog, openBlockDialog, getBlocked, unblockUser } from './moderation.js';
 
 import { fixAvatarUrl, splashFromAvatar } from './avatar-url.js';
 import { compareVotes, pickTitle, pickThumb } from './taste-match.js';
@@ -64,6 +74,8 @@ function hideLoadingSpinner() {
 // State
 let currentProfile = null;
 let isOwnProfile = false;
+// Is the person looking at this page its owner? (decides what a vote in a live match may show: see js/profile-visibility.js)
+let viewerOwnsProfile = false;
 let currentUserId = null;
 let currentUsername = null;
 
@@ -138,12 +150,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Get target username from URL
     const urlParams = new URLSearchParams(window.location.search);
+    // ?uid=<id> (the share link) wins over ?user=<name>; an id that is malformed or unknown is "not found", never a different person
+    const rawUid = urlParams.get('uid');
+    const targetUid = rawUid === null ? null : (/^[A-Za-z0-9_-]{6,128}$/.test(rawUid) ? rawUid : '');
     const targetUsername = urlParams.get('user') || currentUsername;
     
     console.log('👤 Target username:', targetUsername);
     console.log('👤 Current user:', currentUsername);
     
-    if (!targetUsername) {
+    if (targetUid === '' || (targetUid === null && !targetUsername)) {
         showNotFoundState();
         return;
     }
@@ -152,19 +167,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupTabs();
     
     // Load profile
-    await loadProfile(targetUsername);
+    await loadProfile(targetUid ? null : targetUsername, targetUid);
 });
 
 // ========================================
 // LOAD PROFILE
 // ========================================
 
-async function loadProfile(username) {
+async function loadProfile(username, uid = null) {
     try {
-        console.log('📥 Loading profile for:', username);
+        console.log('📥 Loading profile for:', uid || username);
         
         
-        const profile = await fetchUserProfile(username);
+        const profile = uid ? await fetchProfileById(uid) : await fetchUserProfile(username);
         
         if (!profile) {
                         hideLoadingSpinner(); // ✅ Hide spinner before showing error
@@ -174,7 +189,9 @@ async function loadProfile(username) {
         }
         
         currentProfile = profile;
-        isOwnProfile = (username === currentUsername);
+        isOwnProfile = uid ? (profile.userId === (localStorage.getItem('userId') || localStorage.getItem('tournamentUserId'))) : (username === currentUsername);
+        viewerOwnsProfile = !!profile.userId && profile.userId === (localStorage.getItem('userId') || localStorage.getItem('tournamentUserId'));
+        setEmptyVotesText();
 
             // ADD THIS LINE RIGHT HERE — PERFECT SPOT
         if (isOwnProfile && profile.userId) {
@@ -207,11 +224,13 @@ async function loadProfile(username) {
                 hideLoadingSpinner(); // ✅ Hide spinner when done
 
         showProfileContent();
+        // The share band (footer.js) shares this profile's id link. A generated placeholder profile (no real id) has nothing to share.
+        if (!profile.isFallback && profile.userId && profile.userId !== 'unknown') window.setProfileShare?.({ uid: profile.userId, name: profile.username });
 
         // Owner-only voting style + share image, then honour #votes etc.
         await loadOwnerInsights(profile.userId);
         loadTasteMatch(profile);          // not awaited: appears once both vote lists are in
-        loadCupHistory(profile.userId);   // not awaited: the history fills in when it is ready
+        loadCupHistory(profile.userId, { isOwner: viewerOwnsProfile, viewerVoted: viewerHasVoted });   // not awaited: the history fills in when it is ready
         openTabFromHash();
         
     } catch (error) {
@@ -220,6 +239,15 @@ async function loadProfile(username) {
 
         showNotFoundState();
     }
+}
+
+/** "Sam hasn't voted in Jinx Cup 1 yet." (or "You haven't...") */
+function emptyVotesText() {
+    const cup = cupDisplayName(ARCANE_CONFIG.tournamentId);
+    return viewerOwnsProfile ? `You haven't voted in ${cup} yet.` : `${currentProfile?.username || 'They'} hasn't voted in ${cup} yet.`;
+}
+function setEmptyVotesText() {
+    document.querySelectorAll('[data-empty-votes]').forEach(el => { el.textContent = emptyVotesText(); });
 }
 
 // ✅ NEW FUNCTION: Preload tab counts
@@ -246,7 +274,7 @@ async function preloadTabCounts(userId) {
             where('userId', '==', userId),
             where('privacy', '==', 'public')
         ));
-        counts.posts = postsSnapshot.size;
+        counts.posts = postsSnapshot.docs.filter(d => isTypedPost(d.data())).length;
         document.getElementById('postsCount').textContent = counts.posts;
     } catch (error) {
         console.error('❌ Error preloading post count:', error);
@@ -327,6 +355,34 @@ async function fetchUserProfile(username) {
 // DIRECT FIREBASE FALLBACK (with user generation)
 // ========================================
 
+// By id (the share link). Same public data and the same shape as the name lookup; no placeholder profile for an unknown id.
+async function fetchProfileById(uid) {
+    try {
+        const snap = await getDoc(doc(db, 'profiles', uid));
+        return snap.exists() ? profileFromDoc(snap.id, snap.data()) : null;
+    } catch (error) {
+        console.error('❌ Error fetching profile by id:', error);
+        return null;
+    }
+}
+
+function profileFromDoc(id, profileData) {
+    return {
+        ...profileData,                       // the whole public profile, as the name lookup (edge function) returns it
+        userId: id,
+        username: profileData.username,
+        avatar: profileData.avatar || { type: 'emoji', value: '👤' },
+        companionId: profileData.companionId || profileData.championPackId || 'jinx',
+        championPackId: profileData.championPackId || profileData.companionId || 'jinx',
+        bio: profileData.bio || '',
+        xp: profileData.xp,
+        packXp: profileData.packXp,
+        privacy: profileData.privacy || {},
+        createdAt: profileData.createdAt,
+        updatedAt: profileData.updatedAt
+    };
+}
+
 async function fetchUserProfileDirect(username) {
     try {
         // Query profiles collection by username
@@ -352,7 +408,7 @@ async function fetchUserProfileDirect(username) {
 return {
     userId: profileDoc.id,
     username: profileData.username,
-    avatar: profileData.avatar || { type: 'emoji', value: '🎵' },
+    avatar: profileData.avatar || { type: 'emoji', value: '👤' },
 
     // Prefer the new Arcane field, fall back to the legacy field
     companionId: profileData.companionId || profileData.championPackId || 'jinx',
@@ -428,7 +484,7 @@ async function renderProfile(profile) {
     // Avatar
     const avatarEl = document.getElementById('profileAvatar');
     if (profile.avatar.type === 'url') {
-        avatarEl.innerHTML = `<img src="${fixAvatarUrl(profile.avatar.value)}" alt="${profile.username}" />`;
+        avatarEl.innerHTML = `<img src="${escapeHtml(fixAvatarUrl(profile.avatar.value))}" alt="${escapeHtml(profile.username)}" />`;
     } else {
         avatarEl.textContent = profile.avatar.value;
     }
@@ -500,13 +556,6 @@ async function renderProfile(profile) {
         <i class="fas fa-calendar"></i> Joined ${formatJoinDate(joinedDate)}
     `;
     
-    // Vote count
-    const voteCount = await getVoteCountForUser(profile.userId);
-    document.getElementById('profileVotes').innerHTML = `
-        <i class="fas fa-trophy"></i> ${voteCount} ${voteCount === 1 ? 'vote' : 'votes'}
-    `;
-    
-
     // ✅ NEW: Render social links
     renderSocialLinks(profile);
 
@@ -640,8 +689,8 @@ async function renderProfileActions(isOwnProfile) {
             const followBtn = `
                 <button class="profile-action-btn follow ${following ? 'following' : ''}" 
                         id="profileFollowBtn"
-                        data-user-id="${currentProfile.userId}"
-                        data-username="${currentProfile.username}">
+                        data-user-id="${escapeHtml(currentProfile.userId)}"
+                        data-username="${escapeHtml(currentProfile.username)}">
                     ${following ? 
                         '<i class="fas fa-user-check"></i> Following' : 
                         '<i class="fas fa-user-plus"></i> Follow'
@@ -649,7 +698,8 @@ async function renderProfileActions(isOwnProfile) {
                 </button>
             `;
             
-            actionsEl.innerHTML = followBtn;
+            actionsEl.innerHTML = followBtn + profileMoreHtml();
+            bindProfileMore();
             
             // Attach event listeners
             const followButton = document.getElementById('profileFollowBtn');
@@ -663,8 +713,8 @@ async function renderProfileActions(isOwnProfile) {
             // Fallback to basic buttons on error
             actionsEl.innerHTML = `
                 <button class="profile-action-btn follow" id="profileFollowBtn"
-                        data-user-id="${currentProfile.userId}"
-                        data-username="${currentProfile.username}">
+                        data-user-id="${escapeHtml(currentProfile.userId)}"
+                        data-username="${escapeHtml(currentProfile.username)}">
                     <i class="fas fa-user-plus"></i> Follow
                 </button>
             `;
@@ -680,6 +730,12 @@ async function renderProfileActions(isOwnProfile) {
 // ========================================
 async function handleFollowClick(e) {
     const btn = e.currentTarget;
+    if (!hasProfileId()) {
+        // one route to claiming a profile: the settings modal, as the nav avatar button does
+        if (window.showQuickToast) window.showQuickToast('Claim your profile to follow', 2500);
+        window.openSettingsModal?.();
+        return;
+    }
     const targetUserId = btn.dataset.userId;
     const targetUsername = btn.dataset.username;
     const isCurrentlyFollowing = btn.classList.contains('following');
@@ -700,7 +756,7 @@ async function handleFollowClick(e) {
                 await updateFollowCounts();
                 
                 if (window.showQuickToast) {
-                    window.showQuickToast(`Unfollowed ${targetUsername}`, 2000);
+                    window.showQuickToast(`Unfollowed ${escapeHtml(targetUsername)}`, 2000);
                 }
             } else {
                 throw new Error('Failed to unfollow');
@@ -715,7 +771,7 @@ async function handleFollowClick(e) {
                 await updateFollowCounts();
                 
                 if (window.showQuickToast) {
-                    window.showQuickToast(`✅ Now following ${targetUsername}!`, 2000);
+                    window.showQuickToast(`✅ Now following ${escapeHtml(targetUsername)}!`, 2000);
                 }
             } else {
                 throw new Error('Failed to follow');
@@ -870,6 +926,8 @@ else {
         const { votes: visibleVotesForStats } = await fetchUserVotes(userId);
         document.getElementById('statTotalVotes').textContent = visibleVotesForStats.length;
         document.getElementById('statAchievements').textContent = achievementsCount;
+        const achLabel = document.querySelector('#statAchievements + .stat-label');
+        if (achLabel) achLabel.textContent = achievementsCount === 1 ? 'Achievement' : 'Achievements';
         
         // ✅ UPDATE ACTIVITY LEVEL WITH RANK
         const activityLevelEl = document.getElementById('statActivityLevel');
@@ -878,7 +936,7 @@ else {
             
             activityLevelEl.innerHTML = `
                 <span style="font-size: 1.5rem; font-weight: 700; color: var(--pink-bright, #c8aa6e); display: block;">Lv. ${rank.currentLevel.level}</span>
-                <span style="font-size: 1rem; font-weight: 600; color: color-mix(in srgb, var(--text, #f0e6d2) 80%, transparent); display: block; margin-top: 4px;">${cleanTitle}</span>
+                <span style="font-size: 1rem; font-weight: 600; color: color-mix(in srgb, var(--text, #f0e6d2) 80%, transparent); display: block; margin-top: 4px;">${rank.nextLevel ? `${rank.progressXP} / ${rank.xpForNextLevel} XP` : `${rank.totalXP} XP · Max`}</span>
             `;
         }
         
@@ -1018,7 +1076,7 @@ else if (userId === currentUserId) {
                 <div class="achievement-card">
                     <div class="achievement-header">
                         <div class="achievement-icon">
-                            ${isUrl 
+                            ${hasAchievementIcon(ach.id) ? achievementBadgeHtml(ach.id, ach.rarity, { size: 56 }) : isUrl 
                                 ? `<img src="${ach.icon}" 
                                         alt="${ach.name}" 
                                         class="achievement-icon-img"
@@ -1059,7 +1117,17 @@ else if (userId === currentUserId) {
 
 async function loadFavoriteSongs(userId) {
     try {
-        const votes = await getVotesForUser(userId);
+        let votes = await getVotesForUser(userId);
+
+        // On someone else's page, picks in matches that are still open are left out of this list altogether
+        if (!viewerOwnsProfile) {
+            votes = votes.filter(v => v.match && isClosed(v.match));
+            if (votes.length === 0) {
+                const sec = document.getElementById('favoriteSongs')?.closest('.overview-section');
+                if (sec) sec.hidden = true;   // an empty list during a live cup: no heading either
+                return;
+            }
+        }
         
         if (votes.length === 0) {
             return; // Keep no-content state
@@ -1095,15 +1163,15 @@ async function loadFavoriteSongs(userId) {
             songCounts[songId].count++;
         });
         
-        // Get top 3
-        const topSongs = Object.values(songCounts)
-            .sort((a, b) => b.count - a.count)
-            .slice(0, 3);
-        
+        // Only a real order: 2+ picks, no arbitrary tie-breaks (see backedMost)
+        const topSongs = backedMost(Object.values(songCounts));
+
         if (topSongs.length === 0) {
-            return; // Keep no-content state
+            const sec = document.getElementById('favoriteSongs')?.closest('.overview-section');
+            if (sec) sec.hidden = true;
+            return;
         }
-        
+
         const medals = ['🥇', '🥈', '🥉'];
         
         const container = document.getElementById('favoriteSongs');
@@ -1111,7 +1179,7 @@ async function loadFavoriteSongs(userId) {
             <div class="favorite-song-card">
                 <div class="song-rank">${medals[index] || (index + 1)}</div>
                 <img 
-                    src="${song.thumbnail}" 
+                    src="${escapeHtml(song.thumbnail)}" 
                     alt="${song.name}"
                     class="song-thumbnail"
                     loading="lazy"
@@ -1121,9 +1189,9 @@ async function loadFavoriteSongs(userId) {
                     <div class="song-title">${song.name}</div>
                     <div class="song-meta">
                         <span>${song.artist}</span>
-                        ${hasSeed(song.seed) ? `<span class="song-meta-separator">•</span>
+                        ${hasSeed(song.seed) ? `<span class="song-meta-separator">·</span>
                         <span>Seed #${song.seed}</span>` : ''}
-                        <span class="song-meta-separator">•</span>
+                        <span class="song-meta-separator">·</span>
                         <span class="song-vote-count">${song.count} ${song.count === 1 ? 'vote' : 'votes'}</span>
                     </div>
                 </div>
@@ -1135,106 +1203,6 @@ async function loadFavoriteSongs(userId) {
     }
 }
 
-// ========================================
-// LOAD ALL FAVORITE SONGS (for Songs tab)
-// ========================================
-
-// ========================================
-// LOAD ALL FAVORITE SONGS (for Songs tab)
-// ========================================
-
-async function loadAllFavoriteSongs(userId) {
-    try {
-        const votes = await getVotesForUser(userId);
-        
-        if (votes.length === 0) {
-            document.getElementById('allFavoriteSongs').innerHTML = `
-                <div class="no-content">
-                    <i class="fas fa-music"></i>
-                    <p>No votes yet</p>
-                </div>
-            `;
-            return;
-        }
-        
-        // Count song votes
-        const songCounts = {};
-        
-        votes.forEach(vote => {
-            const match = vote.match;
-            if (!match) return;
-            
-            const votedSong = vote.choice === 'song1' ? match.song1 : match.song2;
-            if (!votedSong) return;
-            
-            const songId = votedSong.id;
-            
-            if (!songCounts[songId]) {
-                // ✅ Look up song data from musicData cache
-                const songData = musicData[votedSong.videoId] || musicData[songId] || votedSong;
-                
-                songCounts[songId] = {
-                    id: songId,
-                    name: votedSong.shortTitle || votedSong.title,
-                    artist: votedSong.artist,
-                    videoId: votedSong.videoId,
-                    seed: votedSong.seed,
-                    thumbnail: songData.thumbnail || `https://img.youtube.com/vi/${votedSong.videoId}/mqdefault.jpg`, // ✅ Use thumbnail from JSON
-                    count: 0
-                };
-            }
-            
-            songCounts[songId].count++;
-        });
-        
-        // Sort by count
-        const allSongs = Object.values(songCounts)
-            .sort((a, b) => b.count - a.count);
-        
-        if (allSongs.length === 0) {
-            document.getElementById('allFavoriteSongs').innerHTML = `
-                <div class="no-content">
-                    <i class="fas fa-music"></i>
-                    <p>No votes yet</p>
-                </div>
-            `;
-            return;
-        }
-        
-        const container = document.getElementById('allFavoriteSongs');
-        container.innerHTML = allSongs.map((song, index) => {
-            const medals = ['🥇', '🥈', '🥉'];
-            const rank = medals[index] || `#${index + 1}`;
-            
-            return `
-             <div class="favorite-song-card">
-    <div class="song-rank">${medals[index] || (index + 1)}</div>
-
-    <img
-        src="${song.thumbnail}"
-        alt="${song.name}"
-        class="song-thumbnail"
-        loading="lazy"
-        onerror="this.src='https://via.placeholder.com/160x90/0a0a0a/ff4fb4?text=🎬'"
-    />
-
-    <div class="song-details">
-        <div class="song-title">${song.name}</div>
-
-        <div class="song-meta">
-            <span>${song.count} ${song.count === 1 ? 'vote' : 'votes'}</span>
-            <span class="song-meta-separator">•</span>
-            <span>Supported by you</span>
-        </div>
-    </div>
-</div>
-            `;
-        }).join('');
-        
-    } catch (error) {
-        console.error('❌ Error loading all favorite songs:', error);
-    }
-}
 
 // ========================================
 // LOAD RECENT POSTS
@@ -1262,7 +1230,7 @@ async function loadRecentPosts(userId) {
         }));
         
         const container = document.getElementById('recentPosts');
-        container.innerHTML = posts.map(post => renderPostCard(post)).join('');
+        container.innerHTML = posts.filter(notHeld).map(post => renderPostCard(post)).join('');
         
     } catch (error) {
         console.error('❌ Error loading recent posts:', error);
@@ -1297,7 +1265,7 @@ async function loadAllPosts(userId) {
         }));
         
         const container = document.getElementById('allPosts');
-        container.innerHTML = posts.map(post => renderPostCard(post)).join('');
+        container.innerHTML = posts.filter(notHeld).map(post => renderPostCard(post)).join('');
         
     } catch (error) {
         console.error('❌ Error loading all posts:', error);
@@ -1353,7 +1321,7 @@ async function loadRecentVotes(userId, limitCount = 5) {
             recentVotesContainer.innerHTML = `
                 <div class="no-content">
                     <i class="fas fa-vote-yea"></i>
-                    <p>No votes yet</p>
+                    <p>${escapeHtml(emptyVotesText())}</p>
                 </div>
             `;
             return;
@@ -1361,8 +1329,7 @@ async function loadRecentVotes(userId, limitCount = 5) {
 
         const matchMap = new Map(votes.map(v => [v.matchId, v.match]));
 
-        const votesHTML = votes
-            .slice(0, limitCount)
+        const votesHTML = arrangeForViewer(votes.slice(0, limitCount), v => v.match, v => v.matchId)
             .map(({ match, ...voteData }) => renderVoteCard(voteData, matchMap))
             .join('');
 
@@ -1399,10 +1366,11 @@ async function loadAllVotes(userId) {
         document.getElementById('votesCount').textContent = votes.length;
 
         if (votes.length === 0) {
+            document.querySelector('.filter-buttons')?.setAttribute('hidden', '');
             document.getElementById('allVotes').innerHTML = `
                 <div class="no-content">
                     <i class="fas fa-vote-yea"></i>
-                    <p>No votes yet</p>
+                    <p>${escapeHtml(emptyVotesText())}</p>
                 </div>
             `;
             return;
@@ -1431,14 +1399,40 @@ async function loadAllVotes(userId) {
 // RENDER FILTERED VOTES
 // ========================================
 
+// counts on the filter chips and one summary line ("3 votes · 2 live · 1 advanced")
+function updateVoteFilterBar() {
+    const counts = { all: 0, won: 0, lost: 0, live: 0 };
+    for (const { voteData, match } of allUserVotes || []) { counts.all++; counts[getVoteStatus(voteData, match)]++; }
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        const n = counts[btn.dataset.filter] ?? 0;
+        let c = btn.querySelector('.filter-count');
+        if (!c) { c = document.createElement('span'); c.className = 'filter-count'; btn.appendChild(c); }
+        c.textContent = n;
+        // a chip that can't match anything says nothing: hide it unless it is All or the one in use
+        btn.toggleAttribute('hidden', btn.dataset.filter !== 'all' && n === 0 && !btn.classList.contains('active'));
+    });
+    // one status only (every vote live, say): nothing to filter, so the whole row goes
+    const statusKinds = ['won', 'lost', 'live'].filter(k => counts[k] > 0).length;
+    document.querySelector('.filter-buttons')?.toggleAttribute('hidden', counts.all === 0 || statusKinds < 2);
+    const el = document.getElementById('votesSummary');
+    if (el) {
+        const bits = [`${counts.all} ${counts.all === 1 ? 'vote' : 'votes'}`];
+        if (counts.live) bits.push(`${counts.live} live`);
+        if (counts.won) bits.push(`${counts.won} advanced`);
+        if (counts.lost) bits.push(`${counts.lost} eliminated`);
+        el.textContent = counts.all ? bits.join(' · ') : '';
+    }
+}
+
 function renderFilteredVotes(filter) {
     const allVotesContainer = document.getElementById('allVotes');
+    updateVoteFilterBar();
     
     if (!allUserVotes || allUserVotes.length === 0) {
         allVotesContainer.innerHTML = `
             <div class="no-content">
                 <i class="fas fa-vote-yea"></i>
-                <p>No votes yet</p>
+                <p>${escapeHtml(emptyVotesText())}</p>
             </div>
         `;
         return;
@@ -1468,7 +1462,7 @@ function renderFilteredVotes(filter) {
     const matchMap = new Map(allUserVotes.map(v => [v.voteData.matchId, v.match]));
     
     // Render votes
-    const votesHTML = filteredVotes
+    const votesHTML = arrangeForViewer(filteredVotes, v => v.match, v => v.voteData.matchId)
         .map(({ voteData }) => renderVoteCard(voteData, matchMap))
         .join('');
     
@@ -1483,6 +1477,7 @@ function renderFilteredVotes(filter) {
 // RENDER VOTE CARD (Activity style)
 // ========================================
 
+let voteRowSeq = 0;
 function renderVoteCard(vote, matchMap) {
     const match = matchMap.get(vote.matchId);
 
@@ -1493,6 +1488,22 @@ function renderVoteCard(vote, matchMap) {
                 <p>Match data not found</p>
             </div>
         `;
+    }
+
+    // Someone else's pick in a match that is still open stays hidden until you have voted in it too (or it has closed).
+    // The row is text only: even the order of the two edits would show the pick (the pick is drawn first).
+    if (voteLocked(match, { isOwner: viewerOwnsProfile, viewerVoted: viewerHasVoted(vote.matchId) })) {
+        return `
+        <div class="vote-card live locked">
+            <div class="vote-header">
+                <div class="vote-status-badge live">🔴 LIVE</div>
+                <div class="vote-timestamp">${formatTimeAgo(vote.timestamp)}</div>
+            </div>
+            <p class="vote-locked-text"><i class="fa-solid fa-lock" aria-hidden="true"></i> ${escapeHtml(lockedVoteText(lockedLabel(match, cupDisplayName(match?.tournamentId || ARCANE_CONFIG.tournamentId))))}</p>
+            <div class="vote-footer">
+                <a href="/vote.html?id=${encodeURIComponent(vote.matchId)}" class="view-match-link">Vote in this match →</a>
+            </div>
+        </div>`;
     }
 
     const { song1, song2 } = match;
@@ -1554,7 +1565,24 @@ function renderVoteCard(vote, matchMap) {
 
     const timeAgo = formatTimeAgo(vote.timestamp);
 
+    // One line per vote on a phone (thumbnail, title, "vs", status, time); the full card opens under it. The toggle is hidden on desktop,
+    // where the full card is always shown. Locked votes never reach here (they returned a text-only row above), so a hidden pick can't exist.
+    const rowId = 'vr-' + (++voteRowSeq) + '-' + String(vote.matchId).replace(/[^a-zA-Z0-9_-]/g, '');
     return `
+        <div class="vote-row ${status}">
+            <button type="button" class="vote-row-toggle" aria-expanded="false" aria-controls="${rowId}">
+                <img class="vr-thumb" src="${escapeHtml(chosenThumbnail)}" alt="" loading="lazy">
+                <span class="vr-text">
+                    <span class="vr-title">${escapeHtml(chosenTitle)}</span>
+                    <span class="vr-vs">vs ${escapeHtml(opponentTitle)}</span>
+                </span>
+                <span class="vr-meta">
+                    <span class="vr-chip ${statusInfo.class}">${statusInfo.label}</span>
+                    <span class="vr-time">${timeAgo}</span>
+                </span>
+                <i class="fas fa-chevron-down vr-chev" aria-hidden="true"></i>
+            </button>
+            <div class="vote-row-detail" id="${rowId}" hidden>
         <div class="vote-card ${status}">
             <div class="vote-header">
                 <div class="vote-status-badge ${statusInfo.class}">
@@ -1570,15 +1598,15 @@ function renderVoteCard(vote, matchMap) {
                     <div class="vote-song-thumbnail">
                         <img
                             src="${chosenThumbnail}"
-                            alt="${chosenTitle}"
+                            alt=""
                             loading="lazy"
                         >
                     </div>
 
                     <div class="vote-song-info">
-                        <div class="vote-song-title">${chosenTitle}</div>
+                        <div class="vote-song-title">${escapeHtml(chosenTitle)}</div>
                         <div class="vote-song-meta">
-                            Your Choice
+                            ${viewerOwnsProfile ? 'Your pick' : 'Their pick'}
                         </div>
                     </div>
                 </div>
@@ -1589,13 +1617,13 @@ function renderVoteCard(vote, matchMap) {
                     <div class="vote-song-thumbnail">
                         <img
                             src="${opponentThumbnail}"
-                            alt="${opponentTitle}"
+                            alt=""
                             loading="lazy"
                         >
                     </div>
 
                     <div class="vote-song-info">
-                        <div class="vote-song-title">${opponentTitle}</div>
+                        <div class="vote-song-title">${escapeHtml(opponentTitle)}</div>
                         <div class="vote-song-meta">
                             Opponent
                         </div>
@@ -1605,13 +1633,7 @@ function renderVoteCard(vote, matchMap) {
             </div>
 
             <div class="vote-footer">
-                <span class="vote-tournament">
-                    Arcane Moments
-                </span>
-
-                <span class="vote-round">
-                    Round ${match.round || 1}
-                </span>
+                <span class="vote-tournament">${escapeHtml(cupMatchLabel(match))}</span>
 
                 <a
                     href="/vote.html?id=${vote.matchId}"
@@ -1620,6 +1642,8 @@ function renderVoteCard(vote, matchMap) {
                     View Match →
                 </a>
             </div>
+        </div>
+    </div>
         </div>
     `;
 }
@@ -1722,8 +1746,8 @@ function setupVoteFilters() {
     filterButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             // Update active state
-            filterButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            filterButtons.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+            btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true');
             
             // Update filter and re-render
             currentVoteFilter = btn.dataset.filter;
@@ -1740,8 +1764,8 @@ function setupVoteFilters() {
 
 function renderPostCard(post) {
     const avatar = post.avatar?.type === 'url' 
-        ? `<img src="${fixAvatarUrl(post.avatar.value)}" alt="${post.username}" />`
-        : post.avatar?.value || '🎵';
+        ? `<img src="${escapeHtml(fixAvatarUrl(post.avatar.value))}" alt="${escapeHtml(post.username)}" />`
+        : escapeHtml(post.avatar?.value || '👤');
     
     const timestamp = new Date(post.timestamp);
     const timeAgo = getTimeAgo(timestamp);
@@ -1751,12 +1775,12 @@ function renderPostCard(post) {
             <div class="post-header">
                 <div class="post-avatar">${avatar}</div>
                 <div class="post-author-info">
-                    <div class="post-author">${post.username}</div>
+                    <div class="post-author">${escapeHtml(post.username)}</div>
                     <div class="post-timestamp">${timeAgo}</div>
                 </div>
             </div>
             <div class="post-content">
-                ${post.text || 'Voted in a match'}
+                ${escapeHtml(post.type === 'vote' ? votePostText(post) : (post.text || 'Voted in a match'))}
             </div>
             <div class="post-actions">
                 <button class="post-action-btn">
@@ -1978,7 +2002,7 @@ async function loadOwnerInsights(userId) {
 }
 
 // ========================================
-// DEEP LINKS: /profile#votes, #achievements, #journey, #posts, #moments
+// DEEP LINKS: /profile#votes, #achievements, #journey, #posts (#moments and #songs open Overview)
 // ========================================
 
 const TAB_HASHES = {
@@ -1988,33 +2012,61 @@ const TAB_HASHES = {
     journey: 'participation',
     champions: 'champions',
     achievements: 'achievements',
-    moments: 'songs'
+    moments: 'overview',     // the old Top Moments tab is gone: Overview has "Edits you backed most"
+    songs: 'overview'
 };
 
 function openTabFromHash() {
-    const key = window.location.hash.replace('#', '').toLowerCase();
-    const tab = TAB_HASHES[key];
+    // #votes (old links) or ?tab=votes (the account menu's "My votes")
+    const q = new URLSearchParams(window.location.search).get('tab') || '';
+    const key = (window.location.hash.replace('#', '') || q).replace(/^tab-/, '').toLowerCase();
+    const tab = Object.prototype.hasOwnProperty.call(TAB_HASHES, key) ? TAB_HASHES[key] : null;
     if (!tab) return;
 
     const button = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
     if (button && !button.classList.contains('active')) button.click();
 }
 
+// vote rows: the toggle opens and closes the full card under it (phones)
+document.addEventListener('click', e => {
+    const t = e.target.closest?.('.vote-row-toggle');
+    if (!t) return;
+    const open = t.getAttribute('aria-expanded') !== 'true';
+    t.setAttribute('aria-expanded', String(open));
+    (t.nextElementSibling?.id === t.getAttribute('aria-controls') ? t.nextElementSibling : document.getElementById(t.getAttribute('aria-controls')))?.toggleAttribute('hidden', !open);
+});
+
 function setupTabs() {
     const tabButtons = document.querySelectorAll('.tab-btn');
+    // arrow keys move between tabs (the tab row is one tab stop; the panel is the next)
+    document.querySelector('.tabs-nav')?.addEventListener('keydown', e => {
+        const tabs = [...tabButtons], i = tabs.indexOf(document.activeElement);
+        if (i < 0 || !['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
+        e.preventDefault();
+        const next = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+        tabs[next].focus(); tabs[next].click();
+    });
     const tabPanels = document.querySelectorAll('.tab-panel');
     
+    // a badge with 0 is hidden (Posts, Achievements while empty); it shows again when the number changes
+    const syncBadges = () => document.querySelectorAll('.tab-count').forEach(c => { c.hidden = (c.textContent || '').trim() === '0' || (c.textContent || '').trim() === ''; });
+    document.querySelectorAll('.tab-count').forEach(c => new MutationObserver(syncBadges).observe(c, { childList: true, characterData: true, subtree: true }));
+    syncBadges();
+
     tabButtons.forEach(btn => {
         btn.addEventListener('click', async () => {
             const targetTab = btn.dataset.tab;
+            const scrollY = window.scrollY;   // changing tab must not jump the page
             
             // Remove active from all
-            tabButtons.forEach(b => b.classList.remove('active'));
+            tabButtons.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); b.tabIndex = -1; });
             tabPanels.forEach(p => p.classList.remove('active'));
             
             // Add active to clicked
-            btn.classList.add('active');
+            btn.classList.add('active'); btn.setAttribute('aria-selected', 'true'); btn.tabIndex = 0;
             document.getElementById(`tab-${targetTab}`).classList.add('active');
+            btn.scrollIntoView({ inline: 'center', block: 'nearest' });   // the tab row scrolls sideways on phones
+            window.scrollTo({ top: scrollY });
             
             // Lazy load tab content
             if (targetTab === 'votes' && allUserVotes.length === 0) {
@@ -2027,7 +2079,8 @@ function setupTabs() {
             }
 
             if (targetTab === 'champions') {
-                await loadChampionsTab(currentProfile, currentProfile.userId === localStorage.getItem('tournamentUserId'));
+                await primeLiveMatches();
+                await loadChampionsTab(currentProfile, viewerOwnsProfile, viewerOwnsProfile ? null : openMatchIds);
             }
 
             if (targetTab === 'participation' && window.participationData) {
@@ -2036,10 +2089,6 @@ function setupTabs() {
             
             if (targetTab === 'achievements' && document.getElementById('allAchievements').querySelector('.no-content')) {
                 await loadAllAchievements(currentProfile.userId);
-            }
-            
-            if (targetTab === 'songs' && document.getElementById('allFavoriteSongs').querySelector('.no-content')) {
-                await loadAllFavoriteSongs(currentProfile.userId);
             }
         });
     });
@@ -2294,12 +2343,56 @@ function getRoundName(roundNumber) {
 // FOLLOW SYSTEM INTEGRATION
 // ========================================
 
+// "…" beside Follow on someone else's profile: block / unblock. (Reports are for posts and comments only, so Report lives on each post.)
+function profileMoreHtml() {
+    if (!currentProfile?.userId || viewerOwnsProfile) return '';
+    const name = escapeHtml(currentProfile.username);
+    const blocked = !!getBlocked()[currentProfile.userId];
+    return `
+        <div class="profile-more">
+            <button type="button" class="profile-more-btn" id="profileMoreBtn" aria-label="More actions for ${name}" aria-haspopup="menu" aria-expanded="false"><i class="fas fa-ellipsis" aria-hidden="true"></i></button>
+            <div class="profile-more-menu" id="profileMoreMenu" role="menu" hidden>
+                <button type="button" role="menuitem" class="menu-item" id="profileBlockBtn"><i class="fas fa-ban" aria-hidden="true"></i> ${blocked ? 'Unblock' : 'Block'} ${name}</button>
+            </div>
+        </div>`;
+}
+function bindProfileMore() {
+    const btn = document.getElementById('profileMoreBtn'), menu = document.getElementById('profileMoreMenu');
+    if (!btn || !menu) return;
+    const close = () => { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
+    btn.addEventListener('click', e => { e.stopPropagation(); menu.hidden = !menu.hidden; btn.setAttribute('aria-expanded', String(!menu.hidden)); });
+    document.addEventListener('click', e => { if (!e.target.closest('.profile-more')) close(); });
+    btn.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    document.getElementById('profileBlockBtn').addEventListener('click', () => {
+        close();
+        if (getBlocked()[currentProfile.userId]) { unblockUser(currentProfile.userId); updateProfileMore(); return; }
+        openBlockDialog({ userId: currentProfile.userId, name: currentProfile.username, onDone: updateProfileMore });
+    });
+}
+function updateProfileMore() {
+    const host = document.querySelector('.profile-more');
+    if (!host) return;
+    host.outerHTML = profileMoreHtml();
+    bindProfileMore();
+}
+
+// Signed in = has a profile id on this device (same test follow-system.js uses)
+const hasProfileId = () => { const id = localStorage.getItem('tournamentUserId'); return !!id && id !== 'anonymous'; };
+
 async function renderFollowButton(targetUserId, targetUsername) {
     const currentUserId = localStorage.getItem('userId');
     
     // Don't show follow button on own profile
-    if (!currentUserId || currentUserId === targetUserId) {
+    if (currentUserId && currentUserId === targetUserId) {
         return '';
+    }
+    
+    // No profile yet: Follow still shows, and a click opens the same claim flow as the nav avatar button
+    if (!hasProfileId()) {
+        return `
+        <button class="profile-follow-btn" id="followBtn" data-user-id="${escapeHtml(targetUserId)}" data-username="${escapeHtml(targetUsername)}">
+            <i class="fas fa-user-plus"></i> Follow
+        </button>`;
     }
     
     const { isFollowing } = await import('./follow-system.js');
@@ -2308,8 +2401,8 @@ async function renderFollowButton(targetUserId, targetUsername) {
     return `
         <button class="profile-follow-btn ${following ? 'following' : ''}" 
                 id="followBtn"
-                data-user-id="${targetUserId}"
-                data-username="${targetUsername}">
+                data-user-id="${escapeHtml(targetUserId)}"
+                data-username="${escapeHtml(targetUsername)}">
             ${following ? 
                 '<i class="fas fa-user-check"></i> Following' : 
                 '<i class="fas fa-user-plus"></i> Follow'
@@ -2331,7 +2424,8 @@ async function updateFollowButton() {
     const profileActions = document.querySelector('.profile-actions');
     if (profileActions) {
         const followBtn = await renderFollowButton(currentProfile.userId, currentProfile.username);
-        profileActions.innerHTML = followBtn;
+        profileActions.innerHTML = followBtn + profileMoreHtml();
+        bindProfileMore();
         
         // Attach click handler
         const btn = document.getElementById('followBtn');
@@ -2389,6 +2483,16 @@ document.getElementById('statParticipation').textContent = `${participation.over
 // RENDER PARTICIPATION TAB
 // ========================================
 
+// With one stage, the cup's row in Cup History already carries "N of M voted" and its bar, so the separate Journey card is dropped.
+// If Cup History is not there (failed or still loading), the card stays.
+function syncJourneyCard() {
+    const card = document.querySelector('.participation-overview');
+    const hist = document.getElementById('cupHistory');
+    if (!card) return;
+    card.hidden = !!(window.__journeySingle && hist && !hist.hidden && hist.querySelector('.ch-cup .ch-bar'));
+}
+document.getElementById('cupHistory')?.addEventListener('cuphistory:ready', syncJourneyCard);
+
 function renderParticipationTab() {
     const participation = window.participationData;
     
@@ -2409,15 +2513,35 @@ function renderParticipationTab() {
     // Update percentage display
     document.getElementById('overallParticipation').textContent = `${participation.overallPercentage}%`;
     
+    const journeyTitle = document.getElementById('journeyTitle');
+    if (journeyTitle) journeyTitle.textContent = viewerOwnsProfile ? 'Your Arcane Journey' : `${currentProfile?.username || 'Their'}'s journey`;
+
+    // One stage so far: one progress card (cup, stage, "2 of 6 matches voted", one bar) instead of a donut, a sentence and a second bar
+    const single = participation.byRound.length <= 1;
+    const donut = document.querySelector('.participation-circle');
+    if (donut) donut.hidden = single;
+    const breakdown = document.querySelector('.rounds-breakdown');
+    if (breakdown) breakdown.hidden = single;
+    window.__journeySingle = single;
+    syncJourneyCard();
+
     // Update summary text with tournament name
     const summary = document.getElementById('participationSummary');
-    summary.innerHTML = `
+    const cupName = escapeHtml(cupDisplayName(ARCANE_CONFIG.tournamentId));
+    const only = participation.byRound[0];
+    summary.innerHTML = single && only ? `
+        <div style="margin-bottom: .5rem;"><strong style="color: var(--pink-bright, #c8aa6e); font-size: 1.1rem;">${cupName}</strong></div>
+        <p class="journey-line">${escapeHtml(only.roundName)}: ${only.voted} of ${only.total} matches voted</p>
+        <div class="round-progress-container journey-bar" role="progressbar" aria-label="${escapeHtml(only.roundName)} matches voted" aria-valuenow="${only.voted}" aria-valuemin="0" aria-valuemax="${only.total}">
+            <div class="round-progress-fill" style="width: ${only.percentage}%"></div>
+        </div>
+    ` : `
         <div style="margin-bottom: 1rem;">
 <strong style="color: var(--pink-bright, #c8aa6e); font-size: 1.1rem;">
-    🎬 ${participation.tournamentName}
+    ${cupName}
 </strong>
         </div>
-        <p>You've voted in ${participation.totalVotes} out of ${participation.totalPossible} matches open so far.</p>
+        <p>${viewerOwnsProfile ? 'You\'ve voted' : 'Voted'} in ${participation.totalVotes} of ${participation.totalPossible} open matches.</p>
     `;
     
     // Render rounds breakdown
@@ -2446,8 +2570,28 @@ function renderParticipationTab() {
 // LOAD USER'S POSTS
 // ========================================
 
+// Matches that are live right now. A vote post by someone else in one of them does not say who they picked until the viewer
+// has voted there too (the feed, the vote page and Brackets hide live results the same way).
+let liveMatchIds = new Set();
+let openMatchIds = new Set();   // matches not closed yet: a visitor's votes in them stay out of every count
+async function primeLiveMatches() {
+    try {
+        const { getAllMatches } = await import('./api-client.js');
+        const all = await getAllMatches();
+        liveMatchIds = new Set(all.filter(m => m.status === 'live').map(m => m.id || m.matchId));
+        openMatchIds = new Set(all.filter(m => !isClosed(m)).map(m => m.id || m.matchId));
+    } catch (e) { console.warn('live matches not loaded; vote posts shown as saved:', e); }
+}
+function viewerHasVoted(matchId) {
+    try {
+        const saved = JSON.parse(localStorage.getItem('userVotes') || '{}') || {};
+        return !!saved[matchId] || !!localStorage.getItem(`vote_${ARCANE_CONFIG.tournamentId}_${matchId}`);
+    } catch (e) { return false; }
+}
+
 async function loadUserPosts(userId, limitCount = null) {
     try {
+        await primeLiveMatches();
         const postsQuery = query(
             collection(db, 'posts'),
             where('userId', '==', userId),
@@ -2461,6 +2605,7 @@ async function loadUserPosts(userId, limitCount = null) {
             ...doc.data()
         }));
 
+        posts = posts.filter(notHeld).filter(isTypedPost);
         posts.sort(
             (a, b) => (b.timestamp || 0) - (a.timestamp || 0)
         );
@@ -2496,7 +2641,8 @@ async function loadAllUserPosts(userId) {
             container.innerHTML = `
                 <div class="no-content">
                     <i class="fas fa-pen"></i>
-                    <p>No posts yet</p>
+                    <p>${viewerOwnsProfile ? 'No posts yet. Post about a match after you vote.' : 'No posts yet'}</p>
+                    ${viewerOwnsProfile ? '<a class="btn-go-vote" href="/matches.html">Go vote</a>' : ''}
                 </div>
             `;
             return;
@@ -2544,6 +2690,7 @@ async function loadFeaturedPosts(userId) {
             return;
         }
         
+        await primeLiveMatches();
         // Fetch the actual posts
         const pinnedPosts = [];
         for (const postId of pinnedPostIds) {
@@ -2593,6 +2740,15 @@ async function loadFeaturedPosts(userId) {
 // RENDER PROFILE POST CARD
 // ========================================
 
+// the one ordering rule for lists of someone's votes (see arrangeVotes)
+const arrangeForViewer = (rows, getMatch, getId) => arrangeVotes(rows, { getMatch, getId, isOwner: viewerOwnsProfile, viewerVoted: viewerHasVoted });
+
+/** "Jinx Cup 1 · Group A": the cup's name from its id (the stored tournamentName is the site name), then the stage. */
+function cupMatchLabel(match) {
+    const cupId = match?.tournamentId || ARCANE_CONFIG.tournamentId;
+    return matchLabel({ ...match, tournamentName: '' }, cupDisplayName(cupId));
+}
+
 function renderProfilePostCard(post, isFeatured = false) {
     const currentUserId = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
     const isOwnPost = post.userId === currentUserId;
@@ -2613,44 +2769,58 @@ function renderProfilePostCard(post, isFeatured = false) {
     const timeAgo = formatTimeAgo(post.timestamp);
     const postAge = Date.now() - post.timestamp;
     const isEditable = isOwnPost && postAge < (15 * 60 * 1000);
-    const editedIndicator = post.editedAt ? '<span class="edited-indicator">• Edited</span>' : '';
+    const editedIndicator = post.editedAt ? '<span class="edited-indicator">· Edited</span>' : '';
     const pinBadge = isFeatured ? '<span class="pin-badge"><i class="fas fa-thumbtack"></i> Pinned</span>' : '';
     
     return `
-        <div class="profile-post-card" data-post-id="${post.id}">
+        <div class="profile-post-card" data-post-id="${escapeHtml(post.id)}">
             <div class="post-header">
-                <img src="${avatarUrl}" alt="${displayUsername}" class="post-avatar">
+                <img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(displayUsername)}" class="post-avatar">
                 <div class="post-meta">
-                    <div class="post-username">${displayUsername}</div>
+                    <div class="post-username">${escapeHtml(displayUsername)}</div>
                     <div class="post-timestamp">${timeAgo}${editedIndicator}</div>
                 </div>
                 ${pinBadge}
                 ${isOwnPost ? `
                     <div class="post-actions-menu">
-                        <button class="post-menu-btn" data-post-id="${post.id}">
+                        <button class="post-menu-btn" data-post-id="${escapeHtml(post.id)}">
                             <i class="fa-solid fa-ellipsis"></i>
                         </button>
                         <div class="post-menu-dropdown" style="display: none;">
                             ${!isFeatured ? `
-                                <button class="menu-item pin-post-btn" data-post-id="${post.id}">
+                                <button class="menu-item pin-post-btn" data-post-id="${escapeHtml(post.id)}">
                                     <i class="fa-solid fa-thumbtack"></i> Pin to Profile
                                 </button>
                             ` : `
-                                <button class="menu-item unpin-post-btn" data-post-id="${post.id}">
+                                <button class="menu-item unpin-post-btn" data-post-id="${escapeHtml(post.id)}">
                                     <i class="fa-solid fa-thumbtack"></i> Unpin Post
                                 </button>
                             `}
                             ${isEditable ? `
-                                <button class="menu-item edit-post-btn" data-post-id="${post.id}">
+                                <button class="menu-item edit-post-btn" data-post-id="${escapeHtml(post.id)}">
                                     <i class="fa-solid fa-pen"></i> Edit Post
                                 </button>
                             ` : ''}
-                            <button class="menu-item delete-post-btn" data-post-id="${post.id}">
+                            <button class="menu-item delete-post-btn" data-post-id="${escapeHtml(post.id)}">
                                 <i class="fa-solid fa-trash"></i> Delete Post
                             </button>
                         </div>
                     </div>
-                ` : ''}
+                ` : (post.userId ? `
+                    <div class="post-actions-menu">
+                        <button type="button" class="post-menu-btn" data-post-id="${escapeHtml(post.id)}" aria-label="More actions for ${escapeHtml(displayUsername)}'s post" aria-haspopup="menu">
+                            <i class="fa-solid fa-ellipsis" aria-hidden="true"></i>
+                        </button>
+                        <div class="post-menu-dropdown" role="menu" style="display: none;">
+                            <button type="button" role="menuitem" class="menu-item report-post-btn" data-post-id="${escapeHtml(post.id)}" data-author-id="${escapeHtml(post.userId)}" data-author-name="${escapeHtml(displayUsername)}">
+                                <i class="fa-solid fa-flag" aria-hidden="true"></i> Report post
+                            </button>
+                            <button type="button" role="menuitem" class="menu-item block-user-btn" data-author-id="${escapeHtml(post.userId)}" data-author-name="${escapeHtml(displayUsername)}">
+                                <i class="fa-solid fa-ban" aria-hidden="true"></i> Block ${escapeHtml(displayUsername)}
+                            </button>
+                        </div>
+                    </div>
+                ` : '')}
             </div>
             
             <div class="post-content">
@@ -2671,12 +2841,19 @@ function renderProfilePostCard(post, isFeatured = false) {
 
 function renderPostContent(post) {
     if (post.type === 'vote') {
-        // saved sentences carry the raw titles (with hashtags): show the short names instead
-        const smartText = tidyNames(post.text || `voted for ${post.votedSongName || post.songTitle}`,
-            [post.votedSongName, post.opponentSongName, post.votedMomentName, post.opponentMomentName, post.songTitle]);
+        const me = localStorage.getItem('userId') || localStorage.getItem('tournamentUserId');
+        if (post.matchId && liveMatchIds.has(post.matchId) && post.userId !== me && !viewerHasVoted(post.matchId)) {
+            return `
+            <p class="post-text vote-text">
+                <i class="fa-solid fa-lock"></i> voted in a live match. Vote in it to see who they picked.
+            </p>`;
+        }
+        // one neutral sentence, rebuilt from the names (js/vote-post-text.js): older posts saved a line about how the match stood
+        // at the moment of the vote ("TOO close!", "dominating at 72%"), which is out of date once the match closes
+        const smartText = votePostText(post, name => shortTitle(name, 60));
         return `
             <p class="post-text vote-text">
-                <i class="fa-solid fa-check-circle"></i> ${escapeHtml(smartText)}
+                ${escapeHtml(smartText)}
             </p>
         `;
     } else if (post.type === 'user_post' && post.content) {
@@ -2716,6 +2893,20 @@ function setupProfilePostInteractions() {
         }
     });
     
+    // Report and block (other people's posts)
+    document.querySelectorAll('.profile-post-card .report-post-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.closest('.post-menu-dropdown').style.display = 'none';
+            openReportDialog({ targetType: 'post', targetId: btn.dataset.postId, authorId: btn.dataset.authorId, authorName: btn.dataset.authorName });
+        });
+    });
+    document.querySelectorAll('.profile-post-card .block-user-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.closest('.post-menu-dropdown').style.display = 'none';
+            openBlockDialog({ userId: btn.dataset.authorId, name: btn.dataset.authorName, onDone: updateProfileMore });
+        });
+    });
+
     // Pin post buttons
     document.querySelectorAll('.pin-post-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
@@ -3114,10 +3305,9 @@ async function deleteProfilePost(postId) {
 }
 
 // Helper function (if not already present)
+// Escapes quotes as well, so it is safe inside attributes (a username or picture address can be anything someone wrote).
 function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    return String(text ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 
@@ -3140,7 +3330,7 @@ function renderSocialLinks(profile) {
     
     if (socialLinks.twitter) {
         socialIcons.push(`
-            <a href="https://twitter.com/${socialLinks.twitter}" 
+            <a href="https://twitter.com/${escapeHtml(socialLinks.twitter)}" 
                target="_blank" 
                rel="noopener noreferrer"
                class="social-icon twitter"
@@ -3152,7 +3342,7 @@ function renderSocialLinks(profile) {
     
     if (socialLinks.instagram) {
         socialIcons.push(`
-            <a href="https://instagram.com/${socialLinks.instagram}" 
+            <a href="https://instagram.com/${escapeHtml(socialLinks.instagram)}" 
                target="_blank" 
                rel="noopener noreferrer"
                class="social-icon instagram"
@@ -3164,7 +3354,7 @@ function renderSocialLinks(profile) {
     
     if (socialLinks.twitch) {
         socialIcons.push(`
-            <a href="https://twitch.tv/${socialLinks.twitch}" 
+            <a href="https://twitch.tv/${escapeHtml(socialLinks.twitch)}" 
                target="_blank" 
                rel="noopener noreferrer"
                class="social-icon twitch"
@@ -3176,7 +3366,7 @@ function renderSocialLinks(profile) {
     
     if (socialLinks.youtube) {
         socialIcons.push(`
-            <a href="https://youtube.com/@${socialLinks.youtube}" 
+            <a href="https://youtube.com/@${escapeHtml(socialLinks.youtube)}" 
                target="_blank" 
                rel="noopener noreferrer"
                class="social-icon youtube"
@@ -3189,8 +3379,9 @@ function renderSocialLinks(profile) {
     if (socialLinks.discord) {
         socialIcons.push(`
             <span class="social-icon discord" 
-                  title="Discord: ${socialLinks.discord}"
-                  onclick="copyDiscordHandle('${socialLinks.discord}')">
+                  title="Discord: ${escapeHtml(socialLinks.discord)}"
+                  data-handle="${escapeHtml(socialLinks.discord)}"
+                  onclick="copyDiscordHandle(this.dataset.handle)">
                 <i class="fab fa-discord"></i>
             </span>
         `);
@@ -3244,14 +3435,14 @@ window.invalidateProfileCache = invalidateProfileCache;
 
 function getAvatarUrl(avatar) {
     if (!avatar) {
-        return createEmojiAvatar('🎵');
+        return createEmojiAvatar('👤');
     }
     
     if (avatar.type === 'url') return fixAvatarUrl(avatar.value);
     if (avatar.type === 'champion') return avatar.imageUrl;
     if (avatar.type === 'emoji') return createEmojiAvatar(avatar.value);
     
-    return createEmojiAvatar('🎵');
+    return createEmojiAvatar('👤');
 }
 
 function createEmojiAvatar(emoji) {

@@ -132,9 +132,13 @@ export function createMatchCard(match) {
         ? `https://img.youtube.com/vi/${encodeURIComponent(match.competitor2.videoId)}/mqdefault.jpg`
         : '';
     
-    // ✅ Extract artist names for better alt text
-    const artist1 = match.competitor1.source.split('•')[0]?.trim() || 'Creator';
-    const artist2 = match.competitor2.source.split('•')[0]?.trim() || 'Creator';
+    // Seed, creator and year are only shown once the visitor has voted or the match is over, so they cannot sway a vote
+    // (the vote page hides them before the vote too). The thumbnail's alt text leaves the creator out for the same reason.
+    const reveal = !!match.hasVoted || match.status === 'completed';
+    const artist1 = reveal ? (match.competitor1.source.split('•')[0]?.trim() || 'Creator') : '';
+    const artist2 = reveal ? (match.competitor2.source.split('•')[0]?.trim() || 'Creator') : '';
+    const altFor = (c, artist) => `${c.name}${artist ? ` by ${artist}` : ''} - Arcane Moments edit thumbnail`;
+    const pick = c => c.userVoted ? '<span class="your-pick"><i class="fa-solid fa-check"></i> Your pick</span>' : '';
 
 
 
@@ -161,18 +165,19 @@ const cardHTML = `
                 <div class="competitor ${getCompetitorClass(match.competitor1, match.status)}">
                     ${comp1Thumbnail ? `
                         <img src="${comp1Thumbnail}" 
-                             alt="${escapeHtml(match.competitor1.name)} by ${escapeHtml(artist1)} - Arcane Moments edit thumbnail" 
+                             alt="${escapeHtml(altFor(match.competitor1, artist1))}" 
                              class="competitor-thumbnail"
                              loading="lazy"
                              width="320"
                              height="180">
                     ` : ''}
-                    ${match.competitor1.seed != null ? `<div class="competitor-rank">#${escapeHtml(match.competitor1.seed)}</div>` : ''}
+                    ${reveal && match.competitor1.seed != null ? `<div class="competitor-rank">#${escapeHtml(match.competitor1.seed)}</div>` : ''}
                     <div class="competitor-details">
                         <h3 class="competitor-title">${escapeHtml(match.competitor1.name)}</h3>
-                        <p class="competitor-source">${escapeHtml(match.competitor1.source)}</p>
+                        ${reveal ? `<p class="competitor-source">${escapeHtml(match.competitor1.source)}</p>` : ''}
                     </div>
                     <div class="competitor-result">
+                        ${pick(match.competitor1)}
                         ${showPercentages ? `
                             <span class="vote-percentage">${formatPercentage(match.competitor1.percentage)}</span>
                         ` : match.status === 'completed' ? `
@@ -187,18 +192,19 @@ const cardHTML = `
                 <div class="competitor ${getCompetitorClass(match.competitor2, match.status)}">
                     ${comp2Thumbnail ? `
                         <img src="${comp2Thumbnail}" 
-                             alt="${escapeHtml(match.competitor2.name)} by ${escapeHtml(artist2)} - Arcane Moments edit thumbnail" 
+                             alt="${escapeHtml(altFor(match.competitor2, artist2))}" 
                              class="competitor-thumbnail"
                              loading="lazy"
                              width="320"
                              height="180">
                     ` : ''}
-                    ${match.competitor2.seed != null ? `<div class="competitor-rank">#${escapeHtml(match.competitor2.seed)}</div>` : ''}
+                    ${reveal && match.competitor2.seed != null ? `<div class="competitor-rank">#${escapeHtml(match.competitor2.seed)}</div>` : ''}
                     <div class="competitor-details">
                         <h3 class="competitor-title">${escapeHtml(match.competitor2.name)}</h3>
-                        <p class="competitor-source">${escapeHtml(match.competitor2.source)}</p>
+                        ${reveal ? `<p class="competitor-source">${escapeHtml(match.competitor2.source)}</p>` : ''}
                     </div>
                     <div class="competitor-result">
+                        ${pick(match.competitor2)}
                         ${showPercentages ? `
                             <span class="vote-percentage">${formatPercentage(match.competitor2.percentage)}</span>
                         ` : match.status === 'completed' ? `
@@ -376,8 +382,11 @@ function getTimeUntilMatch(dateString) {
     return 'Starting Soon';
 }
 
+// "jinx-cup-1" -> "Jinx Cup 1" (the page header says the same); a name that is already written out is left alone
 function formatTournamentName(tournament) {
-    return tournament || 'Tournament';
+    const t = String(tournament || '');
+    if (!t) return 'Tournament';
+    return /^[a-z0-9]+(-[a-z0-9]+)+$/.test(t) ? t.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : t;
 }
 
 function formatRoundName(round) {
@@ -389,7 +398,8 @@ function formatRoundName(round) {
         'round-2': 'Round 2',
         'round-3': 'Round 3'
     };
-    return names[round] || round;
+    if (names[round]) return names[round];
+    return /^\d+$/.test(String(round)) ? `Round ${round}` : round;
 }
 
 function formatPercentage(percentage) {

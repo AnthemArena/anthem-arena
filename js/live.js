@@ -149,7 +149,7 @@ async function displayMiniActivityFeed() {
                 <h3><i class="fa-solid fa-fire"></i> Community Activity</h3>
                 <span class="cache-indicator" id="cacheIndicator">Live updates</span>
             </div>
-            <a href="/activity.html" class="see-all">See All <i class="fa-solid fa-arrow-right"></i></a>
+            <a href="/feed" class="see-all">See All <i class="fa-solid fa-arrow-right"></i></a>
         </div>
         <div id="miniFeedContent" class="feed-content">
             <div class="loading-spinner">Loading...</div>
@@ -383,6 +383,8 @@ let roundCountdownTimer = null;
 
 function displayRoundCountdown() {
     const container = document.querySelector('.social-container');
+    // the homepage says this once, in the status line under the logo (js/home.js), so it has no banner of its own
+    if (document.body.classList.contains('page-home')) return;
     if (!container || container.querySelector('.countdown-banner')) return;
 
     // Created up front (the activity ticker attaches itself to it) and filled in once the matches are known
@@ -490,6 +492,7 @@ async function loadLiveMatches() {
 // ========================================
 // The cup champion's line under the round banner (js/champion-says.js)
 function updateLiveSay(unvotedMatches, votedCount) {
+    if (document.body.classList.contains('page-home')) return;   // the status line already says it
     const now = Date.now();
     const ends = unvotedMatches.map(m => (m.endDate ? new Date(m.endDate).getTime() : NaN)).filter(t => Number.isFinite(t) && t > now);
     const msLeft = ends.length ? Math.min(...ends) - now : null;
@@ -503,6 +506,8 @@ function updateLiveSay(unvotedMatches, votedCount) {
         }
     }).catch(e => console.warn('champion line skipped:', e));
 }
+
+let votedCollapseDecided = false;
 
 function displayMatchGrid() {
     const grid = document.getElementById('socialGrid');
@@ -554,6 +559,18 @@ function displayMatchGrid() {
         votedSection.style.display = 'none';
     }
     
+    // On a phone, a long list of finished matches pushes everything else down: once there are more than two, "Your Votes" starts
+    // collapsed (decided once; after that the person's own open/close choice stands)
+    if (!votedCollapseDecided && votedMatches.length > 0) {
+        votedCollapseDecided = true;
+        if (votedMatches.length > 2 && window.matchMedia('(max-width: 600px)').matches) toggleVotedSection();
+    }
+
+    // Progress bar: sits right under the "N Matches Need Your Vote!" heading, and only once there is a vote to count
+    const prog = document.querySelector('.progress-container'), unvotedHead = document.querySelector('.unvoted-header');
+    if (prog && unvotedHead && prog.previousElementSibling !== unvotedHead) unvotedHead.after(prog);
+    if (prog) prog.hidden = votedMatches.length === 0;
+
     // Update progress bar
     updateProgressBar(votedMatches.length, allLiveMatches.length);
 
@@ -662,44 +679,47 @@ function createMatchCard(match, index, isVoted) {
     const card = document.createElement('div');
     card.className = `social-match-card ${isVoted ? 'voted' : ''}`;
     card.style.animationDelay = `${index * 0.1}s`;
+    card.tabIndex = 0;
+    card.setAttribute('role', 'link');
+    card.setAttribute('aria-label', `${cleanTitle(match.song1.shortTitle || match.song1.title)} versus ${cleanTitle(match.song2.shortTitle || match.song2.title)}. ${isVoted ? 'You voted. See the results.' : 'Watch and vote.'}`);
+
+    // Blind voting: who made an edit (and when) can sway a vote, so it only shows once this person has voted in the match.
+    const credit = song => isVoted ? `<p>${escapeHtml(song.artist)}${song.year ? ' • ' + escapeHtml(song.year) : ''}</p>` : '';
+    // "Your pick" is text, so a screen reader hears it too; the picture and the dimmed other entry are only the visual cue
+    const pick = key => userVotedSongId === key ? '<span class="your-pick"><i class="fa-solid fa-check" aria-hidden="true"></i> Your pick</span>' : '';
     
+    // Each edit is one column: its thumbnail with its own title (and, after the vote, creator and "Your pick") underneath.
+    // The first entry is always on the left, as on the vote page.
+    const side = (song, key) => {
+        const name = cleanTitle(song.shortTitle || song.title);
+        const cls = userVotedSongId === key ? 'user-pick' : userVotedSongId ? 'not-picked' : '';
+        return `<div class="social-side">
+                <img src="https://img.youtube.com/vi/${encodeURIComponent(song.videoId)}/hqdefault.jpg"
+                     alt="${escapeHtml(song.shortTitle || song.title)}" class="${cls}" loading="lazy">
+                <div class="song-details">
+                    <h3 title="${escapeHtml(name)}">${escapeHtml(name)}</h3>
+                    ${credit(song)}${pick(key)}
+                </div>
+            </div>`;
+    };
     card.innerHTML = `
         <div class="social-thumbnails">
-            <img src="https://img.youtube.com/vi/${encodeURIComponent(match.song1.videoId)}/hqdefault.jpg" 
-                 alt="${escapeHtml(match.song1.shortTitle || match.song1.title)}"
-                 class="${userVotedSongId === 'song1' ? 'user-pick' : ''}"
-                 loading="lazy">
-            
-            <div class="social-vs">VS</div>
-            
-            <img src="https://img.youtube.com/vi/${encodeURIComponent(match.song2.videoId)}/hqdefault.jpg"
-                 alt="${escapeHtml(match.song2.shortTitle || match.song2.title)}"
-                 class="${userVotedSongId === 'song2' ? 'user-pick' : ''}"
-                 loading="lazy">
-        </div>
-        
-        <div class="social-info">
-            <div class="song-details">
-                <h3>${escapeHtml(cleanTitle(match.song1.shortTitle || match.song1.title))}</h3>
-                <p>${escapeHtml(match.song1.artist)}${match.song1.year ? ' • ' + escapeHtml(match.song1.year) : ''}</p>
-            </div>
-            
-            <div class="vs-divider">vs</div>
-            
-            <div class="song-details">
-                <h3>${escapeHtml(cleanTitle(match.song2.shortTitle || match.song2.title))}</h3>
-                <p>${escapeHtml(match.song2.artist)}${match.song2.year ? ' • ' + escapeHtml(match.song2.year) : ''}</p>
-            </div>
+            ${side(match.song1, 'song1')}
+            <div class="social-vs" aria-hidden="true">VS</div>
+            ${side(match.song2, 'song2')}
         </div>
         
         <div class="social-stats">
-            <span>${isVoted ? '<i class="fa-solid fa-check"></i> You Voted • Tap to see results' : '<i class="fa-solid fa-square-poll-vertical"></i> Watch & Vote'}</span>
+            <span>${isVoted ? '<i class="fa-solid fa-check" aria-hidden="true"></i> You Voted • Tap to see results' : '<i class="fa-solid fa-square-poll-vertical" aria-hidden="true"></i> Watch & Vote'}</span>
         </div>
     `;
     
     // Add click handler
     card.addEventListener('click', () => {
         handleCardClick(match.matchId, index, isVoted);
+    });
+    card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(match.matchId, index, isVoted); }
     });
     
     return card;
@@ -727,14 +747,18 @@ function toggleVotedSection() {
     
     if (!votedGrid || !toggleBtn) return;
     
-    if (votedGrid.style.display === 'none') {
-        votedGrid.style.display = 'grid';
-        toggleBtn.textContent = '▼';
-    } else {
-        votedGrid.style.display = 'none';
-        toggleBtn.textContent = '▶';
-    }
+    const open = votedGrid.style.display === 'none';   // it is about to open
+    votedGrid.style.display = open ? 'grid' : 'none';
+    toggleBtn.setAttribute('aria-expanded', String(open));
+    toggleBtn.classList.toggle('is-closed', !open);
 }
+
+// the whole header bar is clickable with a mouse; the button inside it is what keyboards and screen readers use
+document.addEventListener('click', e => {
+    const bar = e.target.closest?.('.voted-header');
+    if (!bar) return;
+    toggleVotedSection();
+});
 
 // Make toggle available globally
 window.toggleVotedSection = toggleVotedSection;

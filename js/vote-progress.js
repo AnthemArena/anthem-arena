@@ -56,9 +56,11 @@ export function buildProgressSummary({ events = [], xpData = {}, packId = null, 
 
     const byPack = new Map();
     for (const e of events.filter(ev => ev.type === 'mastery')) {
+        // each skin keeps the mastery level it came with: one vote can cross several levels (1 -> 3) and the list is merged
+        const skins = (e.skins || []).map(sk => ({ ...sk, mastery: e.to }));
         const cur = byPack.get(e.packId);
-        if (!cur) byPack.set(e.packId, { packId: e.packId, from: e.from, to: e.to, skins: [...(e.skins || [])] });
-        else { cur.to = e.to; cur.skins.push(...(e.skins || [])); }
+        if (!cur) byPack.set(e.packId, { packId: e.packId, from: e.from, to: e.to, skins });
+        else { cur.to = e.to; cur.skins.push(...skins); }
     }
     const masteryUps = [...byPack.values()];
 

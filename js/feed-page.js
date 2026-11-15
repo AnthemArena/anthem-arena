@@ -2,7 +2,8 @@
 // FEED PAGE - UI CONTROLLER
 // Arcane Moments Community
 // ========================================
-import { mixFeed, digestSummary, rankTrending, findPostById, extractMentions, resultsVisible } from './feed-mix-model.js';
+import { timeAgo as relTime, fullTime } from './feed-time-model.js';
+import { mixFeed, digestSummary, digestWho, rankTrending, findPostById, extractMentions, resultsVisible } from './feed-mix-model.js';
 import { ARCANE_CONFIG } from './arcane-config.js';
 // Mention alerts call this directly (it used to be imported only inside some helpers, so every mention alert failed with a ReferenceError)
 import { saveNotification } from './notification-storage.js';
@@ -22,7 +23,10 @@ import {
 // Follow buttons use follow-system.js: it writes the `follows` collection that the Firestore rules,
 // the profile page and the sidebar counts all use (the version in social-feed.js is the old one).
 import { followUser, unfollowUser, isFollowing } from './follow-system.js';
+import { isHidden as isModeratedHidden, allowedToSend, openReportDialog, openBlockDialog, openBlockedList, getBlocked } from './moderation.js';
+import { blockedEntries } from './moderation-model.js';
 import { shortTitle } from './title-clean.js';
+import { votePostText, votePostParts } from './vote-post-text.js';
 
 import { getActivityFeed, getAllMatches } from './api-client.js';
 
@@ -286,11 +290,11 @@ function parseMentions(text) {
         
         if (user) {
             return `<span class="user-mention" 
-                data-user-id="${user.userId}" 
-                data-username="${user.username}"
-                data-level="${user.level}"
+                data-user-id="${escapeHtml(user.userId)}" 
+                data-username="${escapeHtml(user.username)}"
+                data-level="${escapeHtml(user.level)}"
                 data-rank="${escapeHtml(user.rank)}"
-                data-votes="${user.totalVotes}">@${username}</span>`;
+                data-votes="${escapeHtml(user.totalVotes)}">@${escapeHtml(username)}</span>`;
         }
         
         return match; // Not a valid user, leave as plain text
@@ -346,11 +350,11 @@ function parseMentionsHTML(html) {
         const after = result.substring(mention.index + mention.match.length);
         
         const replacement = `<span class="user-mention" 
-            data-user-id="${mention.user.userId}" 
-            data-username="${mention.user.username}"
-            data-level="${mention.user.level}"
+            data-user-id="${escapeHtml(mention.user.userId)}" 
+            data-username="${escapeHtml(mention.user.username)}"
+            data-level="${escapeHtml(mention.user.level)}"
             data-rank="${escapeHtml(mention.user.rank)}"
-            data-votes="${mention.user.totalVotes}">@${mention.username}</span>`;
+            data-votes="${escapeHtml(mention.user.totalVotes)}">@${escapeHtml(mention.username)}</span>`;
         
         result = before + replacement + after;
     });
@@ -413,6 +417,12 @@ function hideLoadingSpinner() {
 // ========================================
 
 let currentFilter = 'all';
+// The composer belongs to All Activity and Posts; on My Activity, Following and Trending it only pushes the content down
+let composerAllowed = false;
+function applyComposer() {
+    const box = document.getElementById('createPostBox');
+    if (box) box.style.display = composerAllowed && (currentFilter === 'all' || currentFilter === 'posts') ? 'block' : 'none';
+}
 let currentPosts = [];
 let lastLoadedIndex = 0;
 const POSTS_PER_PAGE = 20;
@@ -481,7 +491,7 @@ function convertActivityToFeedPost(activity, matchMap) {
 
         type: 'vote',
 
-        text: `chose ${votedMomentName} over ${opponentMomentName}`,
+        text: votePostText({ votedMomentName, opponentMomentName }),
 
         matchId: activity.matchId,
 
@@ -619,7 +629,8 @@ function checkLoginStatus() {
     
     if (username && username !== 'Anonymous' && isPublic) {
         // Show create post box
-        document.getElementById('createPostBox').style.display = 'block';
+        composerAllowed = true;
+        applyComposer();
         
         // Set avatar
         try {
@@ -654,11 +665,36 @@ function setupFilters() {
             
             // Get filter type
             currentFilter = btn.dataset.filter;
+            applyComposer();
+            btn.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
             
             // Reload feed
             lastLoadedIndex = 0;
             await loadFeed();
         });
+    });
+
+    // The tab row scrolls on a phone: fade its right edge until the last tab is in view
+    const row = document.querySelector('.feed-filters');
+    if (row) {
+        const edge = () => row.classList.toggle('at-end', row.scrollLeft + row.clientWidth >= row.scrollWidth - 4);
+        row.addEventListener('scroll', edge, { passive: true });
+        window.addEventListener('resize', edge);
+        edge();
+    }
+
+    // An empty tab can send you somewhere useful (the Following empty state links to Trending)
+    document.getElementById('emptyState')?.addEventListener('click', e => {
+        const go = e.target.closest('[data-goto-filter]');
+        if (go) document.querySelector(`.filter-btn[data-filter="${go.dataset.gotoFilter}"]`)?.click();
+    });
+
+    // Search sits behind an icon on a phone
+    const toggle = document.getElementById('feedSearchToggle'), box = document.getElementById('feedSearchContainer');
+    if (toggle && box) toggle.addEventListener('click', () => {
+        const open = box.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', String(open));
+        if (open) document.getElementById('feedSearchInput')?.focus();
     });
 }
 
@@ -734,13 +770,14 @@ async function performSearch(query) {
     // Show loading
     loadingState.style.display = 'block';
     emptyState.style.display = 'none';
+    document.getElementById('feedEnd')?.setAttribute('hidden', '');
     feedContainer.innerHTML = '';
     feedContainer.appendChild(loadingState);
     feedContainer.appendChild(emptyState);
     
     try {
         // Get all posts
-        const allPosts = await getFeed('all', 200);
+        const allPosts = await getFeedLive('all', 200);
         
         const lowerQuery = query.toLowerCase();
         
@@ -761,7 +798,7 @@ async function performSearch(query) {
             }
             
             // Search post text (for vote posts)
-            if (post.text && post.text.toLowerCase().includes(lowerQuery)) {
+            if (post.type === 'vote' ? votePostText(post).toLowerCase().includes(lowerQuery) : (post.text && post.text.toLowerCase().includes(lowerQuery))) {
                 return true;
             }
             
@@ -865,6 +902,7 @@ async function loadFeed() {
     // Show loading
     loadingState.style.display = 'block';
     emptyState.style.display = 'none';
+    document.getElementById('feedEnd')?.setAttribute('hidden', '');
     feedContainer.innerHTML = '';
     feedContainer.appendChild(loadingState);
     feedContainer.appendChild(emptyState);
@@ -891,7 +929,7 @@ async function loadFeed() {
                 return;
             }
             
-            currentPosts = await getFeed('all', 100);
+            currentPosts = await getFeedLive('all', 100);
             currentPosts = currentPosts.filter(post => post.userId === currentUserId);
             
         } else if (currentFilter === 'following') {
@@ -909,15 +947,15 @@ async function loadFeed() {
                 return;
             }
             
-            currentPosts = await getFeed('following', 100);
+            currentPosts = await getFeedLive('following', 100);
             
         } else if (currentFilter === 'posts') {
             // ✅ POSTS: what people wrote, with the automatic vote posts left out
-            currentPosts = mixFeed({ posts: await getFeed('all', 100), mode: 'posts' });
+            currentPosts = mixFeed({ posts: await getFeedLive('all', 100), mode: 'posts' });
 
         } else if (currentFilter === 'trending') {
             // ✅ TRENDING: this week's most liked and commented (likes + comments x 2), written posts and votes together
-            const [socialPosts, votePosts] = await Promise.all([getFeed('all', 100), loadVotePosts()]);
+            const [socialPosts, votePosts] = await Promise.all([getFeedLive('all', 100), loadVotePosts()]);
             currentPosts = rankTrending({ posts: [...socialPosts.filter(p => p.type !== 'vote'), ...votePosts] });
 
                 } else {
@@ -930,7 +968,7 @@ async function loadFeed() {
 
             const [activityPosts, socialPosts] = await Promise.all([
                 loadVotePosts(),
-                getFeed('all', 100)
+                getFeedLive('all', 100)
             ]);
 
             // Old automatic vote-post duplicates in the social feed are dropped (votes come from the activity collection).
@@ -968,6 +1006,7 @@ async function loadFeed() {
                         <i class="fa-solid fa-user-plus" style="font-size: 3rem; opacity: 0.3;"></i>
                         <h3>No Posts from Following</h3>
                         <p>Follow other users to see their posts here</p>
+                        <button type="button" class="cta-btn" data-goto-filter="trending"><i class="fa-solid fa-fire"></i> See what's trending</button>
                     </div>
                 `;
             } else if (currentFilter === 'posts') {
@@ -1021,12 +1060,14 @@ function renderPosts(startIndex, count) {
     
     // Render each post
     postsToRender.forEach(post => {
+        if (post.type !== 'vote-digest' && isModeratedHidden(post)) return;     // blocked person, or reported enough times to be held for review
         const postElement = post.type === 'vote-digest' ? createDigestElement(post) : createPostElement(post);
         feedContainer.appendChild(postElement);
     });
     
     // Update last loaded index
     lastLoadedIndex = startIndex + count;
+    refreshBlockedLink();
 
     // ✅ Setup tooltips after rendering
     setupSongTooltips();
@@ -1038,7 +1079,34 @@ function renderPosts(startIndex, count) {
     } else {
         loadMoreContainer.style.display = 'none';
     }
+    // "All caught up" only once everything has been shown, and never over an empty feed (it has its own message)
+    const feedEnd = document.getElementById('feedEnd');
+    if (feedEnd) feedEnd.hidden = !(currentPosts.length > 0 && lastLoadedIndex >= currentPosts.length);
 }
+
+// Vote posts saved at vote time carry the split and the match state from that moment. Refresh them from the current match list,
+// so the same match reads the same in every tab, and its live/finished state (which decides whether the result may be shown) is known.
+async function refreshVoteSplits(posts) {
+    try {
+        const matches = await getAllMatches();
+        const byId = new Map(matches.map(m => [m.matchId || m.id, m]));
+        for (const p of posts) {
+            if (p.type !== 'vote') continue;
+            const m = byId.get(p.matchId);
+            if (!m) continue;
+            const mine = p.choice === 'song1' ? m.song1 : p.choice === 'song2' ? m.song2 : null;
+            const total = m.totalVotes || 0;
+            p.matchState = {
+                ...(p.matchState || {}),
+                userPct: mine && total > 0 ? Math.round(((mine.votes || 0) / total) * 100) : (p.matchState?.userPct ?? 50),
+                status: m.status || null,
+                roundLabel: m.roundLabel || null
+            };
+        }
+    } catch (e) { console.warn('vote splits not refreshed:', e); }
+    return posts;
+}
+const getFeedLive = async (type, n) => refreshVoteSplits(await getFeed(type, n));
 
 // A run of automatic vote posts, collapsed. Click to show the votes in place.
 function createDigestElement(digest) {
@@ -1047,8 +1115,8 @@ function createDigestElement(digest) {
     row.innerHTML = `
         <button type="button" class="vote-digest-toggle" aria-expanded="false">
             <i class="fa-solid fa-check-to-slot"></i>
-            <span class="vote-digest-text">${escapeHtml(digestSummary(digest))}</span>
-            <span class="vote-digest-time">${getTimeAgo(digest.timestamp)}</span>
+            <span class="vote-digest-text"><span class="vote-digest-main">${escapeHtml(digestSummary(digest))}</span>${digestWho(digest) ? ` <span class="vote-digest-who">${escapeHtml(digestWho(digest))}</span>` : ''}</span>
+            <span class="vote-digest-time" title="${escapeHtml(fullTime(digest.timestamp))}">${getTimeAgo(digest.timestamp)}</span>
             <i class="fa-solid fa-chevron-down vote-digest-chevron"></i>
         </button>
         <div class="vote-digest-items" hidden></div>`;
@@ -1059,7 +1127,7 @@ function createDigestElement(digest) {
         toggle.setAttribute('aria-expanded', String(!open));
         items.hidden = open;
         if (!open && !items.childElementCount) {
-            digest.votes.forEach(v => items.appendChild(createPostElement(v)));
+            digest.votes.filter(v => !isModeratedHidden(v)).forEach(v => items.appendChild(createPostElement(v)));
             setupSongTooltips();
             setupMentionTooltips();
         }
@@ -1106,89 +1174,36 @@ function renderPostContent(post) {
         const viewerId = localStorage.getItem('tournamentUserId');
         const showResults = resultsVisible({ status: matchStatus, viewerVoted: youVoted, isOwn: !!viewerId && post.userId === viewerId });
 
+        // Who someone voted for is a result too: while the match is live and you have not voted, say only that they voted.
+        const vp = votePostParts({ votedName: votedMomentName, opponentName: opponentMomentName });
+        const voteLineHtml = showResults
+            ? `${vp.lead} <strong>${escapeHtml(vp.voted)}</strong> ${vp.joiner} <span class="vote-opponent">${escapeHtml(vp.opponent)}</span>`
+            : `voted in a live match <span class="vote-locked-note">Vote in it to see who they picked.</span>`;
         let statusChip = '';
         let ctaLabel = 'View match';
         if (matchStatus === 'live') {
             statusChip = `<span class="match-status-chip is-live"><span class="chip-dot"></span>Live${roundSuffix}</span>`;
-            ctaLabel = showResults ? 'View match' : 'Vote to see results';
+            ctaLabel = showResults ? 'View results' : 'Vote now';
         } else if (matchStatus === 'completed') {
             statusChip = `<span class="match-status-chip is-final">Ended${roundSuffix}</span>`;
-            ctaLabel = 'See result';
+            ctaLabel = 'View results';
         } else if (matchStatus === 'upcoming') {
             statusChip = `<span class="match-status-chip">Upcoming${roundSuffix}</span>`;
         }
 
         return `
           <p class="post-text vote-text">
-    <span class="vote-text-copy">voted for <strong>${escapeHtml(votedMomentName)}</strong> over <span class="vote-opponent">${escapeHtml(opponentMomentName)}</span></span>
+    <span class="vote-text-copy">${voteLineHtml}</span>
 </p>
 
-            <div class="match-embed-card" data-match-id="${post.matchId}">
-                <div class="match-versus">
-
-                    <div class="match-song picked">
-                        <div class="song-thumbnail">
-                            ${
-                                votedThumbnail
-                                    ? `<img
-                                        src="${votedThumbnail}"
-                                        alt="${escapeHtml(votedMomentName)}"
-                                        loading="lazy"
-                                    >`
-                                    : ''
-                            }
-                        </div>
-
-                        <div class="song-details">
-                            <span class="song-name">
-                                ${escapeHtml(votedMomentName)}
-                            </span>
-                            <span class="song-pct">${showResults ? `${userPct}%` : '<i class="fa-solid fa-lock results-lock"></i>'}</span>
-                        </div>
-                    </div>
-
-                    <div class="vs-circle">VS</div>
-
-                    <div class="match-song">
-                        <div class="song-thumbnail">
-                            ${
-                                opponentThumbnail
-                                    ? `<img
-                                        src="${opponentThumbnail}"
-                                        alt="${escapeHtml(opponentMomentName)}"
-                                        loading="lazy"
-                                    >`
-                                    : ''
-                            }
-                        </div>
-
-                        <div class="song-details">
-                            <span class="song-name">
-                                ${escapeHtml(opponentMomentName)}
-                            </span>
-                            <span class="song-pct">${showResults ? `${opponentPct}%` : '<i class="fa-solid fa-lock results-lock"></i>'}</span>
-                        </div>
-                    </div>
-
-                </div>
-
-                ${showResults ? `<div class="match-progress">
-                    <div class="progress-bar-bg">
-                        <div
-                            class="progress-bar-fill"
-                            style="width: ${userPct}%"
-                        ></div>
-                    </div>
-                </div>` : `<div class="results-locked"><i class="fa-solid fa-lock"></i> Vote in this match to see how it is going</div>`}
-
-                <div class="match-foot">
+            <div class="vote-compact" data-match-id="${post.matchId}">
+                ${showResults ? `<div class="vote-split" title="${userPct}% / ${opponentPct}%">
+                    <div class="vote-split-bar"><span style="width: ${userPct}%"></span></div>
+                    <span class="vote-split-pct">${userPct}% &middot; ${opponentPct}%</span>
+                </div>` : ''}
+                <div class="vote-compact-foot">
                     ${statusChip}
-                    <a
-                        href="/vote.html?id=${post.matchId}"
-                        class="match-view-btn"
-                    >
-                        ${ctaLabel}
-                    </a>
+                    <a href="/vote.html?id=${post.matchId}" class="match-view-btn">${ctaLabel}</a>
                 </div>
             </div>
         `;
@@ -1207,7 +1222,7 @@ function renderPostContent(post) {
                 .trim();
         }
 
-        const withMentions = parseMentionsHTML(displayContent);
+        const withMentions = parseMentionsHTML(escapeHtml(displayContent));
 
         const textHtml = withMentions.trim()
             ? `<p class="post-text">${withMentions}</p>`
@@ -1227,7 +1242,9 @@ function renderPostContent(post) {
 // ========================================
 
 function renderYouTubeEmbed(post) {
-    const videoId = post.youtubeVideoId;
+    // A video id is 11 letters, digits, - or _; anything else (someone wrote the post document by hand) shows no embed
+    const videoId = /^[A-Za-z0-9_-]{6,20}$/.test(String(post.youtubeVideoId || '')) ? post.youtubeVideoId : '';
+    if (!videoId) return '';
     
     // Option A: Thumbnail Preview (Fast, Recommended)
     return `
@@ -1255,6 +1272,7 @@ function renderYouTubeEmbed(post) {
 window.loadYouTubePlayer = function(button) {
     const previewDiv = button.closest('.youtube-embed-preview');
     const videoId = previewDiv.dataset.videoId;
+    if (!/^[A-Za-z0-9_-]{6,20}$/.test(String(videoId || ''))) return;
     
     // Replace preview with actual player
     previewDiv.innerHTML = `
@@ -1355,19 +1373,19 @@ function setupMentionTooltips() {
             tooltip.className = 'mention-tooltip';
             tooltip.innerHTML = `
                 <div class="tooltip-profile-header">
-                    <img src="${avatarUrl}" alt="${username}" class="tooltip-profile-avatar">
+                    <img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(username)}" class="tooltip-profile-avatar">
                     <div class="tooltip-profile-info">
-                        <div class="tooltip-profile-username">@${username}</div>
-                        <div class="tooltip-profile-rank">${rank}</div>
+                        <div class="tooltip-profile-username">@${escapeHtml(username)}</div>
+                        <div class="tooltip-profile-rank">${escapeHtml(rank)}</div>
                     </div>
                 </div>
                 <div class="tooltip-profile-stats">
                     <div class="tooltip-profile-stat">
-                        <div class="tooltip-profile-stat-value">${level}</div>
+                        <div class="tooltip-profile-stat-value">${escapeHtml(level)}</div>
                         <div class="tooltip-profile-stat-label">Level</div>
                     </div>
                     <div class="tooltip-profile-stat">
-                        <div class="tooltip-profile-stat-value">${votes}</div>
+                        <div class="tooltip-profile-stat-value">${escapeHtml(votes)}</div>
                         <div class="tooltip-profile-stat-label">Votes</div>
                     </div>
                 </div>
@@ -1529,7 +1547,7 @@ async function setupPostInteractions(postElement, post) {
     
     // ✅ NEW: Comment button - toggle comments section
     const commentBtn = postElement.querySelector('.comment-btn');
-    const commentsSection = postElement.querySelector(`#comments-${post.postId}`);
+    const commentsSection = postElement.querySelector(`#comments-${escapeHtml(post.postId)}`);
     
     commentBtn.addEventListener('click', async () => {
         if (commentsSection.style.display === 'none') {
@@ -1575,7 +1593,7 @@ setupMentionAutocomplete(commentInput);
 // ========================================
 
 async function loadComments(postId) {
-    const commentsList = document.getElementById(`comments-list-${postId}`);
+    const commentsList = document.getElementById(`comments-list-${escapeHtml(postId)}`);
     if (!commentsList) return;
     
     try {
@@ -1604,6 +1622,7 @@ async function loadComments(postId) {
         
         snapshot.forEach(doc => {
             const comment = doc.data();
+            if (isModeratedHidden(comment)) return;          // blocked person, or reported enough times to be held for review
             
             if (!comment.parentId) {
                 // Top-level comment
@@ -1624,7 +1643,7 @@ async function loadComments(postId) {
             
             // Load replies for this comment
             const replies = repliesMap[comment.commentId] || [];
-            const repliesContainer = commentElement.querySelector(`#replies-${comment.commentId}`);
+            const repliesContainer = commentElement.querySelector(`#replies-${escapeHtml(comment.commentId)}`);
             
             if (repliesContainer && replies.length > 0) {
                 replies.forEach(reply => {
@@ -1640,6 +1659,29 @@ async function loadComments(postId) {
     }
 }
 
+// the "Blocked people" link under the feed, and a redraw after someone is blocked or unblocked
+function refreshBlockedLink() {
+    const end = document.getElementById('feedEnd');
+    if (!end) return;
+    let link = document.getElementById('blockedLink');
+    const n = blockedEntries(getBlocked()).length;
+    if (!n) { link?.remove(); return; }
+    if (!link) {
+        link = document.createElement('button');
+        link.type = 'button'; link.id = 'blockedLink'; link.className = 'blocked-link';
+        link.addEventListener('click', () => openBlockedList(refreshAfterBlockChange));
+        end.insertAdjacentElement('afterend', link);
+    }
+    link.textContent = `Blocked people (${n})`;
+}
+function refreshAfterBlockChange() {
+    refreshBlockedLink();
+    const feedContainer = document.getElementById('feedPosts');
+    if (!feedContainer) return;
+    feedContainer.querySelectorAll('.feed-post, .feed-vote-digest').forEach(el => el.remove());
+    renderPosts(0, Math.max(lastLoadedIndex, POSTS_PER_PAGE));
+}
+
 function createCommentElement(comment, isReply = false) {
     const div = document.createElement('div');
     div.className = isReply ? 'comment reply-comment' : 'comment';
@@ -1651,29 +1693,33 @@ function createCommentElement(comment, isReply = false) {
     const isOwnComment = comment.userId === currentUserId;
     
   div.innerHTML = `
-    <img src="${avatarUrl}" alt="${comment.username}" class="comment-avatar" data-user-id="${comment.userId}">
+    <img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(comment.username)}" class="comment-avatar" data-user-id="${escapeHtml(comment.userId)}">
     <div class="comment-content">
         <div class="comment-header">
-            <span class="comment-username" data-user-id="${comment.userId}">${comment.username}</span>
-            <span class="comment-time">${timeAgo}</span>
+            <span class="comment-username" data-user-id="${escapeHtml(comment.userId)}">${escapeHtml(comment.username)}</span>
+            <span class="comment-time" title="${escapeHtml(fullTime(comment.timestamp))}">${timeAgo}</span>
             ${isOwnComment ? `
-                <button class="comment-delete-btn" data-comment-id="${comment.commentId}" data-post-id="${comment.postId}">
+                <button class="comment-delete-btn" data-comment-id="${escapeHtml(comment.commentId)}" data-post-id="${escapeHtml(comment.postId)}">
                     <i class="fa-solid fa-trash"></i>
                 </button>
-            ` : ''}
+            ` : `
+                <button class="comment-report-btn" type="button" aria-label="Report comment" title="Report comment">
+                    <i class="fa-regular fa-flag"></i>
+                </button>
+            `}
         </div>
         <p class="comment-text">${parseMentionsHTML(escapeHtml(comment.content))}</p>
         
         ${!isReply ? `
             <div class="comment-actions">
-                <button class="reply-btn" data-comment-id="${comment.commentId}" data-username="${comment.username}">
+                <button class="reply-btn" data-comment-id="${escapeHtml(comment.commentId)}" data-username="${escapeHtml(comment.username)}">
                     <i class="fa-solid fa-reply"></i> Reply
                 </button>
             </div>
         ` : ''}
         
         ${!isReply ? `
-            <div class="replies-container" id="replies-${comment.commentId}">
+            <div class="replies-container" id="replies-${escapeHtml(comment.commentId)}">
                 <!-- Replies load here -->
             </div>
         ` : ''}
@@ -1699,6 +1745,10 @@ function createCommentElement(comment, isReply = false) {
     avatar.style.cursor = 'pointer';
     avatar.addEventListener('click', goToProfile);
     
+    div.querySelector('.comment-report-btn')?.addEventListener('click', () => {
+        openReportDialog({ targetType: 'comment', targetId: comment.commentId, authorId: comment.userId, authorName: comment.username, postId: comment.postId });
+    });
+
     // Delete handler
     const deleteBtn = div.querySelector('.comment-delete-btn');
     if (deleteBtn) {
@@ -1792,11 +1842,11 @@ function showMentionDropdown(users, inputElement) {
     mentionDropdown.innerHTML = users.map(user => {
         const avatarUrl = getAvatarUrl(user.avatar);
         return `
-            <div class="mention-option" data-username="${user.username}" data-user-id="${user.userId}">
-                <img src="${avatarUrl}" alt="${user.username}" class="mention-avatar">
+            <div class="mention-option" data-username="${escapeHtml(user.username)}" data-user-id="${escapeHtml(user.userId)}">
+                <img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(user.username)}" class="mention-avatar">
                 <div class="mention-info">
-                    <div class="mention-username">@${user.username}</div>
-                    <div class="mention-rank">${user.rank} • ${user.totalVotes} votes</div>
+                    <div class="mention-username">@${escapeHtml(user.username)}</div>
+                    <div class="mention-rank">${escapeHtml(user.rank)} • ${escapeHtml(user.totalVotes)} votes</div>
                 </div>
             </div>
         `;
@@ -1844,7 +1894,7 @@ function insertMention(username) {
 // ========================================
 
 function showReplyInput(parentCommentId, postId, parentUsername) {
-    const repliesContainer = document.getElementById(`replies-${parentCommentId}`);
+    const repliesContainer = document.getElementById(`replies-${escapeHtml(parentCommentId)}`);
     if (!repliesContainer) return;
     
     // Check if reply input already exists
@@ -1858,14 +1908,14 @@ function showReplyInput(parentCommentId, postId, parentUsername) {
     const replyInputBox = document.createElement('div');
     replyInputBox.className = 'reply-input-box';
     replyInputBox.innerHTML = `
-        <img src="${avatarUrl}" alt="You" class="comment-avatar">
+        <img src="${escapeHtml(avatarUrl)}" alt="You" class="comment-avatar">
         <input 
             type="text" 
             class="reply-input" 
-            placeholder="Reply to ${parentUsername}..." 
+            placeholder="Reply to ${escapeHtml(parentUsername)}..." 
             maxlength="280"
-            data-parent-id="${parentCommentId}"
-            data-post-id="${postId}"
+            data-parent-id="${escapeHtml(parentCommentId)}"
+            data-post-id="${escapeHtml(postId)}"
         >
         <button class="send-reply-btn" disabled>
             <i class="fa-solid fa-paper-plane"></i>
@@ -1923,6 +1973,7 @@ setupMentionAutocomplete(input);
 async function postReply(postId, parentCommentId, inputElement) {
     const content = inputElement.value.trim();
     if (!content) return;
+    if (!allowedToSend('comment')) return;    // a few comments a minute at most
     
     const username = localStorage.getItem('username');
     if (!username || username === 'Anonymous') {
@@ -1940,7 +1991,7 @@ async function postReply(postId, parentCommentId, inputElement) {
         try {
             avatar = JSON.parse(avatarJson);
         } catch {
-            avatar = { type: 'emoji', value: '🎵' };
+            avatar = { type: 'emoji', value: '👤' };
         }
         
         const commentId = `reply_${userId}_${Date.now()}`;
@@ -1997,20 +2048,20 @@ async function postReply(postId, parentCommentId, inputElement) {
                     await saveNotification(mention.userId, {
                         type: 'mention',
                         priority: 7,
-                        message: `📢 ${username} mentioned you in a reply`,
+                        message: `📢 ${escapeHtml(username)} mentioned you in a reply`,
                         detail: content.length > 60 ? content.substring(0, 60) + '...' : content,
                         icon: '📢',
                         triggerUsername: username,
                         triggerUserId: userId,
                         ctaText: 'View Reply',
                         ctaAction: 'navigate',
-                        targetUrl: `/feed.html#post-${postId}`
+                        targetUrl: `/feed.html#post-${escapeHtml(postId)}`
                     });
                     
-                    console.log(`✅ Mention notification sent to @${mention.username}`);
+                    console.log(`✅ Mention notification sent to @${escapeHtml(mention.username)}`);
                     
                 } catch (error) {
-                    console.error(`❌ Error sending mention notification to @${mention.username}:`, error);
+                    console.error(`❌ Error sending mention notification to @${escapeHtml(mention.username)}:`, error);
                 }
             }
         }
@@ -2019,14 +2070,14 @@ async function postReply(postId, parentCommentId, inputElement) {
         inputElement.value = '';
         
         // Add reply to UI
-        const repliesContainer = document.getElementById(`replies-${parentCommentId}`);
+        const repliesContainer = document.getElementById(`replies-${escapeHtml(parentCommentId)}`);
         if (repliesContainer) {
             const replyElement = createCommentElement(comment, true);
             repliesContainer.appendChild(replyElement);
         }
         
         // Update comment count in UI
-        const commentCountSpan = document.querySelector(`[data-post-id="${postId}"].comment-btn .comment-count`);
+        const commentCountSpan = document.querySelector(`[data-post-id="${escapeHtml(postId)}"].comment-btn .comment-count`);
         if (commentCountSpan) {
             commentCountSpan.textContent = parseInt(commentCountSpan.textContent) + 1;
         }
@@ -2084,7 +2135,7 @@ async function sendReplyNotification(recipientUserId, postId, replyContent, pare
             triggerUserId: currentUserId,
             ctaText: 'View Reply',
             ctaAction: 'navigate',
-            targetUrl: `/feed.html#post-${postId}`
+            targetUrl: `/feed.html#post-${escapeHtml(postId)}`
         });
         
         console.log(`✅ Reply notification sent to ${recipientUserId}`);
@@ -2097,6 +2148,7 @@ async function sendReplyNotification(recipientUserId, postId, replyContent, pare
 async function postComment(postId, inputElement) {
     const content = inputElement.value.trim();
     if (!content) return;
+    if (!allowedToSend('comment')) return;    // a few comments a minute at most
     
     const username = localStorage.getItem('username');
     if (!username || username === 'Anonymous') {
@@ -2114,7 +2166,7 @@ async function postComment(postId, inputElement) {
         try {
             avatar = JSON.parse(avatarJson);
         } catch {
-            avatar = { type: 'emoji', value: '🎵' };
+            avatar = { type: 'emoji', value: '👤' };
         }
         
         const commentId = `comment_${userId}_${Date.now()}`;
@@ -2176,20 +2228,20 @@ async function postComment(postId, inputElement) {
                     await saveNotification(mention.userId, {
                         type: 'mention',
                         priority: 7,
-                        message: `📢 ${username} mentioned you in a comment`,
+                        message: `📢 ${escapeHtml(username)} mentioned you in a comment`,
                         detail: content.length > 60 ? content.substring(0, 60) + '...' : content,
                         icon: '📢',
                         triggerUsername: username,
                         triggerUserId: userId,
                         ctaText: 'View Comment',
                         ctaAction: 'navigate',
-                        targetUrl: `/feed.html#post-${postId}`
+                        targetUrl: `/feed.html#post-${escapeHtml(postId)}`
                     });
                     
-                    console.log(`✅ Mention notification sent to @${mention.username}`);
+                    console.log(`✅ Mention notification sent to @${escapeHtml(mention.username)}`);
                     
                 } catch (error) {
-                    console.error(`❌ Error sending mention notification to @${mention.username}:`, error);
+                    console.error(`❌ Error sending mention notification to @${escapeHtml(mention.username)}:`, error);
                 }
             }
         }
@@ -2201,7 +2253,7 @@ async function postComment(postId, inputElement) {
         await loadComments(postId);
         
         // Update comment count in UI
-        const commentCountSpan = document.querySelector(`[data-post-id="${postId}"].comment-btn .comment-count`);
+        const commentCountSpan = document.querySelector(`[data-post-id="${escapeHtml(postId)}"].comment-btn .comment-count`);
         if (commentCountSpan) {
             commentCountSpan.textContent = parseInt(commentCountSpan.textContent) + 1;
         }
@@ -2248,14 +2300,14 @@ async function deleteComment(commentId, postId, commentElement) {
             commentElement.remove();
             
             // Update comment count in UI
-            const commentCountSpan = document.querySelector(`[data-post-id="${postId}"].comment-btn .comment-count`);
+            const commentCountSpan = document.querySelector(`[data-post-id="${escapeHtml(postId)}"].comment-btn .comment-count`);
             if (commentCountSpan) {
                 const currentCount = parseInt(commentCountSpan.textContent);
                 commentCountSpan.textContent = Math.max(0, currentCount - 1);
             }
             
             // Check if comments section is now empty
-            const commentsList = document.getElementById(`comments-list-${postId}`);
+            const commentsList = document.getElementById(`comments-list-${escapeHtml(postId)}`);
             if (commentsList && commentsList.children.length === 0) {
                 commentsList.innerHTML = '<p class="no-comments">No comments yet. Be the first!</p>';
             }
@@ -2315,7 +2367,7 @@ async function sendLikeNotification(recipientUserId, post) {
             // Action
             ctaText: 'View Post',
             ctaAction: 'navigate',
-            targetUrl: `/feed.html#post-${post.postId}`
+            targetUrl: `/feed.html#post-${escapeHtml(post.postId)}`
         });
         
         console.log(`✅ Like notification sent to ${recipientUserId}`);
@@ -2360,7 +2412,7 @@ async function sendCommentNotification(recipientUserId, post, commentContent) {
             // Action
             ctaText: 'View Comment',
             ctaAction: 'navigate',
-            targetUrl: `/feed.html#post-${post.postId}`
+            targetUrl: `/feed.html#post-${escapeHtml(post.postId)}`
         });
         
         console.log(`✅ Comment notification sent to ${recipientUserId}`);
@@ -2488,7 +2540,7 @@ function setupLoadMore() {
 
 function createPostElement(post) {
     const postDiv = document.createElement('div');
-    postDiv.className = 'feed-post';
+    postDiv.className = post.type === 'vote' ? 'feed-post feed-post-vote' : 'feed-post';
     postDiv.dataset.postId = post.postId;
     
     // Format time
@@ -2509,69 +2561,93 @@ function createPostElement(post) {
     // Build HTML
     postDiv.innerHTML = `
         <div class="post-header">
-            <img src="${avatarUrl}" alt="${post.username}" class="user-avatar" data-user-id="${post.userId}">
+            <img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(post.username)}" class="user-avatar" data-user-id="${escapeHtml(post.userId)}">
             <div class="post-meta">
-                <span class="username" data-user-id="${post.userId}">${post.username}</span>
-                <span class="post-time">${timeAgo}${editedIndicator}</span>
+                <span class="username" data-user-id="${escapeHtml(post.userId)}">${escapeHtml(post.username)}</span>
+                <span class="post-time" title="${escapeHtml(fullTime(post.timestamp))}">${timeAgo}${editedIndicator}</span>
             </div>
             ${isOwnPost ? `
                 <div class="post-menu">
-                    <button class="post-menu-btn" data-post-id="${post.postId}">
+                    <button class="post-menu-btn" data-post-id="${escapeHtml(post.postId)}" aria-label="Post options" aria-haspopup="true">
                         <i class="fa-solid fa-ellipsis"></i>
                     </button>
-                    <div class="post-menu-dropdown" id="menu-${post.postId}" style="display: none;">
+                    <div class="post-menu-dropdown" id="menu-${escapeHtml(post.postId)}" style="display: none;">
                         ${isEditable ? `
-                            <button class="menu-item edit-post-btn" data-post-id="${post.postId}">
+                            <button class="menu-item edit-post-btn" data-post-id="${escapeHtml(post.postId)}">
                                 <i class="fa-solid fa-pen"></i> Edit Post
                             </button>
                         ` : ''}
-                        <button class="menu-item delete-post-btn" data-post-id="${post.postId}">
+                        <button class="menu-item delete-post-btn" data-post-id="${escapeHtml(post.postId)}">
                             <i class="fa-solid fa-trash"></i> Delete Post
                         </button>
                     </div>
                 </div>
             ` : !isOwnPost ? `
-                <button class="follow-btn" data-user-id="${post.userId}" data-username="${post.username}">
+                <button class="follow-btn" data-user-id="${escapeHtml(post.userId)}" data-username="${escapeHtml(post.username)}">
                     <i class="fa-solid fa-user-plus"></i>
                     Follow
                 </button>
+                <div class="post-menu post-menu-other">
+                    <button class="post-menu-btn" data-post-id="${escapeHtml(post.postId)}" aria-label="Report or block" aria-haspopup="true">
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </button>
+                    <div class="post-menu-dropdown" id="menu-${escapeHtml(post.postId)}" style="display: none;">
+                        ${post.type === 'user_post' ? `
+                            <button class="menu-item report-post-btn" data-post-id="${escapeHtml(post.postId)}">
+                                <i class="fa-regular fa-flag"></i> Report post
+                            </button>
+                        ` : ''}
+                        <button class="menu-item block-user-btn" data-user-id="${escapeHtml(post.userId)}">
+                            <i class="fa-solid fa-ban"></i> Block ${escapeHtml(post.username)}
+                        </button>
+                    </div>
+                </div>
             ` : ''}
         </div>
         
-        <div class="post-content" data-post-id="${post.postId}">
+        <div class="post-content" data-post-id="${escapeHtml(post.postId)}">
             ${renderPostContent(post)}
         </div>
         
         <div class="post-actions-bar">
-            <button class="action-btn like-btn" data-post-id="${post.postId}" data-post-author-id="${post.userId}">
+            <button class="action-btn like-btn" aria-label="Like" data-post-id="${escapeHtml(post.postId)}" data-post-author-id="${escapeHtml(post.userId)}">
                 <i class="fa-regular fa-heart"></i>
                 <span class="like-count">${post.likeCount || 0}</span>
             </button>
-            <button class="action-btn comment-btn" data-post-id="${post.postId}">
+            <button class="action-btn comment-btn" aria-label="Comments" data-post-id="${escapeHtml(post.postId)}">
                 <i class="fa-regular fa-comment"></i>
                 <span class="comment-count">${post.commentCount || 0}</span>
             </button>
-            <button class="action-btn share-btn" data-post-id="${post.postId}">
+            <button class="action-btn share-btn" aria-label="Share" data-post-id="${escapeHtml(post.postId)}">
                 <i class="fa-solid fa-share"></i>
                 Share
             </button>
         </div>
         
         <!-- Comments Section -->
-        <div class="post-comments" id="comments-${post.postId}" style="display: none;">
-            <div class="comments-list" id="comments-list-${post.postId}">
+        <div class="post-comments" id="comments-${escapeHtml(post.postId)}" style="display: none;">
+            <div class="comments-list" id="comments-list-${escapeHtml(post.postId)}">
                 <!-- Comments load here -->
             </div>
             <div class="comment-input-box">
                 <img src="${getAvatarUrl(JSON.parse(localStorage.getItem('avatar') || '{}'))}" alt="You" class="comment-avatar">
-                <input type="text" class="comment-input" placeholder="Write a comment..." maxlength="280" data-post-id="${post.postId}">
-                <button class="send-comment-btn" data-post-id="${post.postId}">
+                <input type="text" class="comment-input" placeholder="Write a comment..." maxlength="280" data-post-id="${escapeHtml(post.postId)}">
+                <button class="send-comment-btn" data-post-id="${escapeHtml(post.postId)}">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </div>
         </div>
     `;
     
+    // A vote is a light event: show the like and comment numbers only once they are above zero
+    if (post.type === 'vote') {
+        const sync = el => { el.hidden = (parseInt(el.textContent, 10) || 0) === 0; };
+        postDiv.querySelectorAll('.like-count, .comment-count').forEach(el => {
+            sync(el);
+            new MutationObserver(() => sync(el)).observe(el, { childList: true, characterData: true, subtree: true });
+        });
+    }
+
     // Setup interactions
     setupPostInteractions(postDiv, post);
     
@@ -2619,6 +2695,16 @@ function setupPostMenu(postElement, post) {
         });
     }
     
+    // Report and block (other people's posts)
+    menuDropdown.querySelector('.report-post-btn')?.addEventListener('click', () => {
+        menuDropdown.style.display = 'none';
+        openReportDialog({ targetType: 'post', targetId: post.postId, authorId: post.userId, authorName: post.username });
+    });
+    menuDropdown.querySelector('.block-user-btn')?.addEventListener('click', () => {
+        menuDropdown.style.display = 'none';
+        openBlockDialog({ userId: post.userId, name: post.username, onDone: refreshAfterBlockChange });
+    });
+
     // Delete button
     const deleteBtn = menuDropdown.querySelector('.delete-post-btn');
     if (deleteBtn) {
@@ -2742,7 +2828,7 @@ async function openEditPostModal(post) {
                     class="edit-post-input" 
                     maxlength="5000"  // ✅ Updated limit
                     placeholder="What's on your mind?"
-                >${post.content || post.text || ''}</textarea>
+                >${escapeHtml(post.content || post.text || '')}</textarea>
                 <div class="edit-post-footer">
                     <span class="edit-char-count">
                         <span id="editCharCount">${(post.content || post.text || '').length}</span> characters
@@ -2815,7 +2901,7 @@ async function openEditPostModal(post) {
             console.log('✅ Post updated');
             
             // Update in UI
-            const postElement = document.querySelector(`[data-post-id="${post.postId}"]`);
+            const postElement = document.querySelector(`[data-post-id="${escapeHtml(post.postId)}"]`);
             if (postElement) {
                 const contentDiv = postElement.querySelector('.post-content');
                 if (contentDiv) {
@@ -2896,7 +2982,7 @@ function setupCreatePost() {
     
     // Character count
     const remaining = 280 - length;
-    charCount.textContent = remaining;
+    charCount.textContent = remaining <= 50 ? `${remaining} left` : '';
     
     if (remaining < 20) {
         charCount.classList.add('danger');
@@ -2931,7 +3017,7 @@ function setupCreatePost() {
             charCount.textContent = `${length} characters`;
             submitBtn.disabled = false;
         } else {
-            charCount.textContent = `${280 - length} characters left`;
+            charCount.textContent = 280 - length <= 50 ? `${280 - length} left` : '';
             submitBtn.disabled = length === 0;
         }
         
@@ -2969,6 +3055,7 @@ async function createUserPost() {
     const content = postInput.value.trim();
     
     if (!content || postingNow) return;
+    if (!allowedToSend('post')) return;       // a few posts a minute at most
     postingNow = true;
     
     // Disable submit while posting
@@ -2990,7 +3077,7 @@ async function createUserPost() {
         try {
             avatar = JSON.parse(avatarJson);
         } catch {
-            avatar = { type: 'emoji', value: '🎵' };
+            avatar = { type: 'emoji', value: '👤' };
         }
         
         // ========================================
@@ -3062,20 +3149,20 @@ async function createUserPost() {
                     await saveNotification(mention.userId, {
                         type: 'mention',
                         priority: 7,
-                        message: `📢 ${username} mentioned you in a post`,
+                        message: `📢 ${escapeHtml(username)} mentioned you in a post`,
                         detail: content.length > 60 ? content.substring(0, 60) + '...' : content,
                         icon: '📢',
                         triggerUsername: username,
                         triggerUserId: userId,
                         ctaText: 'View Post',
                         ctaAction: 'navigate',
-                        targetUrl: `/feed.html#post-${postId}`
+                        targetUrl: `/feed.html#post-${escapeHtml(postId)}`
                     });
                     
-                    console.log(`✅ Mention notification sent to @${mention.username}`);
+                    console.log(`✅ Mention notification sent to @${escapeHtml(mention.username)}`);
                     
                 } catch (error) {
-                    console.error(`❌ Error sending mention notification to @${mention.username}:`, error);
+                    console.error(`❌ Error sending mention notification to @${escapeHtml(mention.username)}:`, error);
                 }
             }
         }
@@ -3106,7 +3193,7 @@ async function createUserPost() {
         if (emptyState) emptyState.style.display = 'none';
         
         // Check if post already exists
-        const existingPost = feedContainer.querySelector(`[data-post-id="${post.postId}"]`);
+        const existingPost = feedContainer.querySelector(`[data-post-id="${escapeHtml(post.postId)}"]`);
         if (!existingPost) {
             const postElement = createPostElement(post);
             
@@ -3155,12 +3242,13 @@ function sharePost(post, anchor) {
     const menu = document.createElement('div');
     menu.className = 'share-menu';
     menu.setAttribute('role', 'menu');
-    const item = (id, icon, label) => `<button type="button" class="share-menu-item" data-act="${id}" role="menuitem"><i class="${icon}"></i><span>${label}</span></button>`;
+    const X_LOGO = '<svg class="x-logo" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>';
+    const item = (id, icon, label) => `<button type="button" class="share-menu-item" data-act="${id}" role="menuitem">${icon === 'x-logo' ? X_LOGO : `<i class="${icon}"></i>`}<span>${label}</span></button>`;
     menu.innerHTML = [
         navigator.share ? item('native', 'fa-solid fa-share-nodes', 'Share…') : '',
         item('link', 'fa-solid fa-link', 'Copy link'),
         item('message', 'fa-regular fa-comment-dots', 'Copy as message'),
-        item('x', 'fa-brands fa-twitter', 'Post on X'),
+        item('x', 'x-logo', 'Post on X'),
         item('reddit', 'fa-brands fa-reddit-alien', 'Share on Reddit'),
         item('whatsapp', 'fa-brands fa-whatsapp', 'Send on WhatsApp')
     ].join('');
@@ -3205,29 +3293,14 @@ async function scrollToLinkedPost() {
 }
 
 function getTimeAgo(timestamp) {
-    const now = Date.now();
-    const diff = now - timestamp;
-    
-    const seconds = Math.floor(diff / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-    
-    if (seconds < 60) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
-    
-    // Format date for older posts
-    const date = new Date(timestamp);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return relTime(timestamp);
 }
 
 function getAvatarUrl(avatar) {
-    if (!avatar) return createEmojiAvatar('🎵');
+    if (!avatar) return createEmojiAvatar('👤');
     if (avatar.type === 'url') return fixAvatarUrl(avatar.value);
-    if (avatar.type === 'champion') return fixAvatarUrl(avatar.imageUrl || avatar.value) || createEmojiAvatar('🎵');
-    return createEmojiAvatar(avatar.value || '🎵');
+    if (avatar.type === 'champion') return fixAvatarUrl(avatar.imageUrl || avatar.value) || createEmojiAvatar('👤');
+    return createEmojiAvatar(avatar.value || '👤');
 }
 
 function createEmojiAvatar(emoji) {
@@ -3241,13 +3314,12 @@ document.addEventListener('error', e => {
     if (!(img instanceof HTMLImageElement) || img.dataset.avatarFallback) return;
     if (!/avatar/i.test(img.className + ' ' + img.id)) return;
     img.dataset.avatarFallback = '1';
-    img.src = createEmojiAvatar('🎵');
+    img.src = createEmojiAvatar('👤');
 }, true);
 
+// Escapes quotes as well, so it is safe inside attributes (a username or picture address can be anything someone wrote).
 function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    return String(text ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 

@@ -5,15 +5,15 @@
 .page-gallery .gallery-page {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2.5rem 1.25rem 3rem;
+    padding: 1.5rem 1.25rem 3rem;
 }
 
 /* ---------- hero ---------- */
-.page-gallery .gallery-hero { text-align: center; margin-bottom: 1.75rem; }
+.page-gallery .gallery-hero { text-align: center; margin-bottom: 1rem; }
 .page-gallery .gallery-title {
-    margin: 0 0 .6rem;
+    margin: 0 0 .35rem;
     font-family: var(--font);
-    font-size: clamp(2rem, 6vw, 3.25rem);
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
     font-weight: 800;
     letter-spacing: -.01em;
     color: var(--text);
@@ -22,8 +22,8 @@
     max-width: 640px;
     margin: 0 auto;
     color: var(--muted);
-    font-size: 1.05rem;
-    line-height: 1.55;
+    font-size: 1rem;
+    line-height: 1.45;
 }
 
 /* ---------- toolbar ---------- */
@@ -31,8 +31,8 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 18px;
-    padding: 1rem 1.1rem;
-    margin-bottom: 1.5rem;
+    padding: .85rem 1rem;
+    margin-bottom: 1.1rem;
 }
 .page-gallery .toolbar-row { display: flex; flex-wrap: wrap; gap: .85rem; align-items: flex-end; }
 .page-gallery .toolbar-field { display: flex; flex-direction: column; gap: .35rem; min-width: 0; }
@@ -59,8 +59,7 @@
 .page-gallery .toolbar-field select option { background: #120a18; color: var(--text); }
 .page-gallery .gallery-toolbar :is(input, select, button):focus-visible,
 .page-gallery .edit-thumb:focus-visible,
-.page-gallery .edit-vote:focus-visible,
-.page-gallery .next-link:focus-visible {
+.page-gallery .edit-vote:focus-visible {
     outline: 2px solid var(--pink-bright);
     outline-offset: 2px;
 }
@@ -80,6 +79,8 @@
 }
 .page-gallery .chip:hover { color: var(--text); border-color: var(--pink-bright); }
 .page-gallery .chip[aria-pressed="true"] { background: var(--pink-soft); color: var(--pink-bright); border-color: var(--pink-bright); }
+.page-gallery .status-chips { margin: 0 0 .85rem; }
+.page-gallery .chip-count { margin-left: .25rem; opacity: .75; font-variant-numeric: tabular-nums; }
 .page-gallery .gallery-count { margin: .9rem 0 0; color: var(--muted); font-size: .9rem; }
 
 /* ---------- grid ---------- */
@@ -121,7 +122,10 @@
     overflow: hidden;
     transition: border-color .2s, transform .2s;
 }
+.page-gallery .edit-card { cursor: pointer; }   /* the whole card opens the player */
 .page-gallery .edit-card:hover { border-color: var(--border); transform: translateY(-2px); }
+.page-gallery .edit-card.is-live { border-color: var(--border); }
+.page-gallery .is-hidden { color: var(--text-dim); font-style: italic; }
 
 .page-gallery .edit-thumb {
     position: relative;
@@ -179,7 +183,7 @@
 .page-gallery .edit-badge.status-eliminated,
 .page-gallery .edit-badge.status-entered { color: var(--text-dim); }
 
-.page-gallery .edit-body { display: flex; flex-direction: column; gap: .5rem; padding: .85rem .9rem 1rem; flex: 1; }
+.page-gallery .edit-body { display: flex; flex-direction: column; gap: .4rem; padding: .7rem .8rem .75rem; flex: 1; }
 .page-gallery .edit-title {
     margin: 0;
     font: 700 1rem/1.3 var(--font);
@@ -204,14 +208,14 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: .4rem;
-    padding: .6rem 0;
+    padding: .5rem 0;
     border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
 }
 .page-gallery .edit-stats div { min-width: 0; }
 .page-gallery .edit-stats dt { font-size: .65rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); }
 .page-gallery .edit-stats dd { margin: .1rem 0 0; font: 700 .95rem var(--font); color: var(--text); font-variant-numeric: tabular-nums; }
-.page-gallery .edit-pills { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .25rem; }
+.page-gallery .edit-pills { display: flex; flex-wrap: wrap; gap: .35rem; }
 .page-gallery .pill {
     padding: .15rem .6rem;
     border: 1px solid var(--line);
@@ -223,8 +227,8 @@
 .page-gallery .edit-vote {
     display: block;
     text-align: center;
-    margin-top: .4rem;
-    padding: .65rem;
+    display: flex; align-items: center; justify-content: center;
+    padding: .5rem;
     min-height: 44px;
     background: var(--pink);
     color: #fff;
@@ -233,8 +237,25 @@
     text-decoration: none;
 }
 .page-gallery .edit-vote:hover { background: var(--pink-bright); }
-.page-gallery .edit-vote.edit-bracket { background: transparent; color: var(--pink-bright); border: 1px solid var(--border); }
-.page-gallery .edit-vote.edit-bracket:hover { background: var(--pink-soft); }
+.page-gallery .edit-bracket-link {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 44px;                 /* same height as the Vote now button, so the stats line up across a row */
+    color: var(--muted); font: 600 .85rem var(--font); text-decoration: none;
+}
+.page-gallery .edit-bracket-link:hover { color: var(--pink-bright); text-decoration: underline; }
+.page-gallery .edit-bracket-link:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
+
+/* ---------- show more ---------- */
+.page-gallery .show-more { display: flex; justify-content: center; margin-top: 1.5rem; }
+.page-gallery .show-more[hidden] { display: none; }
+.page-gallery .show-more-btn {
+    min-height: 48px; padding: .7rem 1.8rem;
+    background: var(--pink-soft); color: var(--pink-bright);
+    border: 1px solid var(--pink-bright); border-radius: 999px;
+    font: 700 .95rem var(--font); cursor: pointer;
+}
+.page-gallery .show-more-btn:hover { background: var(--pink); color: #fff; }
+.page-gallery .show-more-btn:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
 
 /* ---------- next steps ---------- */
 .page-gallery .gallery-creators {
@@ -244,6 +265,9 @@
 }
 .page-gallery .gallery-creators h2 { margin: 0 0 .35rem; font-size: 1.05rem; color: var(--text); }
 .page-gallery .gallery-creators p { margin: 0; font-size: .9rem; line-height: 1.5; color: var(--text-dim); max-width: 60ch; }
+.page-gallery .creators-action { flex: none; display: flex; flex-direction: column; align-items: center; gap: .5rem; }
+.page-gallery .creators-address { color: var(--muted); font-size: .85rem; text-decoration: none; overflow-wrap: anywhere; }
+.page-gallery .creators-address:hover { color: var(--pink-bright); text-decoration: underline; }
 .page-gallery .creators-btn {
     flex: none; display: inline-flex; align-items: center; gap: .5rem; padding: .7rem 1.1rem; border-radius: 999px;
     background: var(--pink-soft); color: var(--pink-bright); border: 1px solid var(--pink-bright);
@@ -251,59 +275,50 @@
 }
 .page-gallery .creators-btn:hover { background: var(--pink); color: #fff; }
 .page-gallery .creators-btn:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
-.page-gallery .gallery-next { display: flex; flex-wrap: wrap; justify-content: center; gap: .85rem; margin-top: 2.5rem; }
-.page-gallery .next-link {
-    display: inline-flex; align-items: center; gap: .6rem;
-    padding: .8rem 1.3rem;
-    min-height: 44px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    color: var(--pink-bright);
-    font: 700 .92rem var(--font);
-    text-decoration: none;
-    transition: background .2s;
-}
-.page-gallery .next-link:hover { background: var(--pink-soft); }
-
 /* ---------- player dialog ---------- */
+/* No card around the player: the picture takes most of the screen height (like YouTube's own page) and the title row and credit
+   line sit on the dimmed page above and below it. --wd-h is the tallest the picture may be: the window minus those two rows. */
 .page-gallery .watch-dialog {
+    --wd-h: min(calc(100vh - 118px), 1000px);
     margin: auto;                 /* main.css resets margin to 0, which un-centres a modal <dialog> */
-    width: min(94vw, 420px);
-    max-height: 96vh;
+    width: fit-content;           /* as wide as the picture */
+    max-width: 94vw;
+    max-height: none;             /* the browser's own dialog limit would push a tall picture off-centre */
     padding: 0;
-    background: #0b0711;
+    background: transparent;
     color: var(--text);
-    border: 1px solid var(--pink-bright);
-    border-radius: 18px;
-    box-shadow: 0 30px 90px rgba(0, 0, 0, .7), 0 0 40px rgba(255, 79, 180, .18);
-    overflow: hidden;
+    border: 0;
+    box-shadow: none;
+    overflow: visible;
 }
-.page-gallery .watch-dialog::backdrop { background: rgba(3, 2, 8, .84); backdrop-filter: blur(4px); }
-.page-gallery .watch-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .8rem 1rem; border-bottom: 1px solid var(--line); }
-.page-gallery .watch-head h2 { margin: 0; font: 700 1rem var(--font); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@supports (height: 1dvh) { .page-gallery .watch-dialog { --wd-h: min(calc(100dvh - 118px), 1000px); } }
+.page-gallery .watch-dialog::backdrop { background: rgba(3, 2, 8, .88); backdrop-filter: blur(4px); }
+/* the title row and credit line never make the dialog wider than the picture (width:0 + min-width:100%) */
+.page-gallery .watch-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; width: 0; min-width: 100%; padding: 0 0 .6rem; }
+.page-gallery .watch-head h2 { margin: 0; font: 700 1rem var(--font); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 8px rgba(0, 0, 0, .8); }
 .page-gallery .watch-close {
     flex: none; width: 44px; height: 44px;
     display: grid; place-items: center;
-    background: var(--pink-soft);
-    color: var(--pink-bright);
-    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, .1);
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, .2);
     border-radius: 50%;
     font-size: 1rem;
     cursor: pointer;
 }
 .page-gallery .watch-close:focus-visible { outline: 2px solid var(--pink-bright); outline-offset: 2px; }
-/* the frame takes the edit's own shape (--ar = width / height, set in JS): as tall as 68vh allows, never wider than the dialog */
-.page-gallery .watch-dialog.is-wide { width: min(94vw, 760px); }
-.page-gallery .watch-frame-wrap { --ar: .5625; width: min(100%, calc(min(68vh, 620px) * var(--ar))); aspect-ratio: var(--ar); margin: .75rem auto 0; background: #000; }
+/* the frame takes the edit's own shape (--ar = width / height, set in JS): as tall as --wd-h allows, never wider than the window */
+.page-gallery .watch-frame-wrap { --ar: .5625; width: min(94vw, 1100px, calc(var(--wd-h) * var(--ar))); aspect-ratio: var(--ar); margin: 0 auto; background: #000; border-radius: 14px; overflow: hidden; box-shadow: 0 0 0 1px var(--pink-bright), 0 30px 90px rgba(0, 0, 0, .7), 0 0 40px rgba(255, 79, 180, .18); }
 .page-gallery .watch-frame-wrap iframe { width: 100%; height: 100%; border: 0; display: block; }
-.page-gallery .watch-meta { margin: 0; padding: .8rem 1rem 1rem; text-align: center; color: var(--muted); font-size: .9rem; }
+.page-gallery .watch-meta { width: 0; min-width: 100%; margin: 0; padding: .7rem 0 0; text-align: center; color: var(--muted); font-size: .9rem; text-shadow: 0 1px 8px rgba(0, 0, 0, .8); }
 .page-gallery .watch-meta a { color: var(--pink-bright); text-decoration: none; }
 .page-gallery .watch-meta a:hover { text-decoration: underline; }
+.page-gallery .watch-meta .watch-removal { color: var(--muted); }
 
 /* ---------- phones ---------- */
 @media (max-width: 560px) {
     .page-gallery .gallery-creators { flex-direction: column; align-items: stretch; text-align: left; }
+    .page-gallery .creators-action { align-items: stretch; text-align: center; }
     .page-gallery .creators-btn { justify-content: center; }
     .page-gallery .gallery-page { padding: 1.5rem .85rem 2.5rem; }
     .page-gallery .edit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }

@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile | Arcane Moments</title>
+    <!-- Preview card tags are static on purpose: this is a static site, so every shared profile link gets the same card, and nothing
+         here can carry a pick, a percentage or a standing. Do not template these per profile. -->
+    <meta name="description" content="A profile on Arcane Moments, the fan-made tournament where Arcane edits go head to head and the votes decide.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Profile | Arcane Moments">
+    <meta property="og:description" content="A profile on Arcane Moments, the fan-made tournament where Arcane edits go head to head and the votes decide.">
+    <meta property="og:image" content="https://arcanemoments.netlify.app/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,7 +44,7 @@
 
     <script type="module" src="/js/global-notifications.js"></script>
 </head>
-<body class="theme-arcane page-profile">
+<body class="theme-arcane page-profile" data-share-band="profile">
     <div id="nav-placeholder"></div>
     <script type="module" src="/js/navigation.js"></script>
     
@@ -91,14 +99,11 @@
                             <span class="profile-meta-item" id="profileJoined">
                                 <i class="fas fa-calendar"></i> Joined Recently
                             </span>
-                            <span class="profile-meta-item" id="profileVotes">
-                                <i class="fas fa-trophy"></i> 0 votes
-                            </span>
                             <!-- Follow Stats -->
                             <span class="profile-meta-item profile-follow-stats">
                                 <i class="fas fa-users"></i>
                                 <span id="followerCount">0</span> Followers
-                                <span class="profile-meta-separator">•</span>
+                                <span class="profile-meta-separator">·</span>
                                 <span id="followingCount">0</span> Following
                             </span>
                         </div>
@@ -141,7 +146,7 @@
                     </div>
                     <div class="stat-info">
                         <div class="stat-value" id="statTotalVotes">0</div>
-                        <div class="stat-label">Total Votes</div>
+                        <div class="stat-label">Votes this cup</div>
                     </div>
                 </div>
                 
@@ -153,6 +158,7 @@
                     <div class="stat-info">
                         <div class="stat-value" id="statParticipation">0%</div>
                         <div class="stat-label">Participation</div>
+                        <div class="stat-sub">of open matches</div>
                     </div>
                 </div>
                 
@@ -170,11 +176,11 @@
                 <!-- Activity Level -->
                 <div class="stat-card">
                     <div class="stat-icon">
-                        <i class="fas fa-fire"></i>
+                        <i class="fas fa-star"></i>
                     </div>
                     <div class="stat-info">
                         <div class="stat-value participation-text" id="statActivityLevel">Just Started</div>
-                        <div class="stat-label">Activity Level</div>
+                        <div class="stat-label">Rank</div>
                     </div>
                 </div>
                 
@@ -182,32 +188,29 @@
             
             <!-- Profile Tabs -->
             <section class="profile-tabs">
-                <div class="tabs-nav">
-                    <button class="tab-btn active" data-tab="overview">
+                <div class="tabs-nav" role="tablist" aria-label="Profile sections">
+                    <button class="tab-btn active" data-tab="overview" role="tab" id="tabbtn-overview" aria-controls="tab-overview" aria-selected="true" tabindex="0">
                         <i class="fas fa-home"></i> Overview
                     </button>
-                    <button class="tab-btn" data-tab="votes">
+                    <button class="tab-btn" data-tab="votes" role="tab" id="tabbtn-votes" aria-controls="tab-votes" aria-selected="false" tabindex="-1">
                         <i class="fas fa-vote-yea"></i> Votes <span class="tab-count" id="votesCount">0</span>
                     </button>
-                    <button class="tab-btn" data-tab="posts">
+                    <button class="tab-btn" data-tab="posts" role="tab" id="tabbtn-posts" aria-controls="tab-posts" aria-selected="false" tabindex="-1">
                         <i class="fas fa-pen"></i> Posts <span class="tab-count" id="postsCount">0</span>
                     </button>
-                   <button class="tab-btn" data-tab="participation">
+                   <button class="tab-btn" data-tab="participation" role="tab" id="tabbtn-participation" aria-controls="tab-participation" aria-selected="false" tabindex="-1">
     <i class="fas fa-chart-bar"></i> Journey
 </button>
 
-<button class="tab-btn" data-tab="champions">
+<button class="tab-btn" data-tab="champions" role="tab" id="tabbtn-champions" aria-controls="tab-champions" aria-selected="false" tabindex="-1">
     <i class="fas fa-shield-halved"></i> Champions
 </button>
 
-<button class="tab-btn" data-tab="achievements">
-    <i class="fas fa-trophy"></i> Achievements
+<button class="tab-btn" data-tab="achievements" role="tab" id="tabbtn-achievements" aria-controls="tab-achievements" aria-selected="false" tabindex="-1">
+    <i class="fas fa-trophy" aria-hidden="true"></i> Achievements
     <span class="tab-count" id="achievementsCount">0</span>
 </button>
 
-<button class="tab-btn" data-tab="songs">
-    <i class="fas fa-film"></i> Top Moments
-</button>
                 </div>
                 
                 <!-- Tab Content -->
@@ -216,7 +219,7 @@
                     <!-- ========================================
                          OVERVIEW TAB - IMPROVED ORDER
                          ======================================== -->
-                    <div class="tab-panel active" id="tab-overview">
+                    <div class="tab-panel active" id="tab-overview" role="tabpanel" aria-labelledby="tabbtn-overview" tabindex="0">
                         
                         <!-- ✅ 1. FEATURED POSTS - Personality First! -->
                         <div class="overview-section" id="featuredPostsOverview" style="display: none;">
@@ -235,7 +238,7 @@
                             <div id="recentVotes" class="recent-votes-list">
                                 <div class="no-content">
                                     <i class="fas fa-vote-yea"></i>
-                                    <p>No votes yet</p>
+                                    <p data-empty-votes>No votes in this cup yet.</p>
                                 </div>
                             </div>
                         </div>
@@ -256,7 +259,7 @@
                         <!-- ✅ 4. FAVORITE SONGS - Music Taste -->
                         <div class="overview-section">
                            <h3 class="section-title">
-    <i class="fas fa-film"></i> Most Supported Moments
+    <i class="fas fa-film"></i> Edits you backed most
 </h3>
                             <div id="favoriteSongs" class="favorite-songs-list">
                                 <div class="no-content">
@@ -271,22 +274,23 @@
                     <!-- ========================================
                          VOTES TAB
                          ======================================== -->
-                    <div class="tab-panel" id="tab-votes">
+                    <div class="tab-panel" id="tab-votes" role="tabpanel" aria-labelledby="tabbtn-votes" tabindex="0">
                         <div class="tab-header">
-                            <h3>Voting History</h3>
+                            <h3 class="section-title"><i class="fas fa-history" aria-hidden="true"></i> Voting History</h3>
                             <p class="hidden-votes-note" hidden></p>
-                            <div class="filter-buttons">
-                                <button class="filter-btn active" data-filter="all">
+                            <p class="votes-summary" id="votesSummary" role="status"></p>
+                            <div class="filter-buttons" role="group" aria-label="Filter votes">
+                                <button type="button" class="filter-btn active" data-filter="all" aria-pressed="true">
                                     <i class="fas fa-list"></i> All
                                 </button>
-                               <button class="filter-btn" data-filter="won">
+                               <button type="button" class="filter-btn" data-filter="won" aria-pressed="false">
     <i class="fas fa-check-circle"></i> Advanced
 </button>
 
-<button class="filter-btn" data-filter="lost">
+<button type="button" class="filter-btn" data-filter="lost" aria-pressed="false">
     <i class="fas fa-times-circle"></i> Eliminated
 </button>
-                                <button class="filter-btn" data-filter="live">
+                                <button type="button" class="filter-btn" data-filter="live" aria-pressed="false">
                                     <i class="fas fa-circle"></i> Live
                                 </button>
                             </div>
@@ -294,7 +298,7 @@
                         <div id="allVotes" class="votes-feed">
                             <div class="no-content">
                                 <i class="fas fa-vote-yea"></i>
-                                <p>No votes yet</p>
+                                <p data-empty-votes>No votes in this cup yet.</p>
                             </div>
                         </div>
                     </div>
@@ -302,7 +306,7 @@
                     <!-- ========================================
                          POSTS TAB
                          ======================================== -->
-                    <div class="tab-panel" id="tab-posts">
+                    <div class="tab-panel" id="tab-posts" role="tabpanel" aria-labelledby="tabbtn-posts" tabindex="0">
                         <div class="tab-content">
                             <!-- Featured Posts Section -->
                             <div id="featuredPostsSection" style="display: none;">
@@ -332,7 +336,7 @@
                     <!-- ========================================
                          PARTICIPATION TAB
                          ======================================== -->
-                    <div class="tab-panel" id="tab-participation">
+                    <div class="tab-panel" id="tab-participation" role="tabpanel" aria-labelledby="tabbtn-participation" tabindex="0">
 
                         <!-- Owner-only: voting style + share image (filled by profile-insights.js) -->
                         <div id="ownerInsights" class="owner-insights" hidden></div>
@@ -352,7 +356,7 @@
                                 <div class="participation-percentage" id="overallParticipation">0%</div>
                             </div>
                             <div class="participation-summary">
-<h3>Your Arcane Journey</h3>
+<h3 class="section-title" id="journeyTitle">Your Arcane Journey</h3>
                                 <p id="participationSummary">Loading...</p>
                             </div>
                         </div>
@@ -374,12 +378,12 @@
                     <!-- ========================================
                          ACHIEVEMENTS TAB
                          ======================================== -->
-                    <div class="tab-panel" id="tab-champions">
+                    <div class="tab-panel" id="tab-champions" role="tabpanel" aria-labelledby="tabbtn-champions" tabindex="0">
                         <!-- Vote spread across the companions, mastery and skins (js/champions-tab.js) -->
                         <div id="championsContent" class="champions-content"></div>
                     </div>
 
-                    <div class="tab-panel" id="tab-achievements">
+                    <div class="tab-panel" id="tab-achievements" role="tabpanel" aria-labelledby="tabbtn-achievements" tabindex="0">
                         <div id="allAchievements" class="achievements-grid">
                             <div class="no-content">
                                 <i class="fas fa-trophy"></i>
@@ -388,16 +392,6 @@
                         </div>
                     </div>
                     
-                    <!-- TOP MOMENTS TAB -->
-
-                    <div class="tab-panel" id="tab-songs">
-                        <div id="allFavoriteSongs" class="favorite-songs-list">
-                           <div class="no-content">
-    <i class="fas fa-film"></i>
-    <p>No moments voted for yet</p>
-</div>
-                        </div>
-                    </div>
                     
                 </div>
             </section>

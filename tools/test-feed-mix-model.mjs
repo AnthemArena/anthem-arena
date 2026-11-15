@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { mixFeed, digestSummary, rankTrending, findPostById, extractMentions, resultsVisible, RUN_MIN } from '../js/feed-mix-model.js';
+import { mixFeed, digestSummary, digestWho, rankTrending, findPostById, extractMentions, resultsVisible, RUN_MIN } from '../js/feed-mix-model.js';
 let pass = 0, fail = 0;
 const t = (n, ok) => { console.log(`  ${ok ? 'ok ' : 'FAIL'} ${n}`); ok ? pass++ : fail++; };
 const vote = (i, u = 'u' + i) => ({ type: 'vote', postId: 'v' + i, username: u, timestamp: 1000 - i });
@@ -21,7 +21,7 @@ t('posts mode: written posts only', r.length === 1 && r[0].postId === 'p1');
 r = mixFeed({ votes: [vote(1), vote(2)], posts: [post(1, 5)], mode: 'votes' });
 t('votes mode: votes only, no digests', r.length === 2 && r.every(x => x.type === 'vote'));
 t('old vote-type social posts are ignored', mixFeed({ posts: [{ type: 'vote', postId: 'x', timestamp: 1 }] }).length === 0);
-t('summary: names', digestSummary({ names: ['A', 'B', 'C', 'D'], count: 9 }) === 'A, B and 2 others cast 9 votes');
+t('summary: more than two people leads with the count', digestSummary({ names: ['A', 'B', 'C', 'D'], count: 9 }) === '4 people cast 9 votes' && digestWho({ names: ['A', 'B', 'C', 'D'], count: 9 }) === 'A, B and 2 others' && digestWho({ names: ['A', 'B', 'C'], count: 3 }) === 'A, B and 1 other' && digestWho({ names: ['A', 'B'], count: 3 }) === '');
 t('summary: two names', digestSummary({ names: ['A', 'B'], count: 4 }) === 'A and B cast 4 votes');
 t('summary: one name', digestSummary({ names: ['A'], count: 4 }) === 'A cast 4 votes');
 const NOW = 1e12, D = 24 * 3600e3;
@@ -46,7 +46,10 @@ t('trending: includes vote posts', r.some(x => x.type === 'vote'));
     t('live match results hidden until you vote; ended matches and your own posts always show', resultsVisible({ status: 'live' }) === false
         && resultsVisible({ status: 'live', viewerVoted: true }) === true && resultsVisible({ status: 'live', isOwn: true }) === true
         && resultsVisible({ status: 'completed' }) === true && resultsVisible({ status: null }) === true);
-    t('feed vote card hides the split and the bar when results are locked', /showResults \? `\$\{userPct\}%`/.test(src) && /results-locked/.test(src));
+    t('feed vote card hides the split and the bar when results are locked', /showResults \? `<div class="vote-split"/.test(src));
+    t('feed vote row does not say who was picked while results are locked', /: `voted in a live match <span class="vote-locked-note">/.test(src));
+    { const prof = fs.readFileSync(new URL('../js/profile-page.js', import.meta.url), 'utf8'); t('profile vote posts by others in a live match do not say who was picked until the viewer has voted', /liveMatchIds\.has\(post\.matchId\) && post\.userId !== me && !viewerHasVoted\(post\.matchId\)/.test(prof)); }
+    t('stored vote posts get the live split and match state in every tab (one source for the same match)', !/[^e]getFeed\('(all|following)'/.test(src.replace(/const getFeedLive[^\n]*/, '')) && /async function refreshVoteSplits/.test(src));
     t('the Post button has exactly one click handler (two used to create every post twice)', (src.match(/submitBtn\.addEventListener\('click'/g) || []).length === 1);
     t('createUserPost refuses a second call while one is saving', /let postingNow = false;/.test(src) && /if \(!content \|\| postingNow\) return;/.test(src) && /postingNow = false;\s*\n\s*submitBtn\.disabled = false;/.test(src));
     t('feed-page imports saveNotification at the top (mention alerts call it directly)', /^import \{ saveNotification \} from '\.\/notification-storage\.js';/m.test(src));

@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { ACHIEVEMENTS, GENERAL_ACHIEVEMENTS, achievementCompletion, getChampionAchievements } from '../js/achievements.js';
 import { CHAMPION_ACHIEVEMENTS, CHAMPION_IDS, MAX_PER_CHAMPION, MAX_XP_PER_CHAMPION } from '../js/champion-achievements/index.js';
-import { SKIN_UNLOCKS } from '../js/champion-unlocks.js';
+import { SKIN_UNLOCKS, masteryLevel } from '../js/champion-unlocks.js';
+import { FOUNDING_MEMBER_XP } from '../js/founding-member-xp.js';
 import { companionStats, championStats } from '../js/achievement-tracker.js';
 
 const REQUIRED = ['id', 'name', 'description', 'icon', 'xp', 'category', 'rarity', 'condition'];
@@ -81,3 +82,9 @@ assert.equal(ACHIEVEMENTS['caitlyn-close-calls'].progress(stats).current, 2);
 assert.equal(ACHIEVEMENTS['caitlyn-steady-aim'].progress({}).current, 0);   // no champion data: zero, not a crash
 
 console.log('achievement registry tests passed');
+
+// A first vote should be a good moment, not the whole progression: vote (10+20+5), First Choice (25) and Founding Member together
+// reach mastery 2 (one skin), not mastery 3.
+assert.equal(ACHIEVEMENTS['founding-member'].xp, FOUNDING_MEMBER_XP, 'the badge and the payout agree');
+assert.equal(masteryLevel(35 + ACHIEVEMENTS['first-choice'].xp + FOUNDING_MEMBER_XP).level, 2, 'a first vote reaches mastery 2 at most');
+console.log('founding member first-vote check passed');

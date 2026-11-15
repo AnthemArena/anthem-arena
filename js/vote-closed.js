@@ -16,6 +16,20 @@ export function votingState(match, now = Date.now()) {
     return 'open';
 }
 
+/** True while people can still vote: status live and the deadline (if any) has not passed. Same rule as votingState. */
+export const isOpenNow = (match, now = Date.now()) => !!match && match.status === 'live' && votingState(match, now) === 'open';
+
+/** True for a match the admin left "live" after its deadline: the vote page says "Voting closed", so lists must not call it live. */
+export const isExpiredLive = (match, now = Date.now()) => !!match && match.status === 'live' && votingState(match, now) === 'closed';
+
+/** Admin Date column for a live match: { kind: 'none' | 'open' | 'expired', ms }. Only live matches have a deadline to show. */
+export function deadlineInfo(match, now = Date.now()) {
+    if (!match || match.status !== 'live') return null;
+    const ms = Date.parse(match.endDate || match.endTime || '');
+    if (!Number.isFinite(ms)) return { kind: 'none', ms: null };
+    return { kind: ms <= now ? 'expired' : 'open', ms };
+}
+
 /**
  * Button text for one side. side: 'song1' | 'song2'.
  * Returns { text, winner }.  winner is true for the side that won (only known once the match is completed).

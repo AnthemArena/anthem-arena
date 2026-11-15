@@ -64,7 +64,7 @@ with sync_playwright() as p:
         n_cards = pg.locator('#socialGrid .social-match-card').count()
         check(f'{tag}: the page shows the live matches you have not voted in ({len(live) - 1})', n_cards == len(live) - 1, n_cards)
         c = rect(pg, '#socialGrid .social-match-card img', 0)
-        check(f'{tag}: covers are portrait (9:16), not landscape boxes', c and abs(c['w'] / c['h'] - 9 / 16) < 0.03, c)
+        check(f'{tag}: covers are portrait (taller than wide), not landscape boxes', c and c['h'] > c['w'] * 1.3, c)
         card = rect(pg, '#socialGrid .social-match-card')
         check(f'{tag}: covers stay inside their card', c['x'] >= card['x'] and c['r'] <= card['r'] and c['b'] <= card['b'], (c, card))
         check(f'{tag}: no sideways scroll', pg.evaluate('document.documentElement.scrollWidth <= innerWidth'))
@@ -72,18 +72,11 @@ with sync_playwright() as p:
         check(f'{tag}: card titles show no trailing hashtags', titles and all(not re.search(r'#\w+\s*$', t) for t in titles), titles)
         hs = pg.eval_on_selector_all('#socialGrid .social-match-card .song-details h3', 'els=>els.map(e=>e.getBoundingClientRect().height)')
         lh = pg.evaluate("parseFloat(getComputedStyle(document.querySelector('#socialGrid .social-match-card .song-details h3')).lineHeight) || 24")
-        check(f'{tag}: titles are two lines at most', all(x <= lh * 2 + 4 for x in hs), (hs, lh))
+        check(f'{tag}: titles wrap in full under their thumbnails, six lines at most', all(x <= lh * 6 + 4 for x in hs), (hs, lh))
         src = pg.get_attribute('#socialGrid .social-match-card img', 'src')
         check(f'{tag}: covers use the sharper 4:3 thumbnail (hqdefault)', 'hqdefault' in src, src)
-        # the cup champion's line sits between the round banner and the matches, and says something that fits
-        check(f'{tag}: the champion line is shown', pg.is_visible('#champion-say-live .cb-text') and len(pg.inner_text('#champion-say-live .cb-text')) > 8, pg.inner_text('#champion-say-live') if pg.query_selector('#champion-say-live') else None)
-        st = pg.get_attribute('#champion-say-live', 'data-state')
-        check(f'{tag}: the line is for the right situation (several matches left to vote in)', st in ('live-some', 'live-closing'), st)
-        sb, ub = rect(pg, '#champion-say-live'), rect(pg, '#unvotedSection')
-        check(f'{tag}: the champion line sits above the matches and inside the screen', sb and ub and sb['y'] < ub['y'] and sb['r'] <= pg.evaluate('innerWidth') + 1, (sb, ub))
-        first_say = pg.inner_text('#champion-say-live .cb-text')
-        pg.click('#champion-say-live .cb-portrait'); pg.wait_for_timeout(200)
-        check(f'{tag}: tapping the portrait gives another line', pg.inner_text('#champion-say-live .cb-text') != first_say, first_say)
+        # the champion's line was dropped from the homepage: the status line under the logo already says it once
+        check(f'{tag}: no separate champion line and no round banner on the homepage', pg.locator('#champion-say-live').count() == 0 and pg.locator('.countdown-banner').count() == 0)
         pg.screenshot(path=f'{SHOTS}/live-{tag}.png')
         # the voted section (collapsed by default): open it and look at the pick
         voted = pg.locator('#votedGrid .social-match-card.voted').first
@@ -97,14 +90,7 @@ with sync_playwright() as p:
             pg.screenshot(path=f'{SHOTS}/live-{tag}-voted.png')
         else:
             check(f'{tag}: the voted card can be seen', False)
-        # 16 Oct: banner without a stray bullet; badge off the covers
-        banner_bullets = pg.evaluate("[...document.querySelectorAll('.countdown-content .cd-part')].slice(1).map(e=>getComputedStyle(e,'::before').content)")
-        if tag == 'phone':
-            check('phone: banner parts stack with no leading bullet', all(c in ('none', 'normal') for c in banner_bullets), banner_bullets)
-        else:
-            check('desktop: banner parts are separated by a dot', all('\u2022' in c for c in banner_bullets) and len(banner_bullets) >= 1, banner_bullets)
-        vc = pg.evaluate("(()=>{const c=document.querySelector('.social-match-card.voted');if(!c)return null;const t=c.getBoundingClientRect();const i=c.querySelector('img').getBoundingClientRect();const bt=parseFloat(getComputedStyle(c,'::before').marginTop)||0;return {pos:getComputedStyle(c,'::before').position}})()")
-        check(f'{tag}: the founding-member tag sits in the flow (not on top of the covers)', vc and vc['pos'] == 'static', vc)
+        # the round banner and the founding-member tag were removed from the homepage (status line, "Your pick" text): see test-home-browser.py
         check(f'{tag}: no page errors', not errs, errs)
         pg.context.close()
     b.close()

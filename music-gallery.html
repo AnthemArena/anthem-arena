@@ -54,25 +54,15 @@
     <main class="gallery-page">
         <header class="gallery-hero">
             <h1 class="gallery-title">Edits Gallery</h1>
-            <p class="gallery-subtitle">Every fan edit that has entered an Arcane Moments cup, with its creator and result. Tap one to watch it.</p>
+            <p class="gallery-subtitle">Every fan edit that has entered an Arcane Moments cup. Tap one to watch it.</p>
         </header>
 
         <section class="gallery-toolbar" aria-label="Search and filter edits">
+            <div class="chip-row status-chips" id="statusChips" role="group" aria-label="Filter by status"></div>
             <div class="toolbar-row">
                 <div class="toolbar-field toolbar-search">
                     <label for="searchInput">Search</label>
                     <input type="search" id="searchInput" placeholder="Edit title or creator" autocomplete="off">
-                </div>
-                <div class="toolbar-field">
-                    <label for="statusFilter">Status</label>
-                    <select id="statusFilter">
-                        <option value="">All</option>
-                        <option value="live">Live now</option>
-                        <option value="bracket">In the bracket</option>
-                        <option value="eliminated">Finished their run</option>
-                        <option value="champion">Champions</option>
-                        <option value="entered">Entered</option>
-                    </select>
                 </div>
                 <div class="toolbar-field" hidden>
                     <label for="cupFilter">Cup</label>
@@ -81,6 +71,7 @@
                 <div class="toolbar-field">
                     <label for="sortSelect">Sort by</label>
                     <select id="sortSelect">
+                        <option value="groups">Live first, then group order</option>
                         <option value="standing">Standing</option>
                         <option value="views">Most views</option>
                         <option value="likes">Most likes</option>
@@ -99,18 +90,19 @@
             <div class="gallery-message"><p>Loading edits&hellip;</p></div>
         </section>
 
+        <div class="show-more" id="showMoreWrap" hidden>
+            <button type="button" class="show-more-btn" id="showMoreBtn">Show 24 more</button>
+        </div>
+
         <section class="gallery-creators" aria-labelledby="creatorsHeading">
             <div>
                 <h2 id="creatorsHeading">Made one of these edits?</h2>
                 <p>We do not host or copy any video: every edit plays straight from YouTube, shown with your name and a link to your channel, so the views and likes go to you. If you would rather not be included, email us and we will take it out. The sooner the better: an edit is easiest to remove before a cup is drawn.</p>
             </div>
-            <a class="creators-btn" data-creator-mail href="/about#creators"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Request removal</a>
-        </section>
-
-        <section class="gallery-next" aria-label="Keep exploring">
-            <a href="/#vote" class="next-link"><i class="fa-solid fa-bolt" aria-hidden="true"></i><span>Vote in live matches</span></a>
-            <a href="/brackets" class="next-link"><i class="fa-solid fa-trophy" aria-hidden="true"></i><span>See the bracket</span></a>
-            <a href="/stats" class="next-link"><i class="fa-solid fa-chart-bar" aria-hidden="true"></i><span>Tournament stats</span></a>
+            <div class="creators-action">
+                <a class="creators-btn" data-creator-mail href="/about#creators"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Request removal</a>
+                <a class="creators-address" data-creator-mail data-show-address href="/about#creators">Email Arcane Moments</a>
+            </div>
         </section>
     </main>
 

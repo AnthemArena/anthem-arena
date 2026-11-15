@@ -18,7 +18,7 @@ import { roundLabel } from './bracket-builder.js';   // same round names the bui
 import { describeCup } from './group-builder.js';
 import { cleanTitle } from './title-clean.js';
 import { mountSay, pickBracketsState } from './champion-says.js';
-import { buildGroupViews, groupStageHtml, stageTabsHtml, knockoutNoteHtml, defaultStage, cupSummary } from './brackets-groups.js';
+import { buildGroupViews, groupStageHtml, stageTabsHtml, knockoutNoteHtml, groupsCloseAt, defaultStage, cupSummary } from './brackets-groups.js';
 const ACTIVE_TOURNAMENT = ARCANE_CONFIG.tournamentId;
 
 // Facts about the bracket on screen, worked out from the matches in describeBracket().
@@ -557,6 +557,10 @@ function generateTournamentStats(allMatches) {
         const activeMatches = allMatches.filter(m => m.status === 'live');
         const activeRound = activeMatches.length > 0 ? Math.max(...activeMatches.map(m => m.round)) : 1;
         
+        // The statistics panel only appears once there is a result to talk about
+        const statsPanel = document.getElementById('tournamentStats');
+        if (statsPanel) statsPanel.style.display = completedMatches.length ? '' : 'none';
+
         // Update the HTML
         updateStatsDisplay({
             finalsWinner,
@@ -742,7 +746,7 @@ function renderStageViews(matches) {
 
     if (groupsEl) groupsEl.innerHTML = groupStageHtml(views, bracketInfo, { userVoted: checkUserVoted, userChoice: getUserVotedSongId });
     if (tabsEl) tabsEl.innerHTML = stageTabsHtml({ active: currentStage, info: bracketInfo, groupViews: views });
-    if (noteEl) noteEl.innerHTML = bracketInfo.knockoutBuilt ? '' : knockoutNoteHtml(bracketInfo, getRoundName(bracketInfo.firstKnockoutRound));
+    if (noteEl) noteEl.innerHTML = bracketInfo.knockoutBuilt ? '' : knockoutNoteHtml(bracketInfo, { roundName: getRoundName, closeAt: groupsCloseAt(matches) });
     setupStageHandlers();
 }
 
@@ -779,10 +783,18 @@ function filterGroups(filter) {
     let shown = 0;
     document.querySelectorAll('.gs-card').forEach(card => {
         const state = card.dataset.state;
-        const show = filter === 'all' || (filter === 'live' && state === 'live') || (filter === 'complete' && state === 'complete');
+        const show = filter === 'all' || state === filter;
         card.hidden = !show;
+        card.style.order = '';
         if (show) shown++;
     });
+    if (filter === 'live') {                       // closing soonest first
+        [...document.querySelectorAll('.gs-card:not([hidden])')]
+            .sort((a, b) => (Number(a.dataset.closes) || Infinity) - (Number(b.dataset.closes) || Infinity))
+            .forEach((card, i) => { card.style.order = String(i); });
+    }
+    const caught = document.getElementById('groupCaughtUp');
+    if (caught) caught.hidden = !(filter === 'live' && caught.dataset.note);
     const empty = document.getElementById('groupEmpty');
     if (empty) empty.hidden = shown > 0;
 }

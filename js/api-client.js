@@ -1,10 +1,26 @@
 import { ARCANE_CONFIG } from './arcane-config.js';
+import { matchFromFirestore } from './match-from-firestore.js';
 // ========================================
 // API CLIENT - USES NETLIFY EDGE CACHE
 // All Firebase reads go through this layer
 // ========================================
 
 const API_BASE = '/api';
+
+// If /api/... cannot answer (edge function not running, answering with a web page instead of data, or failing), read Firestore directly.
+// Only used after the normal route failed, so the usual path and its CDN caching are untouched.
+async function firestoreMatches(tournament) {
+    const { db } = await import('./firebase-config.js');
+    const { collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+    const snap = await getDocs(collection(db, `tournaments/${tournament || ARCANE_CONFIG.tournamentId}/matches`));
+    return snap.docs.map(d => matchFromFirestore(d.id, d.data()));
+}
+async function firestoreMatch(matchId, tournament) {
+    const { db } = await import('./firebase-config.js');
+    const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+    const snap = await getDoc(doc(db, `tournaments/${tournament || ARCANE_CONFIG.tournamentId}/matches/${matchId}`));
+    return snap.exists() ? matchFromFirestore(snap.id, snap.data()) : null;
+}
 
 /**
  * Fetch all matches (cached at Netlify edge)
@@ -53,8 +69,13 @@ async function fetchAllMatches(bypassCache = false, tournament = null) {
         return Array.isArray(data) ? data : [];
         
     } catch (error) {
-        console.error('Error fetching matches:', error);
-        throw error;
+        console.warn('Match list from the edge failed, reading Firestore directly:', error);
+        try {
+            return await firestoreMatches(tournament);
+        } catch (fallbackError) {
+            console.error('Error fetching matches:', error, fallbackError);
+            throw error;
+        }
     }
 }
 
@@ -81,16 +102,27 @@ export async function getMatch(matchId, bypassCache = false) {
             throw new Error(`API error: ${response.status}`);
         }
         
-        const data = await response.json();
+        let data = await response.json();
         
         const cacheStatus = response.headers.get('X-Cache');
         console.log(`✅ Match loaded (Cache: ${cacheStatus || 'UNKNOWN'})`);
         
+        // A cache in between once answered a single-match request with the whole match list: pick the match out of it
+        // instead of rendering a page full of "undefined".
+        if (Array.isArray(data)) {
+            data = data.find(m => m && (m.id === matchId || m.matchId === matchId)) || null;
+        }
+        
         return data;
         
     } catch (error) {
-        console.error('❌ Error fetching match:', error);
-        throw error;
+        console.warn('⚠️ Match from the edge failed, reading Firestore directly:', error);
+        try {
+            return await firestoreMatch(matchId);
+        } catch (fallbackError) {
+            console.error('❌ Error fetching match:', error, fallbackError);
+            throw error;
+        }
     }
 }
 

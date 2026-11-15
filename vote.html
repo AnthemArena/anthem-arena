@@ -6,7 +6,7 @@
     
     <!-- SEO Meta Tags - DYNAMIC (will be updated by JavaScript) -->
     <title>Vote Now | Arcane Moments</title>
-    <meta name="description" content="Cast your vote in the Arcane Moments tournament! Watch the edits head to head and pick your favourite.">
+    <meta name="description" content="Cast your vote in the Arcane Moments tournament! Watch the edits head to head and pick your favorite.">
     <link rel="canonical" href="https://arcanemoments.netlify.app/vote">
     
     <!-- Favicon -->
@@ -74,7 +74,7 @@
 
     <script type="module" src="/js/global-notifications.js"></script>
 
-<body class="theme-arcane">
+<body class="theme-arcane page-vote">
 
     <div id="nav-placeholder"></div>
 <script type="module" src="/js/navigation.js"></script>
@@ -161,10 +161,10 @@
     <div class="video-controls">
         <!-- Competitor 1 Controls -->
         <button class="control-btn replay-btn" data-video="competitor1">
-            <i class="fa-solid fa-rotate-right"></i> Replay
+            <i class="fa-solid fa-rotate-right"></i> Restart
         </button>
-        <button class="control-btn fullscreen-btn" data-video="competitor1">
-            <i class="fa-solid fa-expand"></i> Fullscreen
+        <button class="control-btn expand-btn" data-video="competitor1" aria-haspopup="dialog">
+            <i class="fa-solid fa-expand"></i> Expand
         </button>
     </div>
 </div>
@@ -176,6 +176,7 @@
         <div class="vote-percentage">
             <span class="percentage-number" id="competitor1-percentage">50</span>%
         </div>
+        <p class="vote-result-name" id="competitor1-result-name"></p>
         <p class="vote-count" id="competitor1-votes">0 votes</p>
     </div>
     
@@ -258,10 +259,10 @@
     <div class="video-controls">
         <!-- Competitor 2 Controls -->
         <button class="control-btn replay-btn" data-video="competitor2">
-            <i class="fa-solid fa-rotate-right"></i> Replay
+            <i class="fa-solid fa-rotate-right"></i> Restart
         </button>
-        <button class="control-btn fullscreen-btn" data-video="competitor2">
-            <i class="fa-solid fa-expand"></i> Fullscreen
+        <button class="control-btn expand-btn" data-video="competitor2" aria-haspopup="dialog">
+            <i class="fa-solid fa-expand"></i> Expand
         </button>
     </div>
 </div>
@@ -273,6 +274,7 @@
         <div class="vote-percentage">
             <span class="percentage-number" id="competitor2-percentage">50</span>%
         </div>
+        <p class="vote-result-name" id="competitor2-result-name"></p>
         <p class="vote-count" id="competitor2-votes">0 votes</p>
     </div>
     
@@ -309,6 +311,8 @@
                 </div>
             </div>
 
+            <p class="vote-final-note" id="vote-final-note">Votes are final. Once you vote you can't change it.</p>
+
         </div>
     </div>
 </section>
@@ -332,7 +336,6 @@
                 Keep Voting
             </h2>
             <p class="section-subtitle">
-                More matches need your vote right now! 
                 <a href="/matches.html" class="inline-subtitle-link">View all matches</a>
             </p>
         </div>
@@ -363,7 +366,7 @@
                 <a href="/stats.html" class="modal-quick-link">
                     <i class="fas fa-chart-bar"></i> Statistics
                 </a>
-                <a href="/profile#votes" class="modal-quick-link">
+                <a href="/profile?tab=votes" class="modal-quick-link">
                     <i class="fas fa-history"></i> My Votes
                 </a>
             </div>
@@ -380,7 +383,7 @@
                 <a href="/profile#votes" class="after-voting-card">
                     <div class="card-icon"><i class="fa-solid fa-circle-check"></i></div>
                     <h3>View Your Votes</h3>
-                    <p>Track all your predictions and unlock achievements</p>
+                    <p>Track all your votes and unlock achievements</p>
                     <span class="card-arrow">→</span>
                 </a>
                 

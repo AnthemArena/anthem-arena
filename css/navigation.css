@@ -1723,49 +1723,6 @@
 
 
 /* ========================================
-   PROFILE LOCKED STATE
-   ======================================== */
-
-.profile-locked-state {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 16px;
-    background: linear-gradient(135deg, rgba(50, 50, 50, 0.8), rgba(30, 30, 30, 0.8));
-    border-radius: 8px;
-    border: 2px solid rgba(100, 100, 100, 0.3);
-}
-
-.locked-icon {
-    font-size: 28px;
-    opacity: 0.6;
-    animation: lockPulse 2s ease-in-out infinite;
-}
-
-@keyframes lockPulse {
-    0%, 100% { transform: scale(1); opacity: 0.6; }
-    50% { transform: scale(1.1); opacity: 0.8; }
-}
-
-.locked-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.locked-title {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: #999;
-}
-
-.locked-subtitle {
-    font-size: 0.8rem;
-    color: #666;
-    font-style: italic;
-}
-
-/* ========================================
    PROFILE CLAIM STATE
    ======================================== */
 
@@ -1837,23 +1794,19 @@
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
-    .profile-locked-state,
     .profile-claim-state {
         padding: 6px 12px;
         gap: 8px;
     }
     
-    .locked-icon,
     .claim-icon {
         font-size: 24px;
     }
     
-    .locked-title,
     .claim-title {
         font-size: 0.85rem;
     }
     
-    .locked-subtitle,
     .claim-subtitle {
         font-size: 0.75rem;
     }
@@ -2358,4 +2311,46 @@
 
 .notification-expand:hover {
     background: rgba(200, 170, 110, 0.25);
+}
+/* First visit: a small outlined avatar button instead of the big glowing card (the full card shows after the first vote) */
+.profile-claim-state.is-small,
+body.theme-arcane .profile-claim-state.is-small {
+    padding: 0; gap: 0; background: none; border: 0; box-shadow: none; animation: none; transform: none;
+}
+.profile-claim-state.is-small:hover,
+body.theme-arcane .profile-claim-state.is-small:hover { background: none; box-shadow: none; transform: none; }
+.claim-avatar {
+    width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; padding: 0;
+    background: rgba(255, 79, 180, .08); border: 2px solid var(--pink-bright, #ff6ec7); color: #fff; font-size: 20px; line-height: 1; cursor: pointer;
+    transition: background .2s, box-shadow .2s;
+}
+.claim-avatar:hover { background: rgba(255, 79, 180, .22); box-shadow: 0 0 0 3px rgba(255, 79, 180, .2); }
+.claim-avatar:focus-visible, .profile-claim-state[role=button]:focus-visible, .notification-bell:focus-visible { outline: 2px solid var(--pink-bright, #ff6ec7); outline-offset: 3px; }
+
+/* Header controls: every tap area is at least 44px, padding included */
+@media (max-width: 768px) {
+    .mobile-menu-toggle { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; min-width: 44px; padding: 0; }
+    .nav-settings-btn { width: 44px; height: 44px; min-width: 44px; }
+    .nav-profile-link { min-height: 44px; }
+    .profile-avatar { min-width: 44px; min-height: 44px; }
+    .notification-bell { min-width: 44px; min-height: 44px; display: flex !important; align-items: center; justify-content: center; }
+}
+.mobile-menu-toggle:focus-visible, .nav-settings-btn:focus-visible { outline: 2px solid var(--pink-bright, #ff6ec7); outline-offset: 2px; }
+
+/* phones: the full "Claim Your Profile!" card (shown after the first vote) is one short line, not a tall block */
+@media (max-width: 768px) {
+    .profile-claim-state:not(.is-small) { padding: 4px 10px; gap: 6px; min-height: 44px; }
+    .profile-claim-state:not(.is-small) .claim-subtitle { display: none; }
+    .profile-claim-state:not(.is-small) .claim-title { white-space: nowrap; font-size: .8rem; }
+    .profile-claim-state:not(.is-small) .claim-icon { font-size: 20px; }
+}
+@media (max-width: 768px) {
+    .profile-claim-state:not(.is-small) .claim-arrow { display: none; }
+    .nav-profile-card .notification-bell, .nav-profile-container .notification-bell { margin: 0 !important; }
+    .nav-profile-container > div[style*="margin: 0 12px"], .nav-profile-card > div[style*="margin: 0 12px"] { margin: 0 2px !important; }
+}
+@media (max-width: 420px) {
+    .profile-claim-state:not(.is-small) { padding: 4px 8px; gap: 0; }
+    .profile-claim-state:not(.is-small) .claim-icon { display: none; }
+    .profile-claim-state:not(.is-small) .claim-title { font-size: .78rem; }
 }

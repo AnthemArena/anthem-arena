@@ -8,6 +8,8 @@ import { getAllMatches } from './api-client.js';
 import { cupDisplayName } from './bracket-builder.js';
 import { cleanTitle } from './title-clean.js';
 import { standingFor } from './edit-standing.js';
+import { ARCANE_CONFIG } from './arcane-config.js';
+import { removalMailto } from './creator-contact.js';
 
 // Use shared cache if available (set by vote.js)
 window.pageLoadMatchesCache = window.pageLoadMatchesCache || null;
@@ -82,13 +84,29 @@ export async function getAllTournamentStats() {
 const grid = document.getElementById('editGrid');
 
 const STATUS_RANK = { champion: 0, live: 1, bracket: 2, eliminated: 3, entered: 4 };
-const state = { q: '', chars: new Set(), cup: '', status: '', sort: 'standing' };
+const PAGE_SIZE = 24;
+// chips shown above the grid (a chip with no edits is left out, except All); counts follow the other filters
+const STATUS_CHIPS = [['', 'All'], ['live', 'Live'], ['bracket', 'In the bracket'], ['eliminated', 'Finished their run'], ['entered', 'Entered'], ['champion', 'Champions']];
+const state = { q: '', chars: new Set(), cup: '', status: '', sort: 'groups' };
+let shown = PAGE_SIZE;
 let ALL = [];
 let lastFocus = null;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmtViews = n => !n ? '0' : n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M' : n >= 1e3 ? (n / 1e3).toFixed(n >= 1e4 ? 0 : 1).replace(/\.0$/, '') + 'K' : String(n);
 const fmtDuration = s => s == null ? '' : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+// ---------- blind voting ----------
+// Same rule as the Matches page and the vote page: an edit in a LIVE match hides its creator and YouTube numbers until the viewer
+// has voted in that match (or the match has closed, when standingFor stops reporting a live match).
+// A vote is remembered under userVotes and under vote_<cup>_<match>; either counts.
+function hasVoted(matchId) {
+    try {
+        if ((JSON.parse(localStorage.getItem('userVotes') || '{}') || {})[matchId]) return true;
+        return !!localStorage.getItem(`vote_${ARCANE_CONFIG.tournamentId}_${matchId}`);
+    } catch (e) { return false; }
+}
+export const isBlind = e => !!(e.standing?.liveMatch && !hasVoted(e.standing.liveMatch.matchId));
+
 const safeUrl = u => /^https:\/\//i.test(u || '') ? u : '';
 
 async function loadGallery() {
@@ -103,8 +121,10 @@ async function loadGallery() {
         try { edits = JSON.parse(await res.text()); } catch { throw new Error('data/edits.json is not available'); }
         const matches = Array.isArray(matchesRaw) ? matchesRaw : [];
 
+        // cups whose id contains "test" are internal and never shown (an edit that is only in a test cup is left out)
         ALL = edits
-            .filter(e => Array.isArray(e.tournaments) && e.tournaments.length && e.status !== 'removed' && e.status !== 'blocked' && e.embedAllowed !== false)
+            .map(e => ({ ...e, tournaments: Array.isArray(e.tournaments) ? e.tournaments.filter(t => !/test/i.test(t)) : [] }))
+            .filter(e => e.tournaments.length && e.status !== 'removed' && e.status !== 'blocked' && e.embedAllowed !== false)
             .map(e => ({ ...e, standing: standingFor(e, matches) }));
 
         buildFilters();
@@ -132,42 +152,58 @@ function buildFilters() {
     cupSel.closest('.toolbar-field').hidden = cups.length < 2;
 }
 
-function visible() {
+// everything except the status chip, so the chip counts follow the search, character and cup filters
+function baseList() {
     const q = state.q.trim().toLowerCase();
-    const list = ALL.filter(e =>
-        (!q || `${e.shortTitle || ''} ${e.title || ''} ${e.artist || ''}`.toLowerCase().includes(q)) &&
+    return ALL.filter(e =>
+        // a creator name in the search would reveal the creator of a hidden live edit
+        (!q || `${e.shortTitle || ''} ${e.title || ''} ${isBlind(e) ? '' : e.artist || ''}`.toLowerCase().includes(q)) &&
         (!state.chars.size || (e.characters || []).some(c => state.chars.has(c))) &&
-        (!state.cup || (e.tournaments || []).includes(state.cup)) &&
-        (!state.status || e.standing.kind === state.status));
-    const byViews = (a, b) => (b.views || 0) - (a.views || 0);
+        (!state.cup || (e.tournaments || []).includes(state.cup)));
+}
+
+function visible() {
+    const list = baseList().filter(e => !state.status || e.standing.kind === state.status);
+    // views, likes and creator of a hidden live edit must not leak through the sort order either
+    const views = e => isBlind(e) ? 0 : e.views || 0;
+    const likes = e => isBlind(e) ? 0 : e.likes || 0;
+    const byViews = (a, b) => views(b) - views(a);
+    const groupOrder = e => e.standing.groupIndex ?? (e.standing.group ? 1e6 : 2e6);
     const sorters = {
+        // live edits first, then by group (the order the groups appear on Brackets); no result is implied
+        groups: (a, b) => (b.standing.kind === 'live') - (a.standing.kind === 'live') || groupOrder(a) - groupOrder(b) || String(a.standing.group || '').localeCompare(String(b.standing.group || '')) || (a.shortTitle || a.title || '').localeCompare(b.shortTitle || b.title || ''),
         standing: (a, b) => STATUS_RANK[a.standing.kind] - STATUS_RANK[b.standing.kind] || b.standing.wins - a.standing.wins || byViews(a, b),
         views: byViews,
-        likes: (a, b) => (b.likes || 0) - (a.likes || 0) || byViews(a, b),
+        likes: (a, b) => likes(b) - likes(a) || byViews(a, b),
         wins: (a, b) => b.standing.wins - a.standing.wins || byViews(a, b),
         newest: (a, b) => String(b.uploadDate || '').localeCompare(String(a.uploadDate || '')),
         title: (a, b) => (a.shortTitle || a.title || '').localeCompare(b.shortTitle || b.title || ''),
-        creator: (a, b) => (a.artist || '').localeCompare(b.artist || '')
+        creator: (a, b) => (isBlind(a) ? '' : a.artist || '').localeCompare(isBlind(b) ? '' : b.artist || '')
     };
-    return list.sort(sorters[state.sort] || sorters.standing);
+    return list.sort(sorters[state.sort] || sorters.groups);
 }
 
-function cardHTML(e) {
+function cardHTML(e, tags) {
     const s = e.standing;
+    const blind = isBlind(e);
     const title = cleanTitle(e.shortTitle || e.title || 'Untitled edit');
     const creatorUrl = safeUrl(e.creatorUrl);
-    const creator = creatorUrl
-        ? `<a class="edit-creator" href="${esc(creatorUrl)}" target="_blank" rel="noopener noreferrer">${esc(e.artist || 'Unknown creator')}</a>`
-        : `<span class="edit-creator">${esc(e.artist || 'Unknown creator')}</span>`;
-    const cups = (e.tournaments || []).map(c => `<span class="pill pill-cup">${esc(cupDisplayName(c))}</span>`).join('');
-    const chars = (e.characters || []).map(c => `<span class="pill">${esc(c)}</span>`).join('');
-    // every card ends with one button so rows line up: Vote now when live, otherwise a link to the bracket
+    const creator = blind
+        ? '<span class="edit-creator is-hidden">Shown after you vote</span>'
+        : creatorUrl
+            ? `<a class="edit-creator" href="${esc(creatorUrl)}" target="_blank" rel="noopener noreferrer">${esc(e.artist || 'Unknown creator')}</a>`
+            : `<span class="edit-creator">${esc(e.artist || 'Unknown creator')}</span>`;
+    const cups = tags.cups ? (e.tournaments || []).map(c => `<span class="pill pill-cup">${esc(cupDisplayName(c))}</span>`).join('') : '';
+    const chars = tags.chars ? (e.characters || []).map(c => `<span class="pill">${esc(c)}</span>`).join('') : '';
+    const pills = chars + cups;
+    const hidden = '<dd class="is-hidden" title="Shown after you vote">Hidden</dd>';
+    // live: one filled Vote now button. Everyone else: the card itself opens the player and "View in bracket" is a quiet text link
     const vote = s.liveMatch
         ? `<a class="edit-vote" href="/vote.html?match=${encodeURIComponent(s.liveMatch.matchId)}">Vote now</a>`
-        : `<a class="edit-vote edit-bracket" href="/brackets">View in bracket</a>`;
-    return `<article class="edit-card" data-id="${esc(e.id)}">
-        <button type="button" class="edit-thumb" data-watch="${esc(e.id)}" aria-label="Watch ${esc(title)}">
-            <img src="https://img.youtube.com/vi/${esc(e.videoId)}/hqdefault.jpg" alt="" style="${thumbStyle(e)}" loading="lazy" decoding="async">
+        : `<a class="edit-bracket-link" href="/brackets">View in bracket</a>`;
+    return `<article class="edit-card${s.liveMatch ? ' is-live' : ''}" data-id="${esc(e.id)}">
+        <button type="button" class="edit-thumb" data-watch="${esc(e.id)}" aria-label="Play ${esc(title)}">
+            <img src="https://img.youtube.com/vi/${esc(e.videoId)}/hqdefault.jpg" alt="Thumbnail for ${esc(title)}" style="${thumbStyle(e)}" loading="lazy" decoding="async">
             <span class="edit-badge status-${s.kind}">${s.kind === 'champion' ? '<i class="fa-solid fa-trophy" aria-hidden="true"></i> ' : ''}${esc(s.label)}</span>
             ${e.duration != null ? `<span class="edit-duration">${fmtDuration(e.duration)}</span>` : ''}
             <span class="edit-play" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
@@ -176,38 +212,91 @@ function cardHTML(e) {
             <h3 class="edit-title">${esc(title)}</h3>
             ${creator}
             <dl class="edit-stats">
-                <div><dt>Views</dt><dd>${fmtViews(e.views)}</dd></div>
-                <div><dt>Likes</dt><dd>${e.likes == null ? '\u2013' : fmtViews(e.likes)}</dd></div>
-                <div><dt>Year</dt><dd>${esc(e.year || '\u2013')}</dd></div>
+                <div><dt>Views</dt>${blind ? hidden : `<dd>${fmtViews(e.views)}</dd>`}</div>
+                <div><dt>Likes</dt>${blind ? hidden : `<dd>${e.likes == null ? 'n/a' : fmtViews(e.likes)}</dd>`}</div>
+                <div><dt>Year</dt><dd>${esc(e.year || 'n/a')}</dd></div>
             </dl>
-            <div class="edit-pills">${chars}${cups}</div>
+            ${pills ? `<div class="edit-pills">${pills}</div>` : ''}
             ${vote}
         </div>
     </article>`;
 }
 
+// character and cup tags carry no information while every edit has the same one
+function tagFlags() {
+    return {
+        chars: new Set(ALL.flatMap(e => e.characters || [])).size > 1,
+        cups: new Set(ALL.flatMap(e => e.tournaments || [])).size > 1
+    };
+}
+
+function renderStatusChips() {
+    const box = document.getElementById('statusChips');
+    if (!box) return;
+    const counts = {};
+    baseList().forEach(e => { counts[e.standing.kind] = (counts[e.standing.kind] || 0) + 1; });
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    box.innerHTML = STATUS_CHIPS
+        .filter(([key]) => !key || counts[key] || state.status === key)
+        .map(([key, label]) => `<button type="button" class="chip" data-status="${key}" aria-pressed="${state.status === key}">${label} <span class="chip-count">${key ? counts[key] || 0 : total}</span></button>`)
+        .join('');
+}
+
+function updateShowMore(total) {
+    const wrap = document.getElementById('showMoreWrap');
+    if (!wrap) return;
+    const left = total - shown;
+    wrap.hidden = left <= 0;
+    const btn = document.getElementById('showMoreBtn');
+    if (btn) btn.textContent = `Show ${Math.min(PAGE_SIZE, Math.max(left, 0))} more`;
+}
+
 function render() {
     const list = visible();
-    document.getElementById('editCount').textContent = `${list.length} ${list.length === 1 ? 'edit' : 'edits'}`;
+    const count = document.getElementById('editCount');
+    renderStatusChips();
     if (!ALL.length) {
+        count.textContent = '';
         grid.innerHTML = '<div class="gallery-message"><h3>No edits have entered a cup yet</h3><p>The first cup is on its way. Check back soon, or <a href="/#vote">see what is live</a>.</p></div>';
+        updateShowMore(0);
         return;
     }
     if (!list.length) {
+        count.textContent = '0 edits';
         grid.innerHTML = '<div class="gallery-message"><h3>No edits match</h3><p>Try a different search or clear the filters.</p><button type="button" class="gallery-retry" id="clearFilters">Clear filters</button></div>';
         document.getElementById('clearFilters')?.addEventListener('click', resetFilters);
+        updateShowMore(0);
         return;
     }
-    grid.innerHTML = list.map(cardHTML).join('');
+    const n = Math.min(shown, list.length);
+    count.textContent = n < list.length ? `${n} of ${list.length} edits` : `${list.length} ${list.length === 1 ? 'edit' : 'edits'}`;
+    const tags = tagFlags();
+    grid.innerHTML = list.slice(0, n).map(e => cardHTML(e, tags)).join('');
+    updateShowMore(list.length);
 }
+
+// Show more: append the next page instead of redrawing, so the cards already read stay where they are
+function showMore() {
+    const list = visible();
+    const from = Math.min(shown, list.length);
+    shown += PAGE_SIZE;
+    const tags = tagFlags();
+    grid.insertAdjacentHTML('beforeend', list.slice(from, shown).map(e => cardHTML(e, tags)).join(''));
+    const n = Math.min(shown, list.length);
+    document.getElementById('editCount').textContent = n < list.length ? `${n} of ${list.length} edits` : `${list.length} ${list.length === 1 ? 'edit' : 'edits'}`;
+    updateShowMore(list.length);
+    grid.children[from]?.querySelector('.edit-thumb')?.focus({ preventScroll: true });
+}
+
+// a filter or sort change starts again from the first page
+function refresh() { shown = PAGE_SIZE; render(); }
 
 function resetFilters() {
     state.q = ''; state.chars.clear(); state.cup = ''; state.status = '';
     document.getElementById('searchInput').value = '';
     document.getElementById('cupFilter').value = '';
-    document.getElementById('statusFilter').value = '';
     document.querySelectorAll('#charFilters .chip').forEach(c => c.setAttribute('aria-pressed', 'false'));
-    render();
+    refresh();
 }
 
 // ---------- picture shape ----------
@@ -236,10 +325,15 @@ function openWatch(id, trigger) {
     lastFocus = trigger || null;
     document.getElementById('watchTitle').textContent = cleanTitle(e.shortTitle || e.title || '');
     const creatorUrl = safeUrl(e.creatorUrl);
-    document.getElementById('watchMeta').innerHTML =
-        (creatorUrl ? `<a href="${esc(creatorUrl)}" target="_blank" rel="noopener noreferrer">${esc(e.artist || '')}</a>` : esc(e.artist || '')) +
-        ` <span aria-hidden="true">\u2022</span> <a href="https://www.youtube.com/shorts/${esc(e.videoId)}" target="_blank" rel="noopener noreferrer">Watch on YouTube</a>` +
-        (e.standing.liveMatch ? ` <span aria-hidden="true">\u2022</span> <a href="/vote.html?match=${encodeURIComponent(e.standing.liveMatch.matchId)}">Vote now</a>` : '');
+    const dot = ' <span aria-hidden="true">\u2022</span> ';
+    const vote = e.standing.liveMatch ? `<a href="/vote.html?match=${encodeURIComponent(e.standing.liveMatch.matchId)}">Vote now</a>` : '';
+    const removal = `<a class="watch-removal" href="${esc(removalMailto(cleanTitle(e.shortTitle || e.title || '')))}">Request removal</a>`;
+    // a live edit you have not voted on shows neither the creator nor the YouTube link (which would show its views and likes)
+    document.getElementById('watchMeta').innerHTML = (isBlind(e)
+        ? ['<span class="is-hidden">Creator shown after you vote</span>', vote, removal]
+        : [creatorUrl ? `<a href="${esc(creatorUrl)}" target="_blank" rel="noopener noreferrer">${esc(e.artist || '')}</a>` : esc(e.artist || ''),
+           `<a href="https://www.youtube.com/shorts/${esc(e.videoId)}" target="_blank" rel="noopener noreferrer">Watch on YouTube</a>`, vote, removal]
+    ).filter(Boolean).join(dot);
     // the frame takes the edit's own shape so square and wide edits have no black bars
     const ar = aspectOf(e);
     document.querySelector('#watchDialog .watch-frame-wrap').style.setProperty('--ar', ar.toFixed(4));
@@ -258,20 +352,26 @@ function closeWatch() {
 }
 
 function setup() {
-    document.getElementById('searchInput').addEventListener('input', e => { state.q = e.target.value; render(); });
-    document.getElementById('cupFilter').addEventListener('change', e => { state.cup = e.target.value; render(); });
-    document.getElementById('statusFilter').addEventListener('change', e => { state.status = e.target.value; render(); });
-    document.getElementById('sortSelect').addEventListener('change', e => { state.sort = e.target.value; render(); });
+    document.getElementById('searchInput').addEventListener('input', e => { state.q = e.target.value; refresh(); });
+    document.getElementById('cupFilter').addEventListener('change', e => { state.cup = e.target.value; refresh(); });
+    document.getElementById('sortSelect').addEventListener('change', e => { state.sort = e.target.value; refresh(); });
+    document.getElementById('statusChips').addEventListener('click', e => {
+        const b = e.target.closest('.chip'); if (!b) return;
+        state.status = b.dataset.status; refresh();
+    });
+    document.getElementById('showMoreBtn').addEventListener('click', showMore);
     document.getElementById('charFilters').addEventListener('click', e => {
         const b = e.target.closest('.chip'); if (!b) return;
         const c = b.dataset.char, on = !state.chars.has(c);
         on ? state.chars.add(c) : state.chars.delete(c);
         b.setAttribute('aria-pressed', String(on));
-        render();
+        refresh();
     });
     grid.addEventListener('click', e => {
-        const b = e.target.closest('[data-watch]');
-        if (b) openWatch(b.dataset.watch, b);
+        if (e.target.closest('a, button')) { const b = e.target.closest('[data-watch]'); if (b && !e.target.closest('a')) openWatch(b.dataset.watch, b); return; }
+        // the whole card opens the player (links inside it keep their own job)
+        const card = e.target.closest('.edit-card');
+        if (card) openWatch(card.dataset.id, card.querySelector('.edit-thumb'));
     });
     const dialog = document.getElementById('watchDialog');
     dialog.addEventListener('click', e => { if (e.target === dialog) closeWatch(); });   // click on the backdrop

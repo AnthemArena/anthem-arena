@@ -20,6 +20,7 @@ APP = "export const initializeApp=()=>({});"
 AUTH = "export const getAuth=()=>({currentUser:null});export const signInAnonymously=async()=>({});export const onAuthStateChanged=(a,cb)=>{setTimeout(()=>cb(null),0);return()=>{}};export const signOut=async()=>({});"
 CUP = [l for l in open(os.path.join(ROOT, 'js/arcane-config.js')).read().splitlines() if 'tournamentId:' in l][0].split("'")[1]
 failed = []
+EDITS_BODY = '[]'     # what /data/edits.json answers: none, so every player keeps the 9:16 default (tools/test-vote-player.py sets its own)
 import base64
 PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
 def check(name, ok, got=None):
@@ -47,6 +48,7 @@ def load(browser, width, height, voted, mid=None, extra=''):
         if 'firebase-firestore' in u: r.fulfill(body=FS, content_type='application/javascript')
         elif 'firebase-app' in u: r.fulfill(body=APP, content_type='application/javascript')
         elif 'firebase-auth' in u: r.fulfill(body=AUTH, content_type='application/javascript')
+        elif path.endswith('/data/edits.json') and EDITS_BODY is not None: r.fulfill(body=EDITS_BODY, content_type='application/json')
         elif path.endswith('/api/matches'):
             mid = parse_qs(urlparse(u).query).get('matchId', [None])[0]
             body = next((m for m in matches if m['matchId'] == mid), None) if mid else matches
@@ -80,7 +82,23 @@ with sync_playwright() as p:
     check('desktop: the MATCH label shares the badge row (no extra line above the bubble)', pg.evaluate("document.querySelector('.match-info .match-title--label') !== null") , None)
     check('desktop: the portrait shows its "another line" badge', pg.evaluate("getComputedStyle(document.querySelector('.cb-portrait'), '::after').content") not in ('none', 'normal', '""'))
     check('desktop: no next-match bar before voting', pg.query_selector('#next-match-bar') is None)
+    pv = pg.evaluate("""(() => { const d = sel => { const e = document.querySelector(sel); return e ? getComputedStyle(e).display : 'missing'; };
+        return { cls: document.body.classList.contains('pre-vote'), seed: d('#competitor1-seed'), share: d('#share-section'), more: d('#other-matches-section'), note: d('#vote-final-note'),
+                 upper: getComputedStyle(document.querySelector('.vote-btn')).textTransform }; })()""")
+    check('desktop: before voting the page is only about the vote (pre-vote)', pv['cls'], pv)
+    check('desktop: before voting there are no seeds, no share block and no Keep Voting list', pv['seed'] == 'none' and pv['share'] == 'none' and pv['more'] == 'none', pv)
+    check('desktop: before voting it says votes are final', pv['note'] == 'block' and 'final' in pg.inner_text('#vote-final-note').lower(), pv)
+    check('desktop: the vote buttons are sentence case, not all caps', pv['upper'] == 'none', pv)
+    pg.click('#vote-btn-competitor1'); pg.wait_for_timeout(300)
+    cf = pg.evaluate("({ box: !!document.getElementById('vote-confirm'), text: document.getElementById('vote-confirm')?.innerText || '', stored: Object.keys(localStorage).filter(k => k.startsWith('vote_')).length, pre: document.body.classList.contains('pre-vote') })")
+    check('desktop: tapping a vote button asks to confirm, and nothing is recorded yet', cf['box'] and 'final' in cf['text'].lower() and cf['pre'] and cf['stored'] == 0, cf)
+    check('desktop: the confirm buttons are at least 44px tall', pg.evaluate("[...document.querySelectorAll('#vote-confirm button')].every(b => b.getBoundingClientRect().height >= 44)"))
+    pg.click('#vote-confirm .vote-confirm-no'); pg.wait_for_timeout(200)
+    check('desktop: Cancel closes it and the vote is still open', pg.query_selector('#vote-confirm') is None and pg.evaluate("document.body.classList.contains('pre-vote')"))
+    pg.click('#vote-btn-competitor1'); pg.keyboard.press('Escape'); pg.wait_for_timeout(200)
+    check('desktop: Escape also closes it', pg.query_selector('#vote-confirm') is None)
     # the cup champion's speech bubble: visible, says something, and says nothing about the standings before a vote
+    pg.keyboard.press('Escape'); pg.wait_for_timeout(400)   # an alert on load hides the inline bubble while it shows (by design)
     check('desktop: the champion bubble is shown with a line', pg.is_visible('#champion-bubble .cb-text') and len(pg.inner_text('#champion-bubble .cb-text').strip()) > 10, pg.inner_text('#champion-bubble'))
     bst = pg.get_attribute('#champion-bubble', 'data-state')
     check('desktop: before voting the bubble is in a state that cannot reveal the standings', bst in ('prevote', 'prevote-empty', 'closing-24h', 'closing-3h', 'closing-final'), bst)
@@ -99,8 +117,9 @@ with sync_playwright() as p:
     check('phone: player is portrait and inside the screen', w1 and abs(w1['w'] / w1['h'] - 9 / 16) < 0.03 and w1['r'] <= 390 and w1['x'] >= 0, w1)
     print(f"        info: phone player top at {round(w1['y'])}px of 844px")
     check('phone: no sideways scroll', pg.evaluate('document.documentElement.scrollWidth <= innerWidth'))
-    r1, r2 = rect(pg, '.replay-btn', 0), rect(pg, '.fullscreen-btn', 0)
-    check('phone: Replay and Fullscreen sit side by side', abs(r1['y'] - r2['y']) < 3 and r2['x'] > r1['r'] - 1, (r1, r2))
+    r1, r2 = rect(pg, '.replay-btn', 0), rect(pg, '.expand-btn', 0)
+    check('phone: Restart and Expand sit side by side', abs(r1['y'] - r2['y']) < 3 and r2['x'] > r1['r'] - 1, (r1, r2))
+    pg.keyboard.press('Escape'); pg.wait_for_timeout(400)
     check('phone: the champion bubble fits the screen with the portrait beside the text', pg.is_visible('#champion-bubble') and rect(pg, '#champion-bubble')['r'] <= 390 and rect(pg, '#champion-bubble .cb-portrait')['r'] <= rect(pg, '#champion-bubble .cb-speech')['x'] + 8, rect(pg, '#champion-bubble'))
     pg.screenshot(path=f'{SHOTS}/vote-phone.png')
     pg.context.close()
@@ -114,8 +133,9 @@ with sync_playwright() as p:
     check('phone: a very long title no longer makes a huge vote button (two lines at most)', vb['h'] <= 110, vb)
     check('phone: the vote button is a rounded rectangle, not an oval', radius <= 40, radius)
     pg.evaluate("document.querySelectorAll('.moment-details').forEach(e => e.classList.remove('moment-details--bare'))")   # edits WITH something to say keep their block: check the order for that case
+    b_vote = rect(pg, '#vote-btn-competitor2'); note_r = rect(pg, '#vote-final-note')
     a_vote, b_head, b_vid, a_det, b_det = (rect(pg, s) for s in ('#vote-btn-competitor1', '#competitor2-name', '#competitor2-wrapper', '#competitor-1-column .moment-details', '#competitor-2-column .moment-details'))
-    check('phone: order is player A, vote A, then player B (A\'s About block is not in between)', a_vote['y'] < b_head['y'] < b_vid['y'] < a_det['y'] < b_det['y'], (a_vote['y'], b_head['y'], b_vid['y'], a_det['y'], b_det['y']))
+    check('phone: order is player A, player B, the "votes are final" line, then both vote buttons, then the About blocks', b_head['y'] < b_vid['y'] < note_r['y'] < a_vote['y'] < b_vote['y'] < a_det['y'] < b_det['y'], (b_head['y'], b_vid['y'], note_r['y'], a_vote['y'], b_vote['y'], a_det['y'], b_det['y']))
     check('phone: each About block says which edit it is about', pg.inner_text('#competitor1-details-for').startswith('About: ') and pg.inner_text('#competitor2-details-for').startswith('About: ') and pg.inner_text('#competitor1-details-for') != pg.inner_text('#competitor2-details-for'), pg.inner_text('#competitor1-details-for'))
     check('phone: second player is within about 1.5 screens of the first (it was about 3)', b_vid['y'] - rect(pg, '#competitor1-wrapper')['y'] < 1.5 * 852, b_vid['y'] - rect(pg, '#competitor1-wrapper')['y'])
     pg.locator('#competitor-1-column .vote-section').scroll_into_view_if_needed(); pg.wait_for_timeout(200)
@@ -167,7 +187,7 @@ with sync_playwright() as p:
         pg.screenshot(path=f'{SHOTS}/vote-share-modal-{tag}.png')
         before = pg.inner_text('#vote-modal .pvm-line')
         pg.click('#vote-modal [data-share="reword"]'); pg.wait_for_timeout(200)
-        check(f'alert link ({tag}): "New line" changes the bubble', pg.inner_text('#vote-modal .pvm-line') != before, before)
+        check(f'alert link ({tag}): "New caption" changes the bubble', pg.inner_text('#vote-modal .pvm-line') != before, before)
         pg.keyboard.press('Escape'); pg.wait_for_timeout(300)
         check(f'alert link ({tag}): Escape closes it', not pg.is_visible('#vote-modal .pvm--share'))
         check(f'alert link ({tag}): the page panel is still at the bottom', pg.query_selector('#share-panel .share-quote') is not None)
@@ -188,6 +208,19 @@ with sync_playwright() as p:
     check('toast during the modal: it shows once the modal is closed', 'HELD-TOAST' in pg.evaluate("document.getElementById('bulletin-banner')?.innerText || ''"))
     pg.context.close()
 
+    # ---------- confirm hands the vote to the vote code ----------
+    pg, errs = load(b, 1280, 900, voted=False)
+    pg.click('#vote-btn-competitor2'); pg.wait_for_timeout(200)
+    started = False
+    try:
+        with pg.expect_console_message(lambda m: 'Voting for: Song song2' in m.text, timeout=4000):
+            pg.click('#vote-confirm .vote-confirm-yes')
+        started = True
+    except Exception:
+        pass
+    check('Confirm hands the vote for the tapped side to the vote code, and the confirm box closes', started and pg.query_selector('#vote-confirm') is None)
+    pg.context.close()
+
     # ---------- voted: the Next match bar ----------
     for w, h, tag in ((1280, 900, 'desktop'), (390, 844, 'phone')):
         pg, errs = load(b, w, h, voted=True)
@@ -203,6 +236,21 @@ with sync_playwright() as p:
             br = rect(pg, '#next-match-bar')
             check(f'voted ({tag}): the bar is pinned to the bottom of the window and inside the screen', abs(br['b'] - h) < 2 and br['x'] >= 0 and br['r'] <= w, br)
             check(f'voted ({tag}): the page has room under it (body padding)', pg.evaluate("document.body.classList.contains('has-next-bar')"))
+        check(f'voted ({tag}): after voting the final-vote note and pre-vote hiding are gone', pg.evaluate("!document.body.classList.contains('pre-vote') && getComputedStyle(document.getElementById('vote-final-note')).display === 'none' && getComputedStyle(document.getElementById('share-section')).display !== 'none'"))
+        res = pg.evaluate("({ banner: document.getElementById('voted-indicator-result')?.textContent || '', names: [...document.querySelectorAll('.vote-result-name')].map(e => [getComputedStyle(e).display, e.textContent.trim()]) })")
+        check(f'voted ({tag}): the banner says how the result stands ("N% picked the same (x of y votes)")', 'picked the same' in res['banner'] and ' of ' in res['banner'], res)
+        want = 'block' if tag == 'phone' else 'none'
+        check(f'voted ({tag}): result cards {"name their entry" if tag == "phone" else "leave the name to the column header"}', len(res['names']) == 2 and all(d == want and t for d, t in res['names']), res)
+        wn = pg.evaluate("(() => { const cards = [...document.querySelectorAll('.after-voting-card')]; const rows = new Set(cards.map(c => Math.round(c.getBoundingClientRect().top))); return { n: cards.length, rows: rows.size, h: Math.round(document.querySelector('.after-voting-section').getBoundingClientRect().height), debut: document.body.innerText.includes('Tournament Debut') }; })()")
+        check(f'voted ({tag}): "What\'s Next?" is one compact row on desktop and 2 x 2 on a phone, and "Tournament Debut" is gone', wn['n'] == 4 and wn['rows'] == (2 if tag == 'phone' else 1) and wn['h'] < (420 if tag == 'phone' else 260) and not wn['debut'], wn)
+        # the standings carry real counts, statuses read as statuses, one share block, the bar steps aside for the list
+        cnt = pg.evaluate("[...document.querySelectorAll('#competitor1-votes, #competitor2-votes')].map(e => [getComputedStyle(e).display, e.textContent])")
+        check(f'voted ({tag}): both sides show a real count ("N of M votes") under the percentage', all(d != 'none' and ' of ' in t and 'vote' in t for d, t in cnt) and len(cnt) == 2, cnt)
+        check(f'voted ({tag}): the pick is a badge (not a solid button) and the other side is readable, not dimmed', pg.evaluate("(() => { const v = getComputedStyle(document.querySelector('.vote-btn.voted')); const n = document.querySelector('.vote-btn.not-selected'); return !!n && v.boxShadow === 'none' && getComputedStyle(n).opacity === '1'; })()"))
+        check(f'voted ({tag}): the footer share row is hidden (the page has its own share box)', pg.locator('.footer-cta-banner').count() == 0)
+        check(f'voted ({tag}): "New caption" replaces "New line"', 'New caption' in pg.inner_text('#share-panel [data-share="reword"]'))
+        pg.evaluate("(() => { const s = document.getElementById('other-matches-section'); if (s) { s.style.display = ''; s.scrollIntoView(); } })()"); pg.wait_for_timeout(1200)
+        check(f'voted ({tag}): the bar steps aside while the Keep Voting list is on screen', pg.evaluate("document.getElementById('next-match-bar').classList.contains('is-tucked')"))
         vst = pg.get_attribute('#champion-bubble', 'data-state')
         check(f'voted ({tag}): the bubble now talks about your pick ("voted-..." state)', (vst or '').startswith('voted-'), vst)
         txt_share = pg.inner_text('#share-panel .share-quote') if pg.query_selector('#share-panel .share-quote') else ''
@@ -250,7 +298,7 @@ with sync_playwright() as p:
         check(f'achievement ({tag}): the champion pack gave a line, a detail and a button', bool(shown and shown['message'] and shown['detail'] and shown['cta']), shown)
         check(f'achievement ({tag}): no placeholder is left in the text ({{xp}} used to stay in)', bool(shown) and '{' not in shown['message'] + shown['detail'] + shown['cta'], shown)
         ab = rect(pg, '#bulletin-banner')
-        check(f'achievement ({tag}): the popup is on screen and shows the achievement name above the champion line', bool(ab) and ab['r'] <= w and ab['y'] >= 0 and 'First Choice' in pg.inner_text('#bulletin-banner .nv-toast-name') and pg.is_visible('#bulletin-banner .nv-bubble'), ab)
+        check(f'achievement ({tag}): the popup is on screen and shows the achievement name above the champion line', bool(ab) and ab['r'] <= w and ab['y'] >= 0 and 'First Choice' in pg.inner_text('#bulletin-banner .nv-ach-name') and pg.is_visible('#bulletin-banner .nv-bubble'), ab)
         nb = rect(pg, '#next-match-bar')
         check(f'achievement ({tag}): the popup does not cover the Next match bar', bool(ab and nb) and (ab['b'] <= nb['y'] + 1 or ab['x'] >= nb['r'] - 1 or ab['r'] <= nb['x'] + 1), (ab, nb))
         check(f'achievement ({tag}): the popup uses the shared alert layout (nv-body)', pg.query_selector('#bulletin-banner .nv-body') is not None)

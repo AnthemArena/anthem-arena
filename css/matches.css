@@ -1658,3 +1658,77 @@
         transform: translateY(-10px) scale(1.1);
     }
 }
+/* ========================================
+   STATUS CHIPS, "YOUR PICK", COMPACT TOP (Nov 2026)
+======================================== */
+.mt-chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+.mt-chip {
+    display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: .5rem 1rem;
+    border: 1px solid rgba(255, 255, 255, .13); border-radius: 999px; background: rgba(9, 10, 19, .58);
+    color: var(--text, #f4f0f7); font: 700 .88rem var(--font, system-ui, sans-serif); cursor: pointer;
+    transition: border-color .18s ease, background .18s ease;
+}
+.mt-chip:hover { border-color: var(--border, rgba(255, 79, 180, .5)); }
+.mt-chip:active { background: rgba(255, 79, 180, .14); }
+.mt-chip:focus-visible { outline: 2px solid var(--pink-bright, #ff70c3); outline-offset: 2px; }
+.mt-chip.active { border-color: var(--pink-bright, #ff70c3); background: var(--pink-bright, #ff70c3); color: #160814; }
+.mt-chip.active::before { content: "\2713"; font-weight: 900; }
+.mt-chip-count { min-width: 1.5rem; padding: .05rem .45rem; border-radius: 999px; background: rgba(255, 255, 255, .08); font-size: .75rem; text-align: center; font-variant-numeric: tabular-nums; }
+.mt-chip.active .mt-chip-count { background: rgba(22, 8, 20, .18); }
+.mt-caught-up { margin: .8rem 0 0; padding: .65rem 1rem; border: 1px solid rgba(255, 255, 255, .12); border-radius: 10px; background: rgba(255, 255, 255, .04); color: var(--muted, #b9b3c1); }
+.mt-caught-up[hidden] { display: none; }
+.results-info { padding: .5rem 0 0; text-align: left; }
+.your-pick { display: inline-flex; align-items: center; gap: .3rem; margin-right: .5rem; padding: .1rem .55rem; border-radius: 999px; border: 1px solid rgba(255, 79, 180, .5); background: rgba(255, 79, 180, .12); color: var(--pink-bright, #ff70c3); font-size: .7rem; font-weight: 800; letter-spacing: .04em; white-space: nowrap; }
+.competitor-thumbnail { object-fit: cover; }
+@media (max-width: 640px) {
+    .mt-chips { flex-wrap: nowrap; overflow-x: auto; gap: .4rem; margin-right: -1rem; padding: 0 1rem .25rem 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .mt-chips::-webkit-scrollbar { display: none; }
+    .mt-chip { flex: none; white-space: nowrap; font-size: .85rem; padding: .5rem .85rem; }
+}
+
+/* ---------- toolbar: search, then one Filters button ---------- */
+.mt-toolbar { display: flex; gap: .6rem; align-items: stretch; margin-top: .9rem; }
+.mt-toolbar .search-box { min-width: 0; flex: 1; }
+.mt-filters-btn {
+    display: none; align-items: center; gap: .45rem; min-height: 44px; padding: .5rem 1rem; flex: none;
+    border: 1px solid rgba(255, 255, 255, .13); border-radius: 999px; background: rgba(255, 255, 255, .04);
+    color: var(--text, #f4f0f7); font: 700 .88rem var(--font, system-ui, sans-serif); cursor: pointer;
+}
+.mt-filters-btn[aria-expanded="true"] { border-color: var(--pink-bright, #ff70c3); }
+.mt-filters-btn:focus-visible, .mt-reset:focus-visible, .mt-more-btn:focus-visible { outline: 2px solid var(--pink-bright, #ff70c3); outline-offset: 2px; }
+.mt-badge { min-width: 1.3rem; padding: .05rem .4rem; border-radius: 999px; background: var(--pink-bright, #ff70c3); color: #160814; font-size: .75rem; font-weight: 800; text-align: center; }
+.mt-badge[hidden] { display: none; }
+.mt-filter-panel { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: .9rem; }
+.mt-filter-panel .filter-group[hidden] { display: none; }
+.mt-filter-panel .filter-label { font-size: .75rem; }
+.results-info { display: flex; align-items: center; gap: .8rem; }
+.mt-reset { min-height: 32px; padding: .2rem .4rem; border: 0; background: none; color: var(--pink-bright, #ff70c3); font: 700 .85rem var(--font, system-ui, sans-serif); text-decoration: underline; cursor: pointer; }
+.mt-reset[hidden] { display: none; }
+@media (max-width: 900px) {
+    .mt-filters-btn { display: inline-flex; }
+    .mt-filter-panel { display: none; flex-direction: column; gap: .8rem; }
+    .mt-filter-panel.open { display: flex; }
+    .mt-filter-panel .filter-select { width: 100%; min-width: 0; }
+}
+
+/* ---------- show more ---------- */
+.mt-more { display: flex; flex-direction: column; align-items: center; gap: .6rem; margin: 1.5rem auto 0; }
+.mt-more[hidden] { display: none; }
+.mt-more-info { color: var(--text-faint, #8a8494); font-size: .85rem; }
+.mt-more-btn { min-height: 44px; padding: .6rem 1.6rem; border: 1px solid var(--pink-bright, #ff70c3); border-radius: 999px; background: transparent; color: var(--pink-bright, #ff70c3); font: 800 .9rem var(--font, system-ui, sans-serif); cursor: pointer; }
+.mt-more-btn:hover { background: rgba(255, 79, 180, .14); }
+
+/* ---------- card header on one line: "Jinx Cup 1 · Group A"; no live pill when every card is live ---------- */
+.matches-grid .match-header { flex-wrap: nowrap; gap: .5rem; margin-bottom: .9rem; padding-bottom: .7rem; }
+body.theme-arcane .matches-grid .match-card .match-round, .matches-grid .match-round { width: auto; padding: 0; border: 0; white-space: nowrap; }
+.matches-grid .match-round::before { content: "\00b7"; margin-right: .5rem; color: var(--text-faint, #8a8494); }
+.matches-grid .match-tournament { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.matches-grid .match-header .live-badge, .matches-grid .match-header .voted-badge, .matches-grid .match-header .upcoming-badge { flex: none; margin-left: auto; }
+.matches-grid.hide-live-pill .live-badge { display: none; }
+
+/* ---------- a slim hero ---------- */
+body.theme-arcane .matches-header { padding: 2rem 0 1.1rem; }
+body.theme-arcane .matches-header .header-content { margin-bottom: 0; }
+body.theme-arcane .filters-section { padding: 1.1rem 0 .8rem; }
+body.theme-arcane .matches-section { padding: 1.25rem 0 3rem; }
+@media (max-width: 640px) { body.theme-arcane .matches-header { padding: 1.4rem 0 .9rem; } }

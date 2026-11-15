@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- SEO Meta Tags -->
-    <title>Match Archive | Arcane Moments</title>
+    <title>Matches | Arcane Moments</title>
     <meta name="description" content="View every Arcane Moments match, result and schedule. See which edits are winning and cast your vote.">
     <link rel="canonical" href="https://arcanemoments.netlify.app/matches">
     
@@ -19,7 +19,7 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://arcanemoments.netlify.app/matches">
-    <meta property="og:title" content="Match Archive | Arcane Moments">
+    <meta property="og:title" content="Matches | Arcane Moments">
     <meta property="og:description" content="Browse every Arcane Moments matchup, live results and voting history.">
     <meta property="og:image" content="https://arcanemoments.netlify.app/og-image.png">
     <meta property="og:image:alt" content="Arcane Moments match archive">
@@ -28,7 +28,7 @@
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Match Archive | Arcane Moments">
+    <meta name="twitter:title" content="Matches | Arcane Moments">
     <meta name="twitter:description" content="View every Arcane Moments match and result.">
     <meta name="twitter:image" content="https://arcanemoments.netlify.app/og-image.png">
     <meta name="twitter:image:alt" content="Arcane Moments match archive">
@@ -78,121 +78,71 @@
     <section class="matches-header">
         <div class="container">
             <div class="header-content">
-                <h1 class="page-title">Match Archive</h1>
-                <p class="page-subtitle">Every matchup, live or finished</p>
+                <h1 class="page-title">Matches</h1>
+                <p class="page-subtitle">Vote in the matches that are open, or look back at the ones that have finished</p>
             </div>
 
-           <!-- Stats Overview -->
-<div class="archive-stats">
-    <div class="stat-item">
-        <span class="stat-number" id="total-matches">0</span>
-        <span class="stat-label">Total Matches</span>
-    </div>
-    <div class="stat-item">
-        <span class="stat-number" id="total-votes">0</span>
-        <span class="stat-label">Total Votes Cast</span>
-    </div>
-    <div class="stat-item">
-        <span class="stat-number" id="tournaments">1</span>
-        <span class="stat-label">Tournaments</span>
-    </div>
-    <div class="stat-item">
-        <span class="stat-number" id="unique-videos">0</span>
-        <span class="stat-label">Unique Edits</span>
-    </div>
-</div>
         </div>
     </section>
 
     </section>
 
-    <!-- PAGE INTRO WITH INTERNAL LINKS -->
-    <section class="page-intro">
-        <div class="container">
-            <p>
-                Browse every Arcane Moments matchup. 
-                Click any live match to cast your vote and influence the results. 
-                View the <a href="/brackets.html">full tournament bracket</a> to see progression 
-                through each round, explore the <a href="/music-gallery.html">gallery</a> 
-                to preview every competing edit, or check <a href="/stats.html">detailed statistics</a> 
-                for voting trends and edit performance. Track your personal voting history on the 
-                <a href="/profile#votes">my votes page</a>.
-            </p>
-        </div>
-    </section>
-
-    <!-- FILTERS & SEARCH -->
-
-    <!-- FILTERS & SEARCH -->
+    <!-- FILTERS & SEARCH: status chips first (the task), then search, then the less used filters behind one button -->
     <section class="filters-section">
         <div class="container">
-            <div class="filters-container">
-                
-                <!-- Search Bar -->
+            <input type="hidden" id="status-filter" value="needs">
+            <div class="mt-chips" id="status-chips" role="group" aria-label="Filter by status"></div>
+            <p class="mt-caught-up" id="caught-up" hidden></p>
+
+            <div class="mt-toolbar">
                 <div class="search-box">
-                    <input 
-                        type="text" 
-                        id="search-input" 
-                        class="search-input" 
+                    <input
+                        type="text"
+                        id="search-input"
+                        aria-label="Search edits or creators"
+                        class="search-input"
                         placeholder="Search edits or creators..."
                         onkeyup="filterMatches()"
                     >
-                    <button class="search-button">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <button class="search-button" type="button" aria-label="Search">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
                 </div>
+                <button type="button" class="mt-filters-btn" id="filters-toggle" aria-expanded="false" aria-controls="filters-panel">
+                    Filters <span class="mt-badge" id="filters-badge" hidden></span>
+                </button>
+            </div>
 
-                <!-- Filter Buttons -->
-                <div class="filter-group">
-                    <label class="filter-label">Tournament:</label>
+            <div class="mt-filter-panel" id="filters-panel">
+                <div class="filter-group" id="tournament-group">
+                    <label class="filter-label" for="tournament-filter">Tournament</label>
                     <select id="tournament-filter" class="filter-select" onchange="filterMatches()">
                         <option value="all">All Tournaments</option>
-                 
                     </select>
                 </div>
-
                 <div class="filter-group">
-                    <label class="filter-label">Round:</label>
+                    <label class="filter-label" for="round-filter">Round</label>
                     <select id="round-filter" class="filter-select" onchange="filterMatches()">
                         <option value="all">All Rounds</option>
                     </select>
                 </div>
-
                 <div class="filter-group">
-                    <label class="filter-label">Status:</label>
-                    <select id="status-filter" class="filter-select" onchange="filterMatches()">
-                        <option value="all">All Statuses</option>
-                        <option value="completed">Completed</option>
-                        <option value="live">Live Now</option>
-                        <option value="upcoming">Upcoming</option>
+                    <label class="filter-label" for="sort-filter">Sort by</label>
+                    <select id="sort-filter" class="filter-select" onchange="sortMatches()">
+                        <option value="recent">Closing soonest</option>
+                        <option value="votes-desc">Most Voted</option>
+                        <option value="close">Closest Match</option>
                     </select>
                 </div>
-
-           <div class="filter-group">
-    <label class="filter-label">Sort By:</label>
-    <select id="sort-filter" class="filter-select" onchange="sortMatches()">
-        <option value="recent">Most Recent</option>
-        <option value="votes-desc">Most Voted</option>
-        <option value="close">Closest Match</option>
-    </select>
-</div>
-
-                <!-- Clear Filters -->
-                <button class="clear-filters-btn" onclick="clearFilters()">
-                    Clear Filters
-                </button>
             </div>
-  <!-- Results Count -->
+
             <div class="results-info">
-                <span id="results-count">Showing 248 matches</span>
-                <span class="filter-tip">
-                    <i class="fa-solid fa-lightbulb"></i> Tip: Use filters to find specific rounds or check 
-                    <a href="/stats.html" class="inline-link">tournament statistics</a> 
-                    for deeper insights
-                </span>
+                <span id="results-count" aria-live="polite"></span>
+                <button type="button" class="mt-reset" id="reset-btn" onclick="clearFilters()" hidden>Reset</button>
             </div>
+        </div>
     </section>
 
 
@@ -203,54 +153,18 @@
           <div class="matches-grid" id="matches-grid">
    
 </div>
+            <div class="mt-more" id="show-more-wrap" hidden>
+                <span class="mt-more-info" id="show-more-info"></span>
+                <button type="button" class="mt-more-btn" id="show-more-btn">Show more</button>
+            </div>
 
 
                 <!-- More match cards would be dynamically loaded here -->
                 
             </div>
 
-           <!-- Load More Button -->
-            <div class="load-more-container" style="display: none;">
-                <button class="load-more-btn" onclick="loadMoreMatches()">
-                    Load More Matches
-                </button>
-            </div>
         </div>
     </section>
-
-<!-- QUICK LINKS SECTION -->
-    <section class="quick-links-section">
-        <div class="container">
-            <h2 class="section-title">Explore Tournament Data</h2>
-            <div class="quick-links-grid">
-                <a href="/brackets.html" class="quick-link-card">
-                    <div class="link-icon"><i class="fa-solid fa-chart-column"></i></div>
-                    <h3>Tournament Bracket</h3>
-                    <p>Visualize the complete bracket and see how edits advance through each round</p>
-                    <span class="link-arrow">→</span>
-                </a>
-                <a href="/stats.html" class="quick-link-card">
-                    <div class="link-icon"><i class="fa-solid fa-chart-line"></i></div>
-                    <h3>Statistics Dashboard</h3>
-                    <p>Analyze voting patterns, upsets, participation rates and edit performance</p>
-                    <span class="link-arrow">→</span>
-                </a>
-                <a href="/music-gallery.html" class="quick-link-card">
-                    <div class="link-icon"><i class="fa-solid fa-music"></i></div>
-                    <h3>Gallery</h3>
-                    <p>Preview every edit competing in the tournament</p>
-                    <span class="link-arrow">→</span>
-                </a>
-                <a href="/profile#votes" class="quick-link-card">
-                    <div class="link-icon"><i class="fa-solid fa-circle-check"></i></div>
-                    <h3>Your Voting History</h3>
-                    <p>Review all your votes, track predictions, and monitor your achievement progress</p>
-                    <span class="link-arrow">→</span>
-                </a>
-            </div>
-        </div>
-    </section>
-
 
     <!-- Add to matches.html before footer -->
 <div id="loading-overlay" class="loading-overlay" style="display: none;">

@@ -972,7 +972,7 @@ function displaySongJourneys() {
     container.innerHTML = `
         <div class="song-journeys-header">
             <h3 class="journeys-title"><i class="fa-solid fa-trophy"></i> Edit Journeys</h3>
-            <p class="journeys-subtitle">Track how far your favourite edits have gone</p>
+            <p class="journeys-subtitle">Track how far your favorite edits have gone</p>
         </div>
         <div class="journeys-list">
             ${topSongs.map(song => createSongJourneyCard(song)).join('')}

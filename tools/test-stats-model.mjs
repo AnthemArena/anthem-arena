@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { computeStats, sortRows, compareCups } from '../js/stats-model.js';
+import { computeStats, sortRows, compareCups, nextCloseAt, timeLeft } from '../js/stats-model.js';
 
 let n = 0; const t = (name, fn) => { fn(); n++; console.log('  ok  ' + name); };
 const c = (id, votes = 0) => ({ id, shortTitle: `Edit ${id} #jinx`, artist: `Maker ${id}`, videoId: `v${id}`, votes, drawPosition: 1 });
@@ -9,9 +9,9 @@ const ms = [m('m1', c('a', 30), c('b', 10), 'completed', 'a'), m('m2', c('c', 5)
 
 t('empty input is safe', () => { const s = computeStats(null); assert.equal(s.totalVotes, 0); assert.equal(s.records.closest, null); assert.deepEqual(s.rows, []); });
 t('counts matches and votes', () => { const s = computeStats(ms); assert.equal(s.totalMatches, 4); assert.equal(s.completed, 2); assert.equal(s.live, 1); assert.equal(s.upcoming, 1); assert.equal(s.totalVotes, 91); assert.equal(s.editCount, 4); });
-t('edit rows add votes and records', () => { const s = computeStats(ms); const a = s.rows.find(r => r.id === 'a'); assert.equal(a.votes, 50); assert.equal(a.wins, 1); assert.equal(a.played, 1); assert.equal(a.record, '1-0'); assert.equal(Math.round(a.share), 62); });
+t('edit rows add votes and records', () => { const s = computeStats(ms); const a = s.rows.find(r => r.id === 'a'); assert.equal(a.votes, 30); assert.equal(a.wins, 1); assert.equal(a.played, 1); assert.equal(a.record, '1-0'); assert.equal(Math.round(a.share), 75); });
 t('hashtags are cleaned from names', () => { assert.ok(!computeStats(ms).rows[0].title.includes('#')); });
-t('records pick the right matches', () => { const r = computeStats(ms).records; assert.equal(r.mostVotedMatch.matchId, 'm3'); assert.equal(r.closest.matchId, 'm2'); assert.equal(r.blowout.matchId, 'm1'); assert.equal(r.mostVotedEdit.id, 'a'); });
+t('records pick the right matches', () => { const r = computeStats(ms).records; assert.equal(r.mostVotedMatch.matchId, 'm1'); assert.equal(r.closest.matchId, 'm2'); assert.equal(r.blowout.matchId, 'm1'); assert.equal(r.mostVotedEdit.id, 'a'); });
 t('TBD slots are ignored', () => { const s = computeStats([m('k', c('a', 4), { id: 'TBD', shortTitle: 'TBD' }, 'upcoming', null, { stage: 'knockout' })]); assert.equal(s.editCount, 1); });
 t('winnerId may be "song1" (old matches)', () => { const s = computeStats([m('o', c('a', 3), c('b', 1), 'completed', 'song1')]); assert.equal(s.rows.find(r => r.id === 'a').wins, 1); });
 t('rounds and groups are reported', () => { const s = computeStats(ms); assert.equal(s.rounds[0].label, 'Group A'); assert.equal(s.rounds[0].completed, 2); assert.equal(s.groupCount, 1); assert.equal(s.groupsComplete, 0); });
@@ -35,5 +35,35 @@ t('compareCups: best records name their cup', () => {
 t('compareCups: a cup that failed to load is listed, not fatal', () => {
   const r = compareCups([{ cup: cA, matches: null }, { cup: cB, matches: ms }]); assert.equal(r.cups.find(x => x.id === 'c1').loaded, false); assert.equal(r.totals.cups, 2); assert.equal(r.totals.votes, 91);
   assert.equal(compareCups(null).totals.cups, 0);
+});
+t('BLIND: a live match adds nothing to edit rows or records', () => {
+  const live = [m('l1', c('x', 90), c('y', 10), 'live', null)];
+  const s = computeStats(live);
+  assert.equal(s.rows.length, 2); assert.ok(s.rows.every(r => r.votes === 0 && r.against === 0 && r.played === 0));
+  assert.equal(s.records.mostVotedMatch, null); assert.equal(s.records.mostVotedEdit, null); assert.equal(s.records.bestShare, null);
+  assert.equal(s.totalVotes, 100, 'the plain total of votes cast still counts them');
+});
+t('best vote share needs 2 finished matches', () => {
+  const one = computeStats([m('s1', c('a', 9), c('b', 1), 'completed', 'a')]);
+  assert.equal(one.records.bestShare, null);
+  const two = computeStats([m('s1', c('a', 9), c('b', 1), 'completed', 'a'), m('s2', c('a', 6), c('c', 4), 'completed', 'a', { matchId: 's2' })]);
+  assert.equal(two.records.bestShare.id, 'a');
+  assert.equal(sortRows(two.rows, 'share')[0].id, 'a');
+});
+t('stages: one Group stage row, then knockout rounds in order', () => {
+  const k = (id, round, label, st) => m(id, c(id + 'a'), c(id + 'b'), st, null, { stage: 'knockout', round, roundLabel: label, group: undefined });
+  const s = computeStats([...ms, k('k2', 2, 'Round of 16', 'upcoming'), k('k1', 3, 'Quarterfinal', 'upcoming')]);
+  assert.deepEqual(s.stages.map(x => x.label), ['Group stage', 'Round of 16', 'Quarterfinal']);
+  assert.equal(s.stages[0].total, 4); assert.equal(s.stages[0].completed, 2);
+});
+t('next close time: earliest unfinished end, formatted', () => {
+  const now = Date.parse('2026-11-13T12:00:00Z');
+  const mk = (st, end) => ({ ...m('x' + end, c('a'), c('b'), st, null), endDate: end });
+  const list = [mk('completed', '2026-11-13T13:00:00Z'), mk('live', '2026-11-19T15:30:00Z'), mk('live', '2026-11-20T00:00:00Z'), mk('upcoming', '2026-11-30T00:00:00Z')];
+  assert.equal(nextCloseAt(list, now), Date.parse('2026-11-19T15:30:00Z'));
+  assert.equal(timeLeft(nextCloseAt(list, now), now), '6d 3h');
+  assert.equal(timeLeft(now + 3 * 3600e3 + 20 * 60e3, now), '3h 20m');
+  assert.equal(timeLeft(now + 5 * 60e3, now), '5 min');
+  assert.equal(nextCloseAt([], now), null); assert.equal(timeLeft(null, now), '');
 });
 console.log(`${n} passed`);

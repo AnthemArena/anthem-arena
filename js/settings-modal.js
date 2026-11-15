@@ -6,15 +6,14 @@ import { getUserXPFromStorage, getUserRank } from './rank-system.js';
 import { readPackXp } from './xp-ledger.js';
 import { ddragonUrl } from './arcane-config.js';
 import { CHAMPIONS, championSearchText } from './champion-list.js';
-import { buildChampionsView, avatarKeyOf, skinAvatar, yourChampionHtml, plainChampionHtml } from './champions-tab-model.js';
+import { buildChampionsView, avatarKeyOf, skinAvatar, yourChampionHtml } from './champions-tab-model.js';
 import { lookSkin, readLooks, saveLook } from './companion-look.js';
 import { announcePendingChampion, markChampionSelected } from './champion-selected.js';
 import { buildPreview } from './champion-preview.js';
 import { fixAvatarUrl } from './avatar-url.js';
 import { PACK_IDS } from './xp-ledger.js';
 import { masteryLevel } from './champion-unlocks.js';
-import { readNotificationPrefs, readToastStyle } from './notification-prefs.js';
-import { applyToastStyle } from './notification-visuals.js';
+import { readNotificationPrefs } from './notification-prefs.js';
 import { EMOTES_ENABLED } from './features.js';
 import { db } from './firebase-config.js';
 import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -134,7 +133,7 @@ function createModalHTML() {
                 <div class="settings-modal-body">
                     <!-- Profile Preview -->
                     <div class="profile-preview-card" id="profilePreview">
-                        <div class="preview-avatar" id="previewAvatar">🎵</div>
+                        <div class="preview-avatar" id="previewAvatar">👤</div>
                         <div class="preview-info">
                             <div class="preview-username" id="previewUsername">Guest</div>
                             <div class="preview-rank" id="previewRank">Level 1 - New Voter</div>
@@ -178,7 +177,7 @@ function createModalHTML() {
 
                         <!-- The selected champion, with the skins they have unlocked -->
                         <div class="settings-section">
-                            <h3><i class="fas fa-star"></i> Your Champion</h3>
+                            <h3><i class="fas fa-star"></i> Mastery &amp; skins</h3>
                             <div id="yourChampion"></div>
                         </div>
 
@@ -196,7 +195,7 @@ function createModalHTML() {
                                     autocomplete="off"
                                 ></textarea>
                                 <div class="form-hint">
-                                    <span id="bioCharCount">0</span>/200 characters
+                                    <span id="bioCharCount">0</span>/200 characters. Shown on your public profile.
                                 </div>
                             </div>
                         </div>
@@ -205,16 +204,17 @@ function createModalHTML() {
 <!-- Social Media Links -->
 <div class="setting-group">
     <label>
-        <i class="fas fa-share-nodes"></i> Social Media
+        <i class="fas fa-share-nodes"></i> Links
     </label>
-    <small class="setting-hint">Add your social media profiles (optional)</small>
+    <small class="setting-hint">Shown on your public profile (optional)</small>
 
     <div class="social-inputs">
         <div class="social-input-row">
-<i class="fab fa-twitter"></i>
+<svg class="x-logo" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
             <input
                 type="text"
                 id="socialTwitter"
+                aria-label="X / Twitter"
                 class="setting-input"
                 placeholder="@username"
                 maxlength="50"
@@ -226,6 +226,7 @@ function createModalHTML() {
             <input
                 type="text"
                 id="socialInstagram"
+                aria-label="Instagram"
                 class="setting-input"
                 placeholder="@username"
                 maxlength="50"
@@ -237,6 +238,7 @@ function createModalHTML() {
             <input
                 type="text"
                 id="socialTwitch"
+                aria-label="Twitch"
                 class="setting-input"
                 placeholder="username"
                 maxlength="50"
@@ -248,6 +250,7 @@ function createModalHTML() {
             <input
                 type="text"
                 id="socialYoutube"
+                aria-label="YouTube"
                 class="setting-input"
                 placeholder="@channelname"
                 maxlength="50"
@@ -259,8 +262,9 @@ function createModalHTML() {
             <input
                 type="text"
                 id="socialDiscord"
+                aria-label="Discord"
                 class="setting-input"
-                placeholder="username#0000"
+                placeholder="username"
                 maxlength="50"
             >
         </div>
@@ -269,8 +273,8 @@ function createModalHTML() {
 
                         <!-- Privacy & Social Settings -->
 <div class="settings-section">
-    <h3><i class="fas fa-shield-alt"></i> Privacy & Social</h3>
-    <p class="section-description">Control who can interact with you</p>
+    <h3><i class="fas fa-shield-alt"></i> Privacy</h3>
+    <p class="section-description">Choose what other people can see about you (saved to your account)</p>
 
     <div class="privacy-settings">
         <!-- Public Profile -->
@@ -278,8 +282,8 @@ function createModalHTML() {
             <input type="checkbox" id="publicToggle" class="toggle-input" />
             <span class="toggle-slider"></span>
             <div class="toggle-info">
-                <strong>🌐 Public Profile</strong>
-                <p>Show your votes in Community Activity feed</p>
+                <strong>🌐 Show my votes in Community Activity</strong>
+                <p>Your votes appear in the public activity feed. Your profile page stays visible either way.</p>
             </div>
         </label>
 
@@ -310,7 +314,7 @@ function createModalHTML() {
 <!-- Notification preferences (js/notification-prefs.js; saved on this browser) -->
 <div class="settings-section">
     <h3><i class="fas fa-bell"></i> Notifications</h3>
-    <p class="section-description">Choose which alerts you get (saved on this browser)</p>
+    <p class="section-description">Choose which alerts you get. These apply to this browser only; Save Changes stores them.</p>
     <div class="privacy-settings">
         <div class="toggle-label select-wrapper">
             <div class="toggle-info" style="flex: 1;">
@@ -325,8 +329,8 @@ function createModalHTML() {
         </div>
         <div class="toggle-label select-wrapper">
             <div class="toggle-info" style="flex: 1;">
-                <strong>💬 Pop-up alerts</strong>
-                <p>Which of those also pop up while you're on the site (the rest wait in your bell)</p>
+                <strong>💬 Show as pop-ups</strong>
+                <p>Which of the vote alerts above also pop up while you're on the site (the rest wait in your bell)</p>
                 <select id="toastFromSelect" class="privacy-select">
                     <option value="everyone">From everyone</option>
                     <option value="following">Only people I follow</option>
@@ -334,6 +338,40 @@ function createModalHTML() {
                 </select>
             </div>
         </div>
+        <label class="toggle-label">
+            <input type="checkbox" id="popupsToggle" class="toggle-input" checked />
+            <span class="toggle-slider"></span>
+            <div class="toggle-info">
+                <strong>🔔 Pop-ups</strong>
+                <p>Master switch. Off keeps every alert in your bell and shows no pop-ups at all.</p>
+            </div>
+        </label>
+        <div class="popup-sub" id="popupSub">
+            <label class="toggle-label">
+                <input type="checkbox" id="socialPopupsToggle" class="toggle-input" checked />
+                <span class="toggle-slider"></span>
+                <div class="toggle-info">
+                    <strong>👥 People</strong>
+                    <p>Followers, likes, comments, replies, mentions and streaks</p>
+                </div>
+            </label>
+            <label class="toggle-label">
+                <input type="checkbox" id="chatterPopupsToggle" class="toggle-input" checked />
+                <span class="toggle-slider"></span>
+                <div class="toggle-info">
+                    <strong>💬 Champion chatter</strong>
+                    <p>Welcome back and encouragement lines. Rewards and match alerts are not affected.</p>
+                </div>
+            </label>
+        </div>
+        <label class="toggle-label">
+            <input type="checkbox" id="rivalAlertsToggle" class="toggle-input" checked />
+            <span class="toggle-slider"></span>
+            <div class="toggle-info">
+                <strong>⚔️ Alerts when someone votes against you</strong>
+                <p>Turn off to mute rival alerts. Votes with you still come through.</p>
+            </div>
+        </label>
         <label class="toggle-label">
             <input type="checkbox" id="matchAlertsToggle" class="toggle-input" checked />
             <span class="toggle-slider"></span>
@@ -343,37 +381,6 @@ function createModalHTML() {
             </div>
         </label>
     </div>
-</div>
-
-<!-- Pop-up style (js/notification-prefs.js readToastStyle; saved on this browser) -->
-<div class="settings-section">
-    <h3><i class="fas fa-palette"></i> Pop-up style</h3>
-    <p class="section-description">How alerts look when they pop up. The words and buttons are the same in every style.</p>
-    <div class="toast-style-options" role="radiogroup" aria-label="Pop-up style">
-        <label class="toast-style-option"><input type="radio" name="toastStyle" value="classic" checked />
-            <span class="toast-style-card"><span class="tsm tsm-classic"><i></i><b></b><b></b></span><strong>Classic</strong><small>Splash art on top</small></span></label>
-        <label class="toast-style-option"><input type="radio" name="toastStyle" value="full" />
-            <span class="toast-style-card"><span class="tsm tsm-full"><b></b><b></b></span><strong>Full art</strong><small>Art behind everything</small></span></label>
-        <label class="toast-style-option"><input type="radio" name="toastStyle" value="side" />
-            <span class="toast-style-card"><span class="tsm tsm-side"><i></i><b></b><b></b></span><strong>Side art</strong><small>Art on the left</small></span></label>
-        <label class="toast-style-option"><input type="radio" name="toastStyle" value="minimal" />
-            <span class="toast-style-card"><span class="tsm tsm-minimal"><b></b></span><strong>Minimal</strong><small>Just portrait and words</small></span></label>
-    </div>
-    <style>
-        .toast-style-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:10px;margin-top:8px}
-        .toast-style-option{position:relative;cursor:pointer}
-        .toast-style-option input{position:absolute;opacity:0;pointer-events:none}
-        .toast-style-card{display:flex;flex-direction:column;gap:4px;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);text-align:center}
-        .toast-style-card strong{font-size:13px}.toast-style-card small{font-size:11px;opacity:.7}
-        .toast-style-option input:checked+.toast-style-card{border-color:var(--gold,#c8aa6e);background:rgba(200,170,110,.12)}
-        .toast-style-option input:focus-visible+.toast-style-card{outline:2px solid var(--gold,#c8aa6e)}
-        .tsm{position:relative;display:flex;flex-direction:column;justify-content:flex-end;gap:3px;height:54px;padding:5px;border-radius:6px;background:#120a18;overflow:hidden;border:1px solid rgba(255,105,180,.5)}
-        .tsm b{display:block;height:7px;border-radius:4px;background:rgba(255,255,255,.28)}.tsm b+b{width:60%}
-        .tsm i{position:absolute;left:0;right:0;top:0;height:24px;background:linear-gradient(135deg,#7b3fe4,#ff69b4);-webkit-mask-image:linear-gradient(180deg,#000 40%,transparent);mask-image:linear-gradient(180deg,#000 40%,transparent)}
-        .tsm-full{background:linear-gradient(180deg,#7b3fe4,#ff69b4 40%,#120a18)}
-        .tsm-side{padding-left:30px}.tsm-side i{right:auto;bottom:0;width:24px;height:auto;-webkit-mask-image:linear-gradient(90deg,#000 55%,transparent);mask-image:linear-gradient(90deg,#000 55%,transparent)}
-        .tsm-minimal{justify-content:center}.tsm-minimal b{width:100%;height:16px}
-    </style>
 </div>
 
                         <!-- Form Actions -->
@@ -437,7 +444,7 @@ const allowFollows = localStorage.getItem('allowFollows') === 'true';  // ✅ Ch
     try {
         avatar = JSON.parse(avatarJson);
     } catch {
-        avatar = { type: 'emoji', value: '🎵' };
+        avatar = { type: 'emoji', value: '👤' };
     }
 
     // Update preview card
@@ -481,7 +488,11 @@ document.getElementById('emotePrivacySelect').value = emotePrivacy;
         document.getElementById('notifyFromSelect').value = np.notifyFrom;
         document.getElementById('toastFromSelect').value = np.toastFrom;
         document.getElementById('matchAlertsToggle').checked = np.matchAlerts;
-        const ts = readToastStyle(); document.querySelectorAll('input[name="toastStyle"]').forEach(r => { r.checked = r.value === ts; });
+        document.getElementById('rivalAlertsToggle').checked = np.rivalAlerts;
+        document.getElementById('popupsToggle').checked = np.popups;
+        document.getElementById('socialPopupsToggle').checked = np.socialPopups;
+        document.getElementById('chatterPopupsToggle').checked = np.chatterPopups;
+        syncPopupToggles();
     }
 
     // Show selected avatar if exists
@@ -515,7 +526,7 @@ function updatePreviewCard(username, avatar, rank, xp) {
     if (avatar && avatar.type === 'url') {
         previewAvatar.innerHTML = `<img src="${fixAvatarUrl(avatar.value)}" alt="Avatar" class="preview-avatar-img" />`;
     } else {
-        previewAvatar.textContent = avatar?.value || '🎵';
+        previewAvatar.textContent = avatar?.value || '👤';
     }
 
     // Update username
@@ -633,9 +644,14 @@ function setupEventListeners() {
         'emotePrivacySelect',
         'notifyFromSelect',
         'toastFromSelect',
-        'matchAlertsToggle'
+        'matchAlertsToggle',
+        'rivalAlertsToggle',
+        'popupsToggle',
+        'socialPopupsToggle',
+        'chatterPopupsToggle'
     ];
 
+    document.getElementById('popupsToggle')?.addEventListener('change', syncPopupToggles);
     trackableInputs.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
@@ -646,14 +662,22 @@ function setupEventListeners() {
         }
     });
 
-    document.querySelectorAll('input[name="toastStyle"]').forEach(r => { r.removeEventListener('change', trackChanges); r.addEventListener('change', trackChanges); });
-
     // ESC key to close
     document.removeEventListener('keydown', handleEscapeKey);
     document.addEventListener('keydown', handleEscapeKey);
 }
 
 // ✅ ADD THIS NEW FUNCTION
+// The two category switches only matter while the master switch is on
+function syncPopupToggles() {
+    const on = document.getElementById('popupsToggle')?.checked !== false;
+    for (const id of ['socialPopupsToggle', 'chatterPopupsToggle']) {
+        const el = document.getElementById(id);
+        if (el) el.disabled = !on;
+    }
+    document.getElementById('popupSub')?.classList.toggle('is-off', !on);
+}
+
 function handleBioInput() {
     hasChanges = true;
     updateBioCharCount();
@@ -722,7 +746,7 @@ function handleChampionClick(e) {
 
 // Highlights the chosen champion in the grid.
 function markSelectedInGrid() {
-    const chosen = String(selectedChampion?.name || '').replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+    const chosen = panelPackId() || String(selectedChampion?.name || '').replace(/[^A-Za-z0-9]/g, '').toLowerCase();
     document.querySelectorAll('.champion-avatar-option').forEach(opt => opt.classList.toggle('selected', !!chosen && opt.dataset.champion.toLowerCase() === chosen));
 }
 
@@ -813,7 +837,7 @@ if (socialLinks.youtube) socialLinks.youtube = socialLinks.youtube.replace(/^@/,
         try {
             avatar = JSON.parse(current);
         } catch {
-            avatar = { type: 'emoji', value: '🎵' };
+            avatar = { type: 'emoji', value: '👤' };
         }
     }
 
@@ -848,8 +872,8 @@ localStorage.setItem('socialLinks', JSON.stringify(socialLinks));
             localStorage.setItem('notifyFrom', document.getElementById('notifyFromSelect')?.value ?? 'everyone');
             localStorage.setItem('toastFrom', document.getElementById('toastFromSelect')?.value ?? 'everyone');
             localStorage.setItem('matchAlerts', document.getElementById('matchAlertsToggle')?.checked === false ? 'false' : 'true');
-            const pickedStyle = document.querySelector('input[name="toastStyle"]:checked')?.value;
-            if (pickedStyle) { localStorage.setItem('toastStyle', pickedStyle); applyToastStyle(pickedStyle); }
+            for (const [id, key] of [['popupsToggle', 'popups'], ['socialPopupsToggle', 'socialPopups'], ['chatterPopupsToggle', 'chatterPopups']]) localStorage.setItem(key, document.getElementById(id)?.checked === false ? 'false' : 'true');
+            localStorage.setItem('rivalAlerts', document.getElementById('rivalAlertsToggle')?.checked === false ? 'false' : 'true');
         } catch (e) { console.warn('Could not save notification preferences', e); }
 
         // Save all privacy settings
@@ -1154,18 +1178,35 @@ function selectedPackId() {
     return PACK_IDS.includes(id) ? id : null;
 }
 
+// The champion the panel is about: the one in the picture when it has a pack, otherwise the companion (who still sends the
+// alerts and earns the XP) - so an older account whose picture is a champion without a pack still sees its real champion.
+function panelPackId() {
+    const own = selectedPackId();
+    if (own) return own;
+    let companion = null;
+    try { companion = window.championLoader?.getUserCompanionPack?.(); } catch { /* loader not ready */ }
+    return PACK_IDS.includes(companion) ? companion : null;
+}
+
 function currentSkinNum(packId) {
     return pendingLooks[packId] ?? lookSkin({ id: packId }, localStorage);
 }
 
+// The profile card at the top shows the picture that Save will store, so it follows a new champion or skin straight away
+function refreshPreviewAvatar() {
+    const host = document.getElementById('previewAvatar');
+    if (host && selectedChampion?.url) host.innerHTML = `<img src="${fixAvatarUrl(selectedChampion.url)}" alt="Avatar" class="preview-avatar-img" />`;
+}
+
 function renderYourChampion() {
+    refreshPreviewAvatar();
     const host = document.getElementById('yourChampion');
     if (!host) return;
     if (!host.dataset.bound) {
         host.dataset.bound = '1';
         host.addEventListener('click', e => {
             const skinBtn = e.target.closest('.yc-skin');
-            const packId = selectedPackId();
+            const packId = panelPackId();
             if (skinBtn && packId) {
                 const num = Number(skinBtn.dataset.skin);
                 pendingLooks[packId] = num;
@@ -1178,13 +1219,8 @@ function renderYourChampion() {
             }
         });
     }
-    if (!selectedChampion) { host.innerHTML = '<p class="section-description">Pick a champion above.</p>'; return; }
-    const packId = selectedPackId();
-    if (!packId) {
-        const xpFor = window.championLoader?.getCurrentPack?.()?.name || 'your last champion';
-        host.innerHTML = plainChampionHtml({ name: selectedChampion.displayName || selectedChampion.name, url: selectedChampion.url, xpFor });
-        return;
-    }
+    const packId = panelPackId();
+    if (!packId) { host.innerHTML = '<p class="section-description">Pick a champion above.</p>'; return; }
     let achievements = [];
     try { achievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]'); } catch { /* none */ }
     const view = buildChampionsView({
@@ -1193,7 +1229,15 @@ function renderYourChampion() {
         looks: { ...readLooks(), ...pendingLooks }
     });
     host.innerHTML = yourChampionHtml(view.rows.find(r => r.packId === packId));
+    // The picture is a champion without a pack (an older account): say so, and that the companion still does the work
+    if (!selectedPackId() && selectedChampion) {
+        const pic = escapeHtmlText(selectedChampion.displayName || selectedChampion.name);
+        const mine = escapeHtmlText(view.rows.find(r => r.packId === packId)?.name || packId);
+        host.insertAdjacentHTML('beforeend', `<p class="yc-note">Your picture is ${pic} for now. Your alerts, voice and XP use ${mine}. Pick a champion above to change your picture.</p>`);
+    }
 }
+
+const escapeHtmlText = x => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 // Picks Jinx, Vi or Caitlyn: the companion pack (voice, XP) and the picture both follow.
 async function selectChampionPack(packId) {
@@ -1227,7 +1271,7 @@ async function previewChampion(packId, button) {
         custom: type => loader.getCustomMessage?.(type)
     };
     const { bulletin, number, total } = buildPreview(previewIndex, { voice, packId, dismiss: () => window.dismissBulletin?.() });
-    window.showBulletin(bulletin);
+    window.showBulletin({ ...bulletin, _preview: true });
     previewIndex = (previewIndex + 1) % total;
     const next = buildPreview(previewIndex, { voice, packId, dismiss: () => {} });
     if (button) button.innerHTML = `<i class="fas fa-play"></i> Next alert: ${next.step.label} (${next.number}/${total})`;

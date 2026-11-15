@@ -1298,7 +1298,7 @@ body.theme-arcane .social-input-row input {
     font-family: var(--font)
 }
 body.theme-arcane .social-input-row input::placeholder {
-    color: rgba(255, 112, 195, 0.4)
+    color: rgba(255, 112, 195, 0.6)
 }
 body.theme-arcane .champion-pack-card {
     border: 2px solid rgba(255, 79, 180, 0.3)
@@ -3626,6 +3626,31 @@ body.theme-arcane.page-profile .stat-value {
 }
 body.theme-arcane.page-profile .xp-earned {
     color: var(--pink-bright)
+}
+body.theme-arcane.page-profile .ach-section-head {
+    border-bottom: 1px solid rgba(255, 79, 180, 0.3)
+}
+body.theme-arcane.page-profile .ach-section-head h3 {
+    font-family: var(--font);
+    color: var(--text)
+}
+body.theme-arcane.page-profile .ach-section-count {
+    color: var(--pink-bright)
+}
+body.theme-arcane.page-profile .ach-hidden-note {
+    color: rgba(255, 112, 195, 0.55)
+}
+body.theme-arcane.page-profile .achievement-card--locked {
+    border-color: rgba(255, 79, 180, 0.15)
+}
+body.theme-arcane.page-profile .ach-skin-note {
+    color: var(--text)
+}
+body.theme-arcane.page-profile .ach-progress span {
+    background: linear-gradient(90deg, rgb(176, 45, 120), var(--pink-bright))
+}
+body.theme-arcane.page-profile .ach-progress-text {
+    color: rgba(255, 112, 195, 0.65)
 }
 
 /* ===== css/feed.css ===== */

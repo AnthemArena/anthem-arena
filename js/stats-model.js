@@ -18,6 +18,10 @@ function matchSummary(m) {
         seed1: Number.isFinite(m.song1?.seed) ? m.song1.seed : null, seed2: Number.isFinite(m.song2?.seed) ? m.song2.seed : null, winner: m.status === 'completed' ? winnerSide(m) : 0 };
 }
 
+// Blind voting: a live match's votes and split are never used for rankings or records, only finished matches.
+// Only the plain total of votes cast (an overall count) still includes live matches.
+export const MIN_MATCHES_FOR_SHARE = 2;      // "Best vote share" needs at least this many finished matches, so 1 vote at 100% cannot top it
+
 export function computeStats(matches = []) {
     const list = (Array.isArray(matches) ? matches : []).filter(m => m && m.song1 && m.song2);
     const by = { completed: 0, live: 0, upcoming: 0 };
@@ -39,8 +43,8 @@ export function computeStats(matches = []) {
         const r = rounds.get(label); r.total++; if (m.status === 'completed') r.completed++;
 
         if (real(m.song1)) touch(m.song1); if (real(m.song2)) touch(m.song2);
+        if (m.status !== 'completed') continue;
         if (v1 + v2 > 0) voted.push(m);
-        if (m.status !== 'completed' && m.status !== 'live') continue;
         const a = real(m.song1) ? touch(m.song1) : null, b = real(m.song2) ? touch(m.song2) : null;
         if (a) { a.votes += v1; a.against += v2; }
         if (b) { b.votes += v2; b.against += v1; }
@@ -59,7 +63,7 @@ export function computeStats(matches = []) {
     const upsetSize = x => (x.winner === 1 && x.seed1 !== null && x.seed2 !== null ? x.seed1 - x.seed2 : x.winner === 2 && x.seed1 !== null && x.seed2 !== null ? x.seed2 - x.seed1 : 0);
     const upset = sums.reduce((b, x) => (upsetSize(x) > 0 && (!b || upsetSize(x) > upsetSize(b)) ? x : b), null);
     const mostVotedEdit = rows.reduce((b, e) => (!b || e.votes > b.votes ? e : b), null);
-    const bestShare = rows.filter(e => e.played > 0).reduce((b, e) => (!b || e.share > b.share ? e : b), null);
+    const bestShare = rows.filter(e => e.played >= MIN_MATCHES_FOR_SHARE).reduce((b, e) => (!b || e.share > b.share ? e : b), null);
 
     const groups = allGroupStandings(list);
     return {
@@ -67,6 +71,11 @@ export function computeStats(matches = []) {
         editCount: rows.length, groupCount: groups.length, groupsComplete: groups.filter(g => g.complete).length,
         rows, groups,
         rounds: [...rounds.values()].sort((a, b) => a.round - b.round),
+        // progress by stage: every group match is one "Group stage" row (64 groups would be 64 rows), then the knockout rounds in order
+        stages: (() => {
+            const all = [...rounds.values()], g = all.filter(r => r.group), ko = all.filter(r => !r.group).sort((a, b) => a.round - b.round);
+            return [...(g.length ? [{ label: 'Group stage', total: g.reduce((t, r) => t + r.total, 0), completed: g.reduce((t, r) => t + r.completed, 0) }] : []), ...ko.map(r => ({ label: r.label, total: r.total, completed: r.completed }))];
+        })(),
         records: {
             mostVotedMatch: pick((s, b) => s.total > b.total),
             closest: finished.reduce((b, s) => (!b || s.lean < b.lean ? s : b), null),
@@ -80,7 +89,7 @@ export function computeStats(matches = []) {
 
 export const SORTS = {
     votes: (a, b) => b.votes - a.votes || b.wins - a.wins,
-    share: (a, b) => (b.played > 0) - (a.played > 0) || b.share - a.share || b.votes - a.votes,
+    share: (a, b) => (b.played >= MIN_MATCHES_FOR_SHARE) - (a.played >= MIN_MATCHES_FOR_SHARE) || b.share - a.share || b.votes - a.votes,
     wins: (a, b) => b.wins - a.wins || b.share - a.share || b.votes - a.votes
 };
 export function sortRows(rows, key = 'votes') { return [...rows].sort(SORTS[key] || SORTS.votes); }
@@ -108,4 +117,17 @@ export function compareCups(entries = []) {
     }
     rows.sort((a, b) => String(b.startDate || '').localeCompare(String(a.startDate || '')));
     return { cups: rows, totals: { votes: rows.reduce((t, r) => t + r.votes, 0), cups: rows.length, matches: rows.reduce((t, r) => t + r.matches, 0), finished: rows.reduce((t, r) => t + r.finished, 0) }, records: best };
+}
+
+// ---- the empty states: when does the first match close? ----
+// The earliest end time among matches that are not finished (live ones first), or null. endDate / endTime are ISO strings on the match.
+export function nextCloseAt(matches = [], now = Date.now()) {
+    const t = (Array.isArray(matches) ? matches : []).filter(m => m && m.status !== 'completed')
+        .map(m => Date.parse(m.endDate || m.endTime || '')).filter(x => Number.isFinite(x) && x > now);
+    return t.length ? Math.min(...t) : null;
+}
+export function timeLeft(closeAt, now = Date.now()) {
+    if (!Number.isFinite(closeAt) || closeAt <= now) return '';
+    const mins = Math.floor((closeAt - now) / 60000), d = Math.floor(mins / 1440), h = Math.floor((mins % 1440) / 60);
+    return d ? `${d}d ${h}h` : h ? `${h}h ${mins % 60}m` : `${Math.max(1, mins)} min`;
 }

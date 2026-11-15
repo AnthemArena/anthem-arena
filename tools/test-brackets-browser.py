@@ -65,8 +65,13 @@ with sync_playwright() as p:
     pg.click('.stage-tab[data-stage="groups"]'); pg.wait_for_timeout(300)
     check('groups: tabs shown, Groups tab active', vis(pg, '#stageTabsSection') and 'active' in pg.get_attribute('.stage-tab[data-stage="groups"]', 'class'))
     check('groups: group section visible, bracket hidden', vis(pg, '#groupStageSection') and not vis(pg, '#bracketSection'))
+    check('groups: opens on Live now, so only the live group C shows', cards(pg) == ['C'] and 'active' in pg.get_attribute('.gs-chip[data-filter="live"]', 'class'), cards(pg))
+    pg.click('.gs-chip[data-filter="all"]')
     check('groups: 4 group cards (A-D)', cards(pg) == ['A', 'B', 'C', 'D'], cards(pg))
-    check('groups: info panel (status, edits, progress, format)', info(pg) == ['Group Stage - 6 Live Matches', '16', '14 / 24 Group Matches', 'Group Stage + Knockout'], info(pg))
+    check('groups: the table header says Vote %, not Share', 'vote %' in pg.inner_text('#group-A thead').lower() and 'share' not in pg.inner_text('#group-A thead').lower())
+    check('groups: the old Explore the Tournament section is gone', pg.query_selector('.explore-more-bracket') is None)
+    check('groups: the statistics panel shows once a match is finished', vis(pg, '#tournamentStats'))
+    check('groups: info panel (status, edits, progress, format)', info(pg) == ['1 group live (6 matches)', '16', '14 / 24 Group Matches', 'Group Stage + Knockout'], info(pg))
     q = lambda g: pg.eval_on_selector(f'#group-{g}', "e=>({q:e.querySelectorAll('.gs-pill-in').length,out:e.querySelectorAll('.gs-pill-out').length,open:e.querySelector('details').open,state:e.dataset.state,rows:e.querySelectorAll('.gs-row').length})")
     a, bb, c, d = q('A'), q('B'), q('C'), q('D')
     check('finished group A says Qualified x2 / Out x2', a['q'] == 2 and a['out'] == 2 and a['state'] == 'complete', a)
@@ -84,7 +89,7 @@ with sync_playwright() as p:
     pg.click('.gs-chip[data-filter="live"]'); check('filter: Live now shows only group C', cards(pg) == ['C'], cards(pg))
     pg.click('.gs-chip[data-filter="complete"]'); check('filter: Finished shows A and B', cards(pg) == ['A', 'B'], cards(pg))
     pg.click('.gs-chip[data-filter="all"]'); check('filter: All shows all four again', cards(pg) == ['A', 'B', 'C', 'D'])
-    check('filter chip counts', pg.eval_on_selector_all('.gs-chip-count', 'els=>els.map(e=>e.innerText)') == ['4', '1', '2'], pg.eval_on_selector_all('.gs-chip-count', 'els=>els.map(e=>e.innerText)'))
+    check('filter chip counts', pg.eval_on_selector_all('.gs-chip-count', 'els=>els.map(e=>e.innerText)') == ['4', '1', '0', '2'], pg.eval_on_selector_all('.gs-chip-count', 'els=>els.map(e=>e.innerText)'))
 
     # tabs
     pg.click('.stage-tab[data-stage="knockout"]')
@@ -93,10 +98,12 @@ with sync_playwright() as p:
     check('knockout tab: note names the first knockout round', 'Quarter-finals' in txt(pg, '.ko-note'), txt(pg, '.ko-note'))
     check('knockout tab: URL hash updated', pg.evaluate('location.hash') == '#knockout')
     pg.wait_for_timeout(1300); pg.screenshot(path=f'{SHOTS}/knockout-note.png')
-    pg.click('.ko-note-btn'); check('note button goes back to the groups', vis(pg, '#groupStageSection') and not vis(pg, '#bracketSection') and pg.evaluate('location.hash') == '#groups')
+    check('knockout tab: skeleton shows the pairing example and the round ladder, with no button', 'Winner of Group A' in txt(pg, '.ko-note') and 'Runner-up of Group B' in txt(pg, '.ko-note') and pg.locator('.ko-step').count() == 3 and pg.locator('.ko-note button').count() == 0, txt(pg, '.ko-note'))
+    check('brackets: the intro paragraph is gone', pg.query_selector('.page-intro') is None)
 
     # a finished match is a plain link to its vote page (which shows the result); there is no separate results popup any more
     url0 = pg.url
+    pg.click('.stage-tab[data-stage="groups"]'); check('tab bar goes back to the groups', vis(pg, '#groupStageSection') and not vis(pg, '#bracketSection') and pg.evaluate('location.hash') == '#groups')
     pg.click('#group-A summary')
     done_link = pg.locator('#group-A .gs-match a[data-status="completed"]').first
     href = done_link.get_attribute('href') or ''
@@ -146,11 +153,13 @@ with sync_playwright() as p:
                 m['song1']['shortTitle'] = '<img src=x onerror="window.__xss=1">'; m['song1']['artist'] = '"><script>window.__xss=2</script>'
         return ms
     pg, errs = load(b, 'groups-mid-16', mutate=hostile)
+    pg.click('.gs-chip[data-filter="all"]')
     check('hostile titles are shown as text and never run', pg.evaluate('window.__xss') is None and 'onerror' in pg.inner_text('#groupStageSection'), pg.evaluate('window.__xss'))
     pg.context.close()
 
     # ---------- 6. a big cup: 128 edits = 32 groups ----------
     t0 = time.time(); pg, errs = load(b, 'groups-mid-128'); dt = time.time() - t0
+    pg.click('.gs-chip[data-filter="all"]')
     check('128 edits: 32 group cards, 192 match rows', len(cards(pg)) == 32 and pg.eval_on_selector_all('.gs-match', 'e=>e.length') == 192, len(cards(pg)))
     check('128 edits: loads and draws in under 6 seconds', dt < 6, round(dt, 2))
     pg.click('.gs-chip[data-filter="live"]'); check('128 edits: Live now filter shows groups 7-9 (C,D,E style letters G-I)', len(cards(pg)) == 3, cards(pg))
@@ -163,13 +172,23 @@ with sync_playwright() as p:
     # ---------- 7. phones ----------
     pg, errs = load(b, 'groups-mid-16', width=390, height=844, scale=2)
     check('phone: no sideways scroll', pg.evaluate('document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1'), pg.evaluate('[document.documentElement.scrollWidth, document.documentElement.clientWidth]'))
+    pg.click('.gs-chip[data-filter="all"]')
     check('phone: group cards are one column', pg.eval_on_selector_all('.gs-card', 'els=>new Set(els.map(e=>Math.round(e.getBoundingClientRect().left))).size') == 1)
     pg.locator('#stageTabsSection').scroll_into_view_if_needed(); pg.screenshot(path=f'{SHOTS}/groups-phone-top.png')
     pg.locator('#group-C').scroll_into_view_if_needed(); pg.locator('#group-C').screenshot(path=f'{SHOTS}/groups-phone-live-card.png')
     pg.locator('#group-A').screenshot(path=f'{SHOTS}/groups-phone-done-card.png')
     pg.locator('.gs-head').screenshot(path=f'{SHOTS}/groups-phone-head.png')
-    check('phone: the three filter chips share one row', pg.eval_on_selector_all('.gs-chip', 'els=>new Set(els.map(e=>Math.round(e.getBoundingClientRect().top))).size') == 1)
+    check('phone: the four filter chips sit in two rows, inside the screen, 44px tall', pg.eval_on_selector_all('.gs-chip', 'els=>new Set(els.map(e=>Math.round(e.getBoundingClientRect().top))).size') == 2 and pg.eval_on_selector_all('.gs-chip', 'els=>els.every(e=>e.getBoundingClientRect().right<=390 && e.getBoundingClientRect().height>=44)'))
+    pg.click('.gs-chip[data-filter="live"]')
+    top = lambda sel: pg.eval_on_selector(sel, 'e=>e.getBoundingClientRect().top + scrollY')
+    check('phone: the first group card starts within the first screen and a half', top('.gs-card:not([hidden])') < 844 * 1.5, top('.gs-card:not([hidden])'))
+    check('phone: info card is compact (under 150px tall)', pg.eval_on_selector('.tournament-info', 'e=>e.getBoundingClientRect().height') < 150, pg.eval_on_selector('.tournament-info', 'e=>e.getBoundingClientRect().height'))
+    check('phone: champion line is a thin strip with a small avatar', pg.eval_on_selector('#champion-say-brackets .cb-portrait', 'e=>e.getBoundingClientRect().width') <= 34 and pg.eval_on_selector('#champion-say-brackets', 'e=>e.getBoundingClientRect().height') <= 60, pg.eval_on_selector('#champion-say-brackets', 'e=>e.getBoundingClientRect().height'))
+    check('phone: match rows and the Matches header are at least 44px tall', pg.eval_on_selector_all('.gs-card:not([hidden]) .gs-match a', 'els=>els.every(e=>e.getBoundingClientRect().height>=44)') and pg.eval_on_selector('.gs-card:not([hidden]) .gs-matches summary', 'e=>e.getBoundingClientRect().height') >= 44)
+    check('phone: table thumbnails are hidden', pg.eval_on_selector_all('.gs-thumb', 'els=>els.every(e=>getComputedStyle(e).display==="none")'))
     pg.click('.stage-tab[data-stage="knockout"]'); pg.wait_for_timeout(1300); pg.screenshot(path=f'{SHOTS}/knockout-note-phone.png')
+    check('phone: knockout skeleton fits the screen width', pg.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'))
+    pg.click('.stage-tab[data-stage="groups"]'); pg.screenshot(path=f'{SHOTS}/groups-phone-first-screen.png')
     pg.context.close()
     # ---------- voted state: the visitor's own picks (stored by vote.js as localStorage vote_<cup>_<matchId> = song1 | song2) ----------
     cup = [l for l in open(os.path.join(ROOT, 'js/arcane-config.js')).read().splitlines() if 'tournamentId:' in l][0].split("'")[1]

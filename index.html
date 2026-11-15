@@ -58,12 +58,11 @@
 
     <main class="home-page">
         <header class="home-hero">
-            <img src="/logo.png" alt="Arcane Moments" class="home-logo" width="260" height="260">
-            <p class="home-pill" id="homePill" aria-live="polite">Loading&hellip;</p>
+            <p class="home-pill" id="homePill">Loading&hellip;</p>
             <h1 class="home-title">Arcane Moments</h1>
             <p class="home-lead" id="homeLead">A fan-made tournament where you vote for the best Arcane edits.</p>
             <div class="home-actions" id="homeActions">
-                <a class="btn btn-primary" href="#vote">Vote now</a>
+                <a class="btn btn-primary" href="#vote">Watch &amp; Vote</a>
                 <a class="btn btn-ghost" href="/brackets">See the bracket</a>
             </div>
             <dl class="home-stats" id="homeStats" hidden></dl>
@@ -104,9 +103,9 @@
                 </div>
 
                 <div id="votedSection" class="voted-section" style="display: none;">
-                    <div class="voted-header" onclick="toggleVotedSection()">
-                        <h2><i class="fa-solid fa-check"></i> Your Votes (<span id="votedCount">0</span>)</h2>
-                        <button id="votedToggle" class="toggle-btn">▼</button>
+                    <div class="voted-header">
+                        <h2 id="votedHeading"><i class="fa-solid fa-check" aria-hidden="true"></i> Your Votes (<span id="votedCount">0</span>)</h2>
+                        <button id="votedToggle" class="toggle-btn" type="button" aria-expanded="true" aria-controls="votedGrid" aria-labelledby="votedHeading"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
                     </div>
                     <div id="votedGrid" class="social-grid voted-grid"></div>
                 </div>
@@ -132,7 +131,7 @@
             <h2 id="howHead">How it works</h2>
             <ol class="how-list">
                 <li><b>Edits enter.</b> Fan edits of Arcane, made by creators on YouTube, are drawn into groups of four.</li>
-                <li><b>You vote.</b> Every match is two edits head to head. Watch both, then pick your favourite.</li>
+                <li><b>You vote.</b> Every match is two edits head to head. Watch both, then pick your favorite. Votes are final, and results appear once you&rsquo;ve voted.</li>
                 <li><b>Two go through.</b> The top two in each group move on to the knockout.</li>
                 <li><b>One is crowned.</b> Knockout rounds run until a single edit is left standing.</li>
             </ol>

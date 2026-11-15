@@ -1490,21 +1490,7 @@ text-align: center;
    VOTED BADGE UPDATE (MORE PROMINENT)
    ======================================== */
 
-.social-match-card.voted::before {
-    content: '✅ FOUNDING MEMBER ELIGIBLE';
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    background: linear-gradient(135deg, #4CAF50, #388E3C);
-    color: white;
-    padding: 0.4rem 0.85rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    z-index: 10;
-    box-shadow: 0 2px 10px rgba(76, 175, 80, 0.4);
-}
+/* (the "Founding member eligible" badge that used to sit on every voted card is gone: see css/home-arcane.css) */
 
 /* ========================================
    COMPLETION BANNER ENHANCEMENTS

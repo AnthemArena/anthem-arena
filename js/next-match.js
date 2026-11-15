@@ -4,6 +4,7 @@
 // js/vote.js uses these to (a) list the live matches the visitor has not voted in yet and (b) show a "Next match" bar once they have voted.
 // Matches from /api/matches carry `matchId` (not `id`), so every lookup goes through matchKey().
 import { cleanTitle, shortTitle } from './title-clean.js';
+import { isOpenNow } from './vote-closed.js';
 
 const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ESC[c]);
@@ -14,7 +15,7 @@ export const matchKey = m => (m && (m.matchId ?? m.id)) ?? null;
 // (and wrapping round), so "Next match" really is the next one rather than always the first in the list.
 //   hasVoted(matchId) -> boolean
 export function unvotedLiveMatches(matches, { currentId = null, hasVoted = () => false } = {}) {
-    const live = (Array.isArray(matches) ? matches : []).filter(m => m && m.status === 'live' && matchKey(m) != null);
+    const live = (Array.isArray(matches) ? matches : []).filter(m => m && isOpenNow(m) && matchKey(m) != null);
     const at = live.findIndex(m => matchKey(m) === currentId);
     const ordered = at < 0 ? live : [...live.slice(at + 1), ...live.slice(0, at + 1)];
     return ordered.filter(m => matchKey(m) !== currentId && !hasVoted(matchKey(m)));

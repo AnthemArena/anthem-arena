@@ -112,7 +112,7 @@ function showUsernamePrompt() {
                     <input type="checkbox" id="make-public-checkbox" checked />
                     <span>Make my votes public (appear on leaderboards)</span>
                 </label>
-                <p class="privacy-note">You can change this later in My Votes</p>
+                <p class="privacy-note">You can change this later in Settings</p>
             </div>
             
             <div class="modal-actions">

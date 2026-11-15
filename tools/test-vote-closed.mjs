@@ -1,6 +1,6 @@
 // The closed-match state of the vote buttons.   node tools/test-vote-closed.mjs
 import assert from 'node:assert/strict';
-import { votingState, closedButton } from '../js/vote-closed.js';
+import { votingState, closedButton, isOpenNow, isExpiredLive, deadlineInfo } from '../js/vote-closed.js';
 let passed = 0;
 const test = (name, fn) => { fn(); passed++; console.log('  ok  ' + name); };
 const NOW = Date.UTC(2026, 9, 16, 12, 0, 0);
@@ -31,5 +31,22 @@ test('no known winner (deadline passed, or an unmatched id) just says "Voting cl
 });
 test('an upcoming match says voting opens soon on both buttons', () => {
     for (const s of ['song1', 'song2']) assert.equal(closedButton(match({ status: 'upcoming', winnerId: null }), s, 'upcoming').text, 'Voting opens soon');
+});
+test('isOpenNow / isExpiredLive: a live match past its deadline is not open', () => {
+    const past = new Date(NOW - 1000).toISOString(), future = new Date(NOW + 3600e3).toISOString();
+    assert.equal(isOpenNow(match({ status: 'live', endDate: future }), NOW), true);
+    assert.equal(isOpenNow(match({ status: 'live' }), NOW), true);              // no deadline: open
+    assert.equal(isOpenNow(match({ status: 'live', endDate: past }), NOW), false);
+    assert.equal(isExpiredLive(match({ status: 'live', endDate: past }), NOW), true);
+    assert.equal(isExpiredLive(match({ status: 'completed', endDate: past }), NOW), false);
+    assert.equal(isOpenNow(match({ status: 'upcoming' }), NOW), false);
+});
+test('deadlineInfo: only live matches; none / open / expired', () => {
+    assert.equal(deadlineInfo(match({ status: 'completed' }), NOW), null);
+    assert.equal(deadlineInfo(match({ status: 'upcoming' }), NOW), null);
+    assert.equal(deadlineInfo(match({ status: 'live' }), NOW).kind, 'none');
+    assert.equal(deadlineInfo(match({ status: 'live', endDate: 'junk' }), NOW).kind, 'none');
+    assert.equal(deadlineInfo(match({ status: 'live', endTime: new Date(NOW + 5e3).toISOString() }), NOW).kind, 'open');
+    assert.equal(deadlineInfo(match({ status: 'live', endDate: new Date(NOW - 5e3).toISOString() }), NOW).kind, 'expired');
 });
 console.log(`\n${passed} tests passed`);

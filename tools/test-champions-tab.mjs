@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { voteShares, buildChampionsView, championsHtml, avatarKeyOf, skinAvatar, masteryChipHtml, requirementText, yourChampionHtml, plainChampionHtml } from '../js/champions-tab-model.js';
+import { voteShares, buildChampionsView, championsHtml, avatarKeyOf, skinAvatar, masteryChipHtml, requirementText, yourChampionHtml, skinColumns, plainChampionHtml } from '../js/champions-tab-model.js';
 let n = 0; const t = (name, fn) => { fn(); n++; console.log('  ok  ' + name); };
 const votes = (spec) => Object.entries(spec).flatMap(([id, c]) => Array.from({ length: c }, () => ({ championId: id === 'none' ? undefined : id })));
 
@@ -39,9 +39,10 @@ t('html: own profile gets clickable unlocked skins, visitors do not; locked ones
     assert.doesNotMatch(own, /data-action="(avatar|look)"/);
     assert.doesNotMatch(own, /data-skin="48"/);          // Arcane Brawler is locked at Mastery 2
     assert.doesNotMatch(other, /data-action=/);
-    assert.match(other, /100%/); assert.match(other, /Vi_29\.jpg/);
+    assert.match(other, /4 votes/); assert.doesNotMatch(other, /100%/); assert.match(other, /Vi_29\.jpg/);
     assert.match(championsHtml(v, { filters: { vi: 'locked' } }), /Mastery 10/);
-    assert.match(championsHtml(buildChampionsView({}), {}), /No votes yet/);
+    assert.match(championsHtml(buildChampionsView({}), { own: true }), /No votes yet/);
+    assert.doesNotMatch(championsHtml(buildChampionsView({}), {}), /cm-spread/, 'a visitor with nothing countable gets no 0% bars');
 });
 t('filters: all by default, locked in the order they are earned, all lists unlocked first', () => {
     const v = buildChampionsView({ packXp: { vi: 100 }, activePack: 'vi' });
@@ -62,7 +63,7 @@ t('look: Arcane by default once unlocked, a chosen look wins, shown as pressed',
     const w = buildChampionsView({ packXp: { jinx: 1700 }, looks: { jinx: 13 }, avatarKey: 'jinx:13' });
     assert.equal(w.rows[0].skins.find(s => s.look).num, 13);
     const wornHtml = championsHtml(w, { own: true });
-    assert.match(wornHtml, /class="cm-skin-tag">Wearing/);
+    assert.match(wornHtml, /class="cm-skin-tag">Worn/);
     assert.doesNotMatch(wornHtml, /data-action="wear" data-pack="jinx" data-skin="13"/);
     assert.doesNotMatch(wornHtml, /data-action="use"/);
     assert.equal(buildChampionsView({}).rows[0].skins.find(s => s.look).num, 0);
@@ -89,3 +90,7 @@ t('names are escaped and the settings chip shows level, progress and next reward
     assert.equal(masteryChipHtml('default', 50), '');
 });
 console.log(`\n${n} passed`);
+
+t('skin grid splits evenly: 6 is 3 + 3, never 5 + 1', () => {
+    assert.deepEqual([1, 2, 4, 5, 6, 7, 8, 9].map(skinColumns), [1, 2, 4, 3, 3, 4, 4, 3]);
+});

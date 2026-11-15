@@ -1,7 +1,7 @@
 // Offline tests for js/brackets-groups.js and describeCup() (the brackets page's group stage view).   node tools/test-brackets-groups.mjs
 import assert from 'node:assert/strict';
 import { planGroupBuild, planKnockoutBuild, describeCup } from '../js/group-builder.js';
-import { cupSummary, buildGroupViews, groupCounts, groupCardHtml, groupStageHtml, stageTabsHtml, knockoutNoteHtml, defaultStage, esc } from '../js/brackets-groups.js';
+import { cupSummary, buildGroupViews, groupCounts, groupCardHtml, groupStageHtml, stageTabsHtml, knockoutNoteHtml, groupsCloseAt, groupsCloseLabel, defaultStage, esc, opensLabel, caughtUpNote } from '../js/brackets-groups.js';
 
 const CUP = 'jinx-cup-1';
 const mk = n => ({
@@ -50,11 +50,11 @@ test('describeCup: knockoutBuilt flips once knockout matches exist', () => {
 test('group views: one per group, in order, with states and progress', () => {
     const v = buildGroupViews(midway().ms);
     assert.deepEqual(v.map(g => g.name), ['A', 'B', 'C', 'D']);
-    assert.deepEqual(v.map(g => g.state), ['complete', 'live', 'idle', 'idle']);
+    assert.deepEqual(v.map(g => g.state), ['complete', 'live', 'idle', 'upcoming']);
     assert.deepEqual(v.map(g => g.played), [6, 0, 2, 0]);
     assert.equal(v[1].live, 6);
     assert.ok(v.every(g => g.rows.length === 4 && g.matches.length === 6));
-    assert.deepEqual(groupCounts(v), { all: 4, live: 1, complete: 1 });
+    assert.deepEqual(groupCounts(v), { all: 4, live: 1, upcoming: 1, complete: 1 });
     const nums = v[0].matches.map(m => m.matchNumber); assert.deepEqual(nums, [...nums].sort((a, b) => a - b));
 });
 
@@ -117,7 +117,45 @@ test('stage section: header, filter chip counts, one card per group', () => {
     assert.ok(html.includes('4 groups of 4') && html.includes('(8 edits)'));
     assert.ok(/data-filter="live"[^>]*>Live now <span class="gs-chip-count">1<\/span>/.test(html));
     assert.ok(/data-filter="complete"[^>]*>Finished <span class="gs-chip-count">1<\/span>/.test(html));
-    assert.ok(/data-filter="all"[^>]*aria-pressed="true"/.test(html));
+    assert.ok(/data-filter="live"[^>]*aria-pressed="true"/.test(html) && /data-filter="all"[^>]*aria-pressed="false"/.test(html));   // opens on what is live now
+    assert.equal((html.match(/class="gs-card"[^>]* hidden/g) || []).length, 3);                                                       // the other groups wait behind the other chips
+    const none = groupStageHtml(buildGroupViews(plan(16).matches), describeCup(plan(16).matches));                                      // nothing live: every group shows
+    assert.ok(/data-filter="all"[^>]*aria-pressed="true"/.test(none) && !/class="gs-card"[^>]* hidden/.test(none));
+});
+
+test('upcoming groups: opening time instead of "0 of 6 played", dashes instead of ranks, no advance marker', () => {
+    const v = buildGroupViews(midway().ms), d = v[3];
+    assert.equal(d.state, 'upcoming');
+    const html = groupCardHtml(d, { now: Date.parse('2026-01-01T00:00:00Z') });
+    assert.ok(!html.includes('0 of 6 played') && html.includes('Not open yet'));
+    assert.ok(!html.includes('gs-in-position') && !/<td class="gs-rank">\d/.test(html) && (html.match(/<td class="gs-rank">&ndash;/g) || []).length === 4);
+    const timed = { ...d, opens: Date.parse('2026-01-02T07:00:00Z') };
+    assert.ok(groupCardHtml(timed, { now: Date.parse('2026-01-01T00:00:00Z') }).includes('Opens in 31h'));
+    assert.equal(opensLabel(Date.parse('2026-01-05T00:00:00Z'), Date.parse('2026-01-01T00:00:00Z')), 'Opens in 4d');
+    assert.equal(opensLabel(NaN), 'Not open yet');
+});
+
+test('a group that has results ranks the edits that have votes; the header says "Vote %", never "Share"', () => {
+    const v = buildGroupViews(midway().ms), html = groupCardHtml(v[0]);
+    assert.ok(html.includes('>Vote %<') && !html.includes('>Share<') && !html.includes('data-label="Share"'));
+    assert.equal((html.match(/<td class="gs-rank">[1-4]</g) || []).length, 4);
+    assert.equal((html.match(/gs-in-position/g) || []).length, 2);
+});
+
+test('your pick is spelled out ("Your pick"), apart from the winner styling', () => {
+    const v = buildGroupViews(midway().ms), m = v[1].matches[0];
+    const html = groupCardHtml(v[1], { userChoice: id => id === m.matchId ? 'song2' : null });
+    assert.equal((html.match(/Your pick<\/span>/g) || []).length, 1);
+    assert.ok(!groupCardHtml(v[1], { userChoice: () => null }).includes('Your pick</span>'));
+});
+
+test('caught up: said only when everything open is voted; names the next group when one is coming', () => {
+    const v = buildGroupViews(midway().ms);
+    assert.equal(caughtUpNote(v, { userChoice: () => null }), '');
+    const all = caughtUpNote(v, { userChoice: () => 'song1' }, Date.parse('2026-01-01T00:00:00Z'));
+    assert.ok(all.startsWith("You're all caught up.") && all.includes('Next group is not open yet'));
+    const timed = v.map(g => g.state === 'upcoming' ? { ...g, opens: Date.parse('2026-01-02T07:00:00Z') } : g);
+    assert.ok(caughtUpNote(timed, { userChoice: () => 'song1' }, Date.parse('2026-01-01T00:00:00Z')).includes('Next group opens in 31h'));
 });
 
 test('128 entrants: 32 cards, 6 match rows each', () => {
@@ -134,9 +172,20 @@ test('tabs: active tab, live count, knockout meta changes once built', () => {
     assert.ok(stageTabsHtml({ active: 'knockout', info: { ...info, knockoutBuilt: true }, groupViews: v }).includes('8 edits'));
 });
 
-test('knockout note names the first round and offers the groups tab', () => {
-    const html = knockoutNoteHtml(describeCup(midway().ms), 'Quarter-finals');
-    assert.ok(html.includes('4 groups (8 in all)') && html.includes('Quarter-finals') && html.includes('data-stage="groups"'));
+test('knockout skeleton: pairing rule with example, round ladder with match counts, no groups button', () => {
+    const info = describeCup(midway().ms);
+    const html = knockoutNoteHtml(info, { roundName: r => ({ 2: 'Quarter-finals', 3: 'Semi-finals', 4: 'Final' }[r]) });
+    assert.ok(html.includes('4 groups (8 in all)'));
+    assert.ok(html.includes('Winner of Group A') && html.includes('Runner-up of Group B') && html.includes('Runner-up of Group A'));
+    assert.ok(/Quarter-finals<\/span><span class="ko-step-n">4 matches/.test(html) && /Semi-finals<\/span><span class="ko-step-n">2 matches/.test(html) && /Final<\/span><span class="ko-step-n">1 match</.test(html));
+    assert.ok(!html.includes('data-stage="groups"') && !html.includes('See the groups'));
+    assert.ok(!html.includes('Groups close'));                                                   // no end times: no date claim
+    const now = Date.parse('2026-11-01T00:00:00Z');
+    assert.ok(knockoutNoteHtml(info, { closeAt: now + 12 * 86400000 - 1000, now }).includes('Groups close in 12 days'));
+    assert.equal(groupsCloseLabel(now + 3600000, now), 'Groups close today'); assert.equal(groupsCloseLabel(now - 1, now), '');
+    const ms = [{ stage: 'group', status: 'upcoming', endDate: '2026-11-05T00:00:00Z' }, { stage: 'group', status: 'live', endTime: '2026-11-09T00:00:00Z' }, { stage: 'group', status: 'completed', endDate: '2026-12-31T00:00:00Z' }, { stage: 'knockout', status: 'upcoming', endDate: '2027-01-01T00:00:00Z' }];
+    assert.equal(groupsCloseAt(ms), Date.parse('2026-11-09T00:00:00Z'));
+    assert.equal(groupsCloseAt([{ stage: 'group', status: 'upcoming' }]), null);
 });
 
 test('default tab: groups until the knockout has started', () => {
@@ -163,9 +212,9 @@ test('info panel: groups upcoming, live, between groups, finished', () => {
     const dated = p.matches.map(m => m.matchNumber === 1 ? { ...m, date: '2026-11-01' } : m);
     assert.equal(sum(dated).statusText, '📅 Group Stage Opens on 2026-11-01');
     const live = sum(midway().ms);
-    assert.equal(live.statusText, 'Group Stage - 6 Live Matches'); assert.equal(live.liveDot, true); assert.equal(live.statusClass, 'status-live');
+    assert.equal(live.statusText, '1 group live (6 matches)'); assert.equal(live.liveDot, true); assert.equal(live.statusClass, 'status-live');
     assert.equal(live.progress, '8 / 24 Group Matches');
-    const oneLive = sum(p.matches.map((m, i) => i === 0 ? { ...m, status: 'live' } : m)); assert.equal(oneLive.statusText, 'Group Stage - 1 Live Match');
+    const oneLive = sum(p.matches.map((m, i) => i === 0 ? { ...m, status: 'live' } : m)); assert.equal(oneLive.statusText, '1 group live (1 match)');
     const allDone = sum(p.matches.map(finish));
     assert.equal(allDone.statusText, '✅ Groups complete - knockout next'); assert.equal(allDone.progress, '24 / 24 Group Matches'); assert.notEqual(allDone.statusClass, 'status-completed');
 });
@@ -204,7 +253,7 @@ test('voted state: tick on the pick, other edit dimmed, VOTED tag, counter "n/6 
     assert.ok(html.includes('2/6 voted') && html.includes('You voted 2/6') && html.includes('data-voted="2"'));
     assert.equal((html.match(/gs-tag-voted/g) || []).length, 2);                   // two voted rows get the quiet tag
     assert.equal((html.match(/gs-tag-live/g) || []).length, 4);                    // the other four still say Vote
-    assert.equal((html.match(/gs-check/g) || []).length, 2);                       // one tick per voted match
+    assert.equal((html.match(/class="gs-check"/g) || []).length, 2);                // one tick per voted match
     assert.equal((html.match(/gs-dimmed/g) || []).length, 2);                      // the edit not picked is dimmed
     const row1 = html.split('<li').find(x => x.includes(id1));                     // picked song2: the second side carries the tick
     assert.ok(row1.indexOf('gs-picked') > row1.indexOf('gs-vs'));
@@ -227,7 +276,7 @@ test('voted state: voted in every open match reads as done; finished groups have
     assert.ok(!done.includes('gs-voted-note'));
     assert.equal((done.match(/gs-dimmed/g) || []).length, 0);                      // finished: no dimming, the winner is already marked
     assert.equal((done.match(/gs-win/g) || []).length, 6);
-    assert.equal((done.match(/gs-check/g) || []).length, 6);                       // the pick is still ticked
+    assert.equal((done.match(/class="gs-check"/g) || []).length, 6);                     // the pick is still ticked
     assert.ok(!groupCardHtml(v[3], { userChoice: () => null }).includes('gs-voted-note'));   // an upcoming group has nothing open: no note
 });
 

@@ -1,13 +1,15 @@
 // node tools/test-notification-prefs.mjs   (prefs + relationship-aware grouping)
 import assert from 'node:assert/strict';
-import { readNotificationPrefs, readToastStyle, TOAST_STYLES, shouldSaveSocial, shouldToastSocial } from '../js/notification-prefs.js';
+import { readFileSync } from 'node:fs';
+import * as prefs from '../js/notification-prefs.js';
+import { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } from '../js/notification-prefs.js';
 import { groupNotifications, groupHeadline, socialHeadline } from '../js/notification-model.js';
 let pass = 0; const t = (n, f) => { f(); console.log('  ok  ', n); pass++; };
 const store = o => ({ getItem: k => (k in o ? o[k] : null) });
 
-t('defaults: everyone, everyone, match alerts on', () => assert.deepEqual(readNotificationPrefs(store({})), { notifyFrom: 'everyone', toastFrom: 'everyone', matchAlerts: true }));
+t('defaults: everyone, everyone, match alerts on', () => assert.deepEqual(readNotificationPrefs(store({})), { notifyFrom: 'everyone', toastFrom: 'everyone', matchAlerts: true, rivalAlerts: true, popups: true, socialPopups: true, chatterPopups: true }));
 t('reads saved values, ignores junk', () => {
-    assert.deepEqual(readNotificationPrefs(store({ notifyFrom: 'following', toastFrom: 'off', matchAlerts: 'false' })), { notifyFrom: 'following', toastFrom: 'off', matchAlerts: false });
+    assert.deepEqual(readNotificationPrefs(store({ notifyFrom: 'following', toastFrom: 'off', matchAlerts: 'false' })), { notifyFrom: 'following', toastFrom: 'off', matchAlerts: false, rivalAlerts: true, popups: true, socialPopups: true, chatterPopups: true });
     assert.equal(readNotificationPrefs(store({ notifyFrom: 'banana' })).notifyFrom, 'everyone');
     assert.equal(readNotificationPrefs(null).notifyFrom, 'everyone');
 });
@@ -23,14 +25,15 @@ t('toast rule (never toasts what is not saved)', () => {
     assert.ok(!shouldToastSocial(p({ notifyFrom: 'following', toastFrom: 'everyone' }), false));
 });
 
-t('toast style: classic by default, saved choice kept, junk ignored', () => {
-    assert.deepEqual(TOAST_STYLES, ['classic', 'full', 'side', 'minimal']);
-    assert.equal(readToastStyle(store({})), 'classic');
-    assert.equal(readToastStyle(store({ toastStyle: 'full' })), 'full');
-    assert.equal(readToastStyle(store({ toastStyle: 'side' })), 'side');
-    assert.equal(readToastStyle(store({ toastStyle: 'minimal' })), 'minimal');
-    assert.equal(readToastStyle(store({ toastStyle: 'banana' })), 'classic');
-    assert.equal(readToastStyle(null), 'classic');
+t('one pop-up style: a toastStyle saved by an older version is ignored (no setting, no migration)', () => {
+    assert.equal(prefs.readToastStyle, undefined);
+    assert.equal(prefs.TOAST_STYLES, undefined);
+    const withStale = readNotificationPrefs(store({ toastStyle: 'full' }));
+    assert.deepEqual(withStale, readNotificationPrefs(store({})));
+    for (const f of ['js/settings-modal.js', 'js/notification-visuals.js', 'js/global-notifications.js', 'test-toasts.html']) {
+        const src = readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+        assert.ok(!/name="toastStyle"|readToastStyle|applyToastStyle|setCenteredSplash|data-toast-style="(classic|full|side)"/.test(src), f + ' still has the old style switch');
+    }
 });
 
 const n = (id, who, uid, match, rel, ts) => ({ id, triggerUsername: who, triggerUserId: uid, matchId: match, matchTitle: `T-${match}`, relationship: rel, type: 'live-activity', timestamp: ts });
@@ -60,3 +63,19 @@ t('non-social rows still group per person', () => {
     const g = groupNotifications(l, new Set()); assert.equal(g.length, 1); assert.equal(g[0].count, 2); assert.equal(groupHeadline(g[0]), null);
 });
 console.log(`${pass} passed`);
+
+// ---- rival mute ----
+{
+    const assert = (await import('node:assert/strict')).default;
+    const { readNotificationPrefs, shouldSaveSocial, shouldToastSocial } = await import('../js/notification-prefs.js');
+    const mem = o => ({ getItem: k => (k in o ? o[k] : null) });
+    assert.equal(readNotificationPrefs(mem({})).rivalAlerts, true);
+    const muted = readNotificationPrefs(mem({ rivalAlerts: 'false' }));
+    assert.equal(muted.rivalAlerts, false);
+    assert.equal(shouldSaveSocial(muted, true, false), false);     // voted against me: muted, even from someone I follow
+    assert.equal(shouldToastSocial(muted, true, false), false);
+    assert.equal(shouldSaveSocial(muted, true, true), true);       // voted with me: unaffected
+    assert.equal(shouldSaveSocial(muted, false, undefined), true); // not a vote alert: unaffected
+    assert.equal(shouldSaveSocial(readNotificationPrefs(mem({})), false, false), true);
+    console.log('  ok   rival mute only silences votes against me');
+}

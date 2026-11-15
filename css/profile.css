@@ -3031,3 +3031,8 @@
 .ach-progress span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #8c7340, #c8aa6e); }
 .ach-progress-text { margin-bottom: .75rem; color: rgba(240, 230, 210, 0.65); font-size: .8rem; }
 @media (max-width: 600px) { .ach-section-head { flex-wrap: wrap; } }
+
+/* a vote in a live match, seen by someone who has not voted in it: text only */
+.overview-section[hidden] { display: none; }
+.vote-card.locked .vote-locked-text { margin: .5rem 0 .75rem; color: var(--text, #f0e6d2); line-height: 1.5; }
+.vote-card.locked .vote-locked-text i { color: var(--pink-bright, #ff6ec7); margin-right: .35rem; }

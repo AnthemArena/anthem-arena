@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="robots" content="noindex, nofollow">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tournament Admin - Arcane Edits</title>
@@ -91,6 +92,21 @@
                 </div>
             </section>
 
+
+            <!-- Reports from the feed (js/moderation.js) -->
+            <section class="reports-queue" id="tidyPosts">
+                <h2>Tidy old vote posts</h2>
+                <p>Vote posts written before 14 November 2026 carry a line about how the match stood when the vote was cast ("TOO close!", "dominating at 72%") and the numbers behind it. This rewrites them to the plain "voted for X over Y" and removes those numbers. Safe to run more than once. Copies already sent to followers' feeds are not touched (the Feed shows the plain sentence anyway).</p>
+                <button type="button" id="tidyPostsBtn" class="btn btn-info">Tidy vote posts</button>
+                <p id="tidyPostsResult" role="status"></p>
+            </section>
+
+            <section class="reports-queue" id="reportsQueue">
+                <h2>Reports <span id="reportsCount" class="reports-count"></span></h2>
+                <p class="warning-text">Posts and comments that people have reported. Three reports hide an item from everyone but its author until you decide here.</p>
+                <button type="button" id="reportsRefresh" class="btn btn-info">Refresh</button>
+                <div id="reportsList" class="reports-list">Loading...</div>
+            </section>
 
             <!-- Match Management -->
             <section class="match-management">

@@ -21,6 +21,9 @@ export function reachedLabel(roundLabel) {
     return `Reached the ${roundLabel}`;
 }
 
+// "Group BH · Live" (the group is part of the badge, so a live edit says where it is playing); a knockout match uses its round name
+const liveLabel = m => m ? `${m.roundLabel || (m.group ? `Group ${m.group}` : 'Live now')}${m.roundLabel || m.group ? ' · Live' : ''}` : 'Live now';
+
 export function standingFor(edit, matches) {
     const mine = (matches || []).filter(m => inMatch(m, edit.id)).sort((a, b) => (a.round || 0) - (b.round || 0));
     if (!mine.length) return { kind: 'entered', label: 'Entered', wins: 0, losses: 0, reached: '', liveMatch: null };
@@ -35,12 +38,12 @@ export function standingFor(edit, matches) {
     const liveMatch = mine.find(m => m.status === 'live') || null;
     const last = mine[mine.length - 1];
     const reached = (liveMatch || last).roundLabel || '';
-    const base = { wins, losses, reached, liveMatch };
+    const groupMatch = mine.find(m => m.stage === 'group');
+    const base = { wins, losses, reached, liveMatch, group: groupMatch?.group ?? null, groupIndex: groupMatch?.groupIndex ?? null };
 
     if (champion) return { ...base, kind: 'champion', label: 'Champion', reached: 'Champion', liveMatch: null };
     if (knockoutLoss) return { ...base, kind: 'eliminated', label: reachedLabel(knockoutLoss.roundLabel), reached: knockoutLoss.roundLabel || '', liveMatch: null };
 
-    const groupMatch = mine.find(m => m.stage === 'group');
     if (groupMatch) {
         const inKnockout = mine.some(m => m.stage !== 'group');
         if (!inKnockout) {
@@ -50,10 +53,10 @@ export function standingFor(edit, matches) {
                 if (row.rank > 2) return { ...base, kind: 'eliminated', label: 'Group stage', reached: groupMatch.roundLabel || '', liveMatch: null };
                 if (!liveMatch) return { ...base, kind: 'bracket', label: 'Through to the knockout', liveMatch: null };
             }
-            if (liveMatch) return { ...base, kind: 'live', label: 'Live now' };
+            if (liveMatch) return { ...base, kind: 'live', label: liveLabel(liveMatch) };
             return { ...base, kind: 'bracket', label: groupMatch.roundLabel || 'In the groups', liveMatch: null };
         }
-        if (liveMatch) return { ...base, kind: 'live', label: 'Live now' };
+        if (liveMatch) return { ...base, kind: 'live', label: liveLabel(liveMatch) };
         return { ...base, kind: 'bracket', label: 'In the knockout', liveMatch: null };
     }
 
@@ -62,6 +65,6 @@ export function standingFor(edit, matches) {
         const lostIn = [...mine].reverse().find(m => m.status === 'completed' && winnerOf(m) && winnerOf(m) !== edit.id);
         return { ...base, kind: 'eliminated', label: reachedLabel(lostIn?.roundLabel), reached: lostIn?.roundLabel || '', liveMatch: null };
     }
-    if (liveMatch) return { ...base, kind: 'live', label: 'Live now' };
+    if (liveMatch) return { ...base, kind: 'live', label: liveLabel(liveMatch) };
     return { ...base, kind: 'bracket', label: 'In the bracket', liveMatch: null };
 }

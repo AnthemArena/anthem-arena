@@ -6,6 +6,7 @@
 import { doc, getDoc, updateDoc, arrayUnion } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { db } from './firebase-config.js';
 import { addXP } from './rank-system.js';
+import { FOUNDING_MEMBER_XP } from './founding-member-xp.js';
 import { checkForAchievementUnlocks } from './vote.js';
 import { recordProgress } from './vote-progress.js';
 
@@ -63,8 +64,8 @@ export async function awardFoundingMemberBadge(userId) {
     localStorage.setItem('foundingMemberXPBackfilled', 'true');
 
     // Award XP
-    const newXP = addXP(500, 'founding-member-achievement');
-    console.log(`✨ Awarded 500 XP for Founding Member! New total: ${newXP} XP`);
+    const newXP = addXP(FOUNDING_MEMBER_XP, 'founding-member-achievement');
+    console.log(`✨ Awarded ${FOUNDING_MEMBER_XP} XP for Founding Member! New total: ${newXP} XP`);
 
     // Sync to Firebase
     if (userId) {
@@ -91,10 +92,10 @@ export async function awardFoundingMemberBadge(userId) {
     }
 
     // During a vote the post-vote modal lists it instead of a toast over the modal (js/vote-progress.js)
-    const captured = recordProgress({ type: 'achievement', id: FOUNDING_MEMBER_ACHIEVEMENT_ID, name: 'Founding Member', icon: '👑', xp: 500, rarity: 'legendary' });
+    const captured = recordProgress({ type: 'achievement', id: FOUNDING_MEMBER_ACHIEVEMENT_ID, name: 'Founding Member', icon: '👑', xp: FOUNDING_MEMBER_XP, rarity: 'legendary' });
     if (captured) {
       import('./achievement-tracker.js').then(({ saveAchievementToBell }) => saveAchievementToBell({
-        id: FOUNDING_MEMBER_ACHIEVEMENT_ID, name: 'Founding Member', description: 'One of the first 1,000 voters', xp: 500, rarity: 'legendary'
+        id: FOUNDING_MEMBER_ACHIEVEMENT_ID, name: 'Founding Member', description: 'One of the first 1,000 voters', xp: FOUNDING_MEMBER_XP, rarity: 'legendary'
       })).catch(() => {});
     }
 
@@ -102,15 +103,18 @@ export async function awardFoundingMemberBadge(userId) {
     if (!captured && typeof window !== 'undefined' && window.showBulletin) {
       setTimeout(() => {
         const voiced = window.championLoader?.getAchievementMessage(FOUNDING_MEMBER_ACHIEVEMENT_ID, {
-          name: 'Founding Member', description: 'One of the first 1,000 voters', xp: 500, rarity: 'legendary'
+          name: 'Founding Member', description: 'One of the first 1,000 voters', xp: FOUNDING_MEMBER_XP, rarity: 'legendary'
         });
         window.showBulletin({
           priority: 1,
           type: 'achievement',
           matchId: FOUNDING_MEMBER_ACHIEVEMENT_ID,
           achievementName: 'Founding Member',
+          description: 'One of the first 1,000 voters',
+          xp: FOUNDING_MEMBER_XP,
+          rarity: 'legendary',
           message: voiced?.message || '👑 Founding Member Unlocked!',
-          detail: voiced?.detail || 'You\'re part of the first 1,000 voters - this badge is yours forever! +500 XP',
+          detail: voiced?.detail || 'You\'re part of the first 1,000 voters - this badge is yours forever! +' + FOUNDING_MEMBER_XP + ' XP',
           cta: voiced?.cta || 'View Badge',
           action: 'navigate',
           targetUrl: '/profile#achievements'
@@ -173,9 +177,9 @@ export async function backfillFoundingMemberXP() {
   const xpBackfilled = localStorage.getItem('foundingMemberXPBackfilled') === 'true';
 
   if (hasBadge && !xpBackfilled) {
-    const newXP = addXP(500, 'founding-member-achievement');
+    const newXP = addXP(FOUNDING_MEMBER_XP, 'founding-member-achievement');
     localStorage.setItem('foundingMemberXPBackfilled', 'true');
-    console.log(`✨ Backfilled 500 XP! New total: ${newXP} XP`);
+    console.log(`✨ Backfilled ${FOUNDING_MEMBER_XP} XP! New total: ${newXP} XP`);
 
     // Older awards never reached the Firestore profile, so save the badge now.
     try {
@@ -194,7 +198,7 @@ export async function backfillFoundingMemberXP() {
         priority: 1,
         type: 'achievement',
         message: '✨ Founding Member Bonus!',
-        detail: 'You received 500 XP for being a Founding Member!',
+        detail: `You received ${FOUNDING_MEMBER_XP} XP for being a Founding Member!`,
         duration: 4000
       });
     }

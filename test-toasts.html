@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="robots" content="noindex, nofollow">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎪 Toast Testing Suite - Arcane Moments</title>
@@ -301,11 +302,6 @@
         <h3>Skins</h3>
         <label><input type="checkbox" id="unlockAllSkins"> Unlock every skin for testing (this browser only, switch it off when you are done)</label>
         <div class="skin-grid" id="skinGrid"></div>
-        <div style="margin:10px 0 4px"><strong>Pop-up style:</strong>
-            <label><input type="radio" name="tsStyle" value="classic"> Classic</label>
-            <label><input type="radio" name="tsStyle" value="full"> Full art</label>
-            <label><input type="radio" name="tsStyle" value="side"> Side art</label>
-            <label><input type="radio" name="tsStyle" value="minimal"> Minimal</label></div>
         <div class="skin-status" id="skinStatus"></div>
     </div>
     
@@ -564,13 +560,6 @@
     <script type="module">
         import { SKIN_UNLOCKS } from '/js/champion-unlocks.js';
         import { lookSkin, saveLook, TEST_UNLOCK_KEY } from '/js/companion-look.js';
-        import { readToastStyle } from '/js/notification-prefs.js';
-        import { applyToastStyle } from '/js/notification-visuals.js';
-        document.querySelectorAll('input[name=tsStyle]').forEach(r => {
-            r.checked = r.value === readToastStyle();
-            r.addEventListener('change', () => { try { localStorage.setItem('toastStyle', r.value); } catch { /* storage blocked */ } applyToastStyle(r.value); });
-        });
-        import { voiceSetFor } from '/js/champion-voice.js';
         import { getChampionTileUrl, getChampionSplashUrl } from '/js/arcane-config.js';
 
         const esc = x => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -585,12 +574,11 @@
             const pack = window.championLoader?.getCurrentPack();
             const worn = lookSkin({ id: packId }, localStorage);
             const cid = SKIN_UNLOCKS[packId].championId;
-            const voice = voiceSetFor(packId, wanted);
             const el = document.getElementById('skinStatus');
             const locked = worn !== wanted;
             el.innerHTML = `<img src="${esc(getChampionSplashUrl(cid, worn))}" alt="">
                 <div><strong>${esc(window.skinNameFor(packId, wanted))}</strong> (skin ${wanted})<br>
-                Voice: <strong>${esc(voice || 'base pack (' + packId + '.json)')}</strong>${pack?.voiceSet === (voice || undefined) ? '' : ' <span class="warn">(loaded pack reports ' + esc(pack?.voiceSet || 'base') + ')</span>'}<br>
+                Voice: <strong>the champion's own (every skin speaks the same)</strong><br>
                 Alerts use: <strong>${esc(window.skinNameFor(packId, worn))}</strong> (skin ${worn})${locked ? ' <span class="warn">Locked in this browser, so the alerts fall back. Tick the box above to try it anyway.</span>' : ''}</div>`;
         }
 

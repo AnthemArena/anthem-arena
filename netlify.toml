@@ -69,6 +69,18 @@
 # HEADERS - CRITICAL FIX
 # ========================================
 
+# ========================================
+# SECURITY HEADERS (every page and file)
+# ========================================
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+
 [[headers]]
   for = "/api/*"
   [headers.values]
@@ -142,11 +154,20 @@
   to = "/profile.html?user=:username"
   status = 200
 
-# Activity and Feed routes
+# The Activity page was merged into the Feed (the Feed already lists votes, with the pick hidden until you vote)
 [[redirects]]
   from = "/activity"
-  to = "/activity.html"
-  status = 200
+  to = "/feed"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/activity.html"
+  to = "/feed"
+  status = 301
+  force = true
+
+# Feed route
 
 [[redirects]]
   from = "/feed"
@@ -195,6 +216,68 @@
   from = "/profile"
   to = "/profile.html"
   status = 200
+
+# The site is published from the repository root, so these project files would otherwise be downloadable. They are not
+# part of the site: answer 404 instead (force = true so the catch-all below never serves the home page for them).
+[[redirects]]
+  from = "/docs/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/tools/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/netlify/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/node_modules/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/netlify.toml"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/firestore.rules"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/package.json"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/package-lock.json"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/deno.lock"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/README.md"
+  to = "/404.html"
+  status = 404
+  force = true
 
 # ========================================
 # CATCH-ALL - MUST BE LAST
