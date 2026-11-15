@@ -97,7 +97,7 @@ with sync_playwright() as p:
     tab(pg, 'posts')
     po = txt(pg, '#allUserPosts')
     import re
-    check('Posts tab: only typed posts (no auto vote entries, nothing from live matches)', 'my own typed words' in po and 'voted for' not in po and 'voted in a live match' not in po and not any(n in po for m in (L1, L2) for n in names(m)), po[:300])
+    check('Posts tab: only typed posts (no auto vote entries, nothing from live matches)', 'my own typed words' in po and 'voted for' not in po and 'voted in ' not in po and not any(n in po for m in (L1, L2) for n in names(m)), po[:300])
     check('Posts count counts typed posts only', txt(pg, '#postsCount').strip() == '1', txt(pg, '#postsCount'))
     check('no JS errors', not real(errs), real(errs))
     pg.screenshot(path=f'{SHOTS}/visitor.png', full_page=True)

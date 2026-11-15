@@ -26,7 +26,7 @@ import { followUser, unfollowUser, isFollowing } from './follow-system.js';
 import { isHidden as isModeratedHidden, allowedToSend, openReportDialog, openBlockDialog, openBlockedList, getBlocked } from './moderation.js';
 import { blockedEntries } from './moderation-model.js';
 import { shortTitle } from './title-clean.js';
-import { votePostText, votePostParts } from './vote-post-text.js';
+import { votePostText, votePostParts, lockedVoteNames } from './vote-post-text.js';
 
 import { getActivityFeed, getAllMatches } from './api-client.js';
 
@@ -1178,7 +1178,7 @@ function renderPostContent(post) {
         const vp = votePostParts({ votedName: votedMomentName, opponentName: opponentMomentName });
         const voteLineHtml = showResults
             ? `${vp.lead} <strong>${escapeHtml(vp.voted)}</strong> ${vp.joiner} <span class="vote-opponent">${escapeHtml(vp.opponent)}</span>`
-            : `voted in a live match <span class="vote-locked-note">Vote in it to see who they picked.</span>`;
+            : `voted in ${lockedVoteNames(post, n => shortTitle(n, 60)).map(n => `<strong>${escapeHtml(n)}</strong>`).join(' vs ')} <span class="vote-locked-note">Vote in it to see who they picked.</span>`;
         // The two edits as small pictures. While results are locked the order must not say which was picked (the picked one used to
         // always come first), so it follows the video id instead; once results are visible the pick is first and ringed.
         const thumbs = [

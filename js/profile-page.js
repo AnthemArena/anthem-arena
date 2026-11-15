@@ -26,7 +26,7 @@ import { buildAchievementsView, renderAchievementsHtml } from './achievements-vi
 import { achievementVote } from './vote-facts.js';
 import { ARCANE_CONFIG, ddragonUrl, getCompanionPack } from './arcane-config.js';
 import { tidyNames, shortTitle } from './title-clean.js';
-import { votePostText } from './vote-post-text.js';
+import { votePostText, lockedVoteNames } from './vote-post-text.js';
 import { cupDisplayName } from './bracket-builder.js';
 import { arrangeVotes, lockedLabel, backedMost, voteLocked, matchLabel, lockedVoteText, isClosed } from './profile-visibility.js';
 import { hasSeed, renderOwnerInsights } from './profile-insights.js';
@@ -2845,7 +2845,7 @@ function renderPostContent(post) {
         if (post.matchId && liveMatchIds.has(post.matchId) && post.userId !== me && !viewerHasVoted(post.matchId)) {
             return `
             <p class="post-text vote-text">
-                <i class="fa-solid fa-lock"></i> voted in a live match. Vote in it to see who they picked.
+                <i class="fa-solid fa-lock"></i> voted in ${lockedVoteNames(post, name => shortTitle(name, 60)).map(n => `<strong>${escapeHtml(n)}</strong>`).join(' vs ')}. Vote in it to see who they picked.
             </p>`;
         }
         // one neutral sentence, rebuilt from the names (js/vote-post-text.js): older posts saved a line about how the match stood

@@ -1,6 +1,15 @@
 import fs from 'node:fs';
+import { lockedVoteNames } from '../js/vote-post-text.js';
 import { mixFeed, digestSummary, digestWho, rankTrending, findPostById, extractMentions, resultsVisible, RUN_MIN } from '../js/feed-mix-model.js';
 let pass = 0, fail = 0;
+{
+    // a locked vote post names both edits, and the order never depends on which one was picked
+    const mk = (votedId, oppId) => ({ votedMomentId: votedId, votedMomentName: 'Name ' + votedId, opponentMomentId: oppId, opponentMomentName: 'Name ' + oppId });
+    const x = lockedVoteNames(mk('aaa', 'zzz')), y = lockedVoteNames(mk('zzz', 'aaa'));
+    console.log(`  ${x.join() === y.join() && x.length === 2 ? 'ok ' : 'FAIL'} locked vote line: same order whichever edit was picked`);
+    if (!(x.join() === y.join() && x.length === 2)) process.exitCode = 1;
+    console.log(`  ${lockedVoteNames({ votedMomentName: 'Only' }).join() === 'Only' ? 'ok ' : 'FAIL'} locked vote line: a post with no opponent name still reads`);
+}
 const t = (n, ok) => { console.log(`  ${ok ? 'ok ' : 'FAIL'} ${n}`); ok ? pass++ : fail++; };
 const vote = (i, u = 'u' + i) => ({ type: 'vote', postId: 'v' + i, username: u, timestamp: 1000 - i });
 const post = (i, ts) => ({ type: 'text', postId: 'p' + i, username: 'w', timestamp: ts });
@@ -48,7 +57,7 @@ t('trending: includes vote posts', r.some(x => x.type === 'vote'));
         && resultsVisible({ status: 'completed' }) === true && resultsVisible({ status: null }) === true);
     t('feed vote card hides the split and the bar when results are locked', /showResults \? `<div class="vote-split"/.test(src));
     t('feed vote row shows both edits as thumbnails; while results are locked their order ignores the pick and nothing is ringed', /const thumbs = \[/.test(src) && /if \(!showResults\) thumbs\.sort\(/.test(src) && /showResults && t\.picked \? ' picked'/.test(src));
-    t('feed vote row does not say who was picked while results are locked', /: `voted in a live match <span class="vote-locked-note">/.test(src));
+    t('feed vote row does not say who was picked while results are locked', /: `voted in \$\{lockedVoteNames\(post/.test(src) && /vote-locked-note/.test(src));
     { const prof = fs.readFileSync(new URL('../js/profile-page.js', import.meta.url), 'utf8'); t('profile vote posts by others in a live match do not say who was picked until the viewer has voted', /liveMatchIds\.has\(post\.matchId\) && post\.userId !== me && !viewerHasVoted\(post\.matchId\)/.test(prof)); }
     t('stored vote posts get the live split and match state in every tab (one source for the same match)', !/[^e]getFeed\('(all|following)'/.test(src.replace(/const getFeedLive[^\n]*/, '')) && /async function refreshVoteSplits/.test(src));
     t('the Post button has exactly one click handler (two used to create every post twice)', (src.match(/submitBtn\.addEventListener\('click'/g) || []).length === 1);

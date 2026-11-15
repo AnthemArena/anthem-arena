@@ -13,3 +13,12 @@ export function votePostText(post, tidy = s => s) {
     const p = votePostParts({ votedName: voted, opponentName: opponent });
     return opponent ? `${p.lead} ${p.voted} ${p.joiner} ${p.opponent}` : `${p.lead} ${p.voted}`;
 }
+
+// While a live match is hidden from the viewer, a vote post names the two edits but not the pick. The order must not give the
+// pick away (the picked edit is stored first), so it follows the video id instead. Returns [first, second] names.
+export function lockedVoteNames(post, tidy = s => s) {
+    const a = { id: post?.votedMomentId || post?.votedSongId || '', name: tidy(post?.votedMomentName || post?.votedSongName || post?.songTitle || '') || 'an edit' };
+    const b = { id: post?.opponentMomentId || post?.opponentSongId || '', name: tidy(post?.opponentMomentName || post?.opponentSongName || '') };
+    if (!b.name) return [a.name];
+    return [a, b].sort((x, y) => String(x.id || x.name).localeCompare(String(y.id || y.name))).map(e => e.name);
+}
