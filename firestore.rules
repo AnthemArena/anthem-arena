@@ -471,6 +471,14 @@ service cloud.firestore {
     }
 
     // ---------------------------------------------------------------------
+    // Discover new edits (admin.html). Videos the admin chose to ignore.
+    // ---------------------------------------------------------------------
+
+    match /discover-ignored/{videoId} {
+      allow read, write: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
     // Everything else stays locked, on purpose:
     //  - matchViews: written by the Netlify edge function with no sign-in.
     //    Opening it would let anyone write to it. Needs a different design.

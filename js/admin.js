@@ -9,6 +9,7 @@ import { allGroupStandings } from './group-builder.js';
 import { deadlineInfo } from './vote-closed.js';
 import { groupReports, reasonSummary } from './moderation-model.js';
 import { votePostText } from './vote-post-text.js';
+import './admin-discover.js';
 
 import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField, query, where, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';

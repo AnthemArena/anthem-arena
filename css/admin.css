@@ -350,3 +350,12 @@ body.theme-arcane.page-admin .status-badge.completed, .status-completed { border
 .report-meta { color: var(--muted, #aaa); font-size: .88rem; }
 .report-text { margin: .6rem 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .report-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+/* Discover new edits */
+.discover-list { display: flex; flex-direction: column; gap: 10px; margin: 10px 0 18px; }
+.discover-card { display: flex; gap: 12px; align-items: flex-start; }
+.discover-card img { width: 160px; height: 90px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: #222; }
+.discover-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.discover-title { font-weight: 600; overflow-wrap: anywhere; }
+.discover-info .btn { align-self: flex-start; }
+@media (max-width: 520px) { .discover-card img { width: 120px; height: 68px; } }
