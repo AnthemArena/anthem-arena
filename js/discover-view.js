@@ -3,7 +3,8 @@
 //
 // "Ignore" is per champion: "Not for Jinx" hides the video from the Jinx list only, so a Jinx + Ekko edit can still be
 // picked up for an Ekko cup. The document id is "<champion>_<videoId>". An older document with the bare video id (made
-// before ignores were per champion) still hides the video everywhere.
+// before ignores were per champion) hides the video everywhere: that is "Ignore everywhere", for edits that are not
+// about any of our champions at all.
 
 export const ignoreKey = (ruleId, videoId) => `${ruleId}_${videoId}`;
 export const isIgnored = (ignored, ruleId, videoId) => ignored.has(ignoreKey(ruleId, videoId)) || ignored.has(videoId);
@@ -27,6 +28,13 @@ export function importerText(groups, ignored, ruleId) {
     return [...buckets].map(([h, urls]) => `#${h}\n${urls.join('\n')}\n`).join('\n');
 }
 
-// Everything hidden, as [{ ruleId, label, candidate }], for the "Show ignored" list.
-export const ignoredList = (groups, ignored) =>
-    groups.flatMap(g => g.candidates.filter(c => isIgnored(ignored, g.id, c.videoId)).map(c => ({ ruleId: g.id, label: g.label, candidate: c })));
+// Everything hidden, for the "Show ignored" list: one row per video ignored everywhere (ruleId '*'), plus one row per
+// champion it is hidden for otherwise.
+export function ignoredList(groups, ignored) {
+    const rows = [], seenAll = new Set();
+    for (const g of groups) for (const c of g.candidates) {
+        if (ignored.has(c.videoId)) { if (!seenAll.has(c.videoId)) { seenAll.add(c.videoId); rows.push({ ruleId: '*', label: 'everywhere', group: g, candidate: c }); } }
+        else if (ignored.has(ignoreKey(g.id, c.videoId))) rows.push({ ruleId: g.id, label: g.label, group: g, candidate: c });
+    }
+    return rows;
+}

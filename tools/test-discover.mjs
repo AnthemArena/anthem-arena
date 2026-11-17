@@ -96,9 +96,9 @@ t('every heading it can produce is understood by the importer', () => {
     assert.equal(charactersFromHeading(all).length, DISCOVER_RULES.length);
     assert.equal(importerText(mkGroups(), new Map([[ignoreKey('jinx', 'SOLO'), {}], [ignoreKey('jinx', 'BOTH'), {}]]), 'jinx'), '');
 });
-t('the ignored list says which champion each hide is for', () => {
-    const l = ignoredList(mkGroups(), new Map([[ignoreKey('jinx', 'BOTH'), {}]]));
-    assert.deepEqual(l.map(x => x.ruleId + ':' + x.candidate.videoId), ['jinx:BOTH']);
+t('the ignored list says which champion each hide is for, and lists an ignore-everywhere video once', () => {
+    const l = ignoredList(mkGroups(), new Map([[ignoreKey('jinx', 'SOLO'), {}], ['BOTH', {}]]));
+    assert.deepEqual(l.map(x => x.ruleId + ':' + x.candidate.videoId), ['jinx:SOLO', '*:BOTH']);
 });
 t('all-time results are ordered by views', () => {
     const out = buildCandidates([vid('a', 'Jinx edit', { snippet: { publishedAt: '2026-11-12T00:00:00Z' } }), Object.assign(vid('b', 'Jinx edit', { snippet: { publishedAt: '2024-01-01T00:00:00Z' } }), { statistics: { viewCount: '9000' } })], DISCOVER_RULES, new Set(), {}, 'views');

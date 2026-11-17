@@ -358,4 +358,5 @@ body.theme-arcane.page-admin .status-badge.completed, .status-completed { border
 .discover-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .discover-title { font-weight: 600; overflow-wrap: anywhere; }
 .discover-info .btn { align-self: flex-start; }
+.discover-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 @media (max-width: 520px) { .discover-card img { width: 120px; height: 68px; } }

@@ -21,7 +21,7 @@ function quotaToday(add = 0) {
 }
 const quotaNote = () => `Quota used from this browser today: about ${quotaToday().toLocaleString('en-GB')} of 10,000.`;
 
-function card(c, g, restore) {
+function card(c, g, restore, scope = g.id) {
     const date = c.published ? new Date(c.published).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
     const also = championsFor(groups, ignored, c.videoId).filter(x => x.id !== g.id).map(x => x.label);
     return `<div class="discover-card" data-id="${esc(c.videoId)}">
@@ -29,7 +29,10 @@ function card(c, g, restore) {
         <div class="discover-info">
             <a href="${esc(c.url)}" target="_blank" rel="noopener" class="discover-title">${esc(c.title)}</a>
             <small>${esc(c.channel)} · ${esc(date)} · ${c.views.toLocaleString('en-GB')} views · ${c.seconds}s${c.arcane ? ' · <strong>mentions Arcane</strong>' : ''}${also.length && !restore ? ` · <strong>Also: ${esc(also.join(', '))}</strong>` : ''}</small>
-            <button type="button" class="btn ${restore ? 'discover-restore' : 'discover-ignore'}" data-id="${esc(c.videoId)}" data-rule="${esc(g.id)}">${restore ? `Restore for ${esc(g.label)}` : `Not for ${esc(g.label)}`}</button>
+            ${restore
+                ? `<button type="button" class="btn discover-restore" data-id="${esc(c.videoId)}" data-rule="${esc(scope)}">${scope === '*' ? 'Restore everywhere' : `Restore for ${esc(g.label)}`}</button>`
+                : `<span class="discover-actions"><button type="button" class="btn discover-ignore" data-id="${esc(c.videoId)}" data-rule="${esc(g.id)}">Not for ${esc(g.label)}</button>
+                   <button type="button" class="btn discover-ignore" data-id="${esc(c.videoId)}" data-rule="*" title="Not about any of our champions: hide it for every champion">Ignore everywhere</button></span>`}
         </div></div>`;
 }
 
@@ -44,7 +47,7 @@ function render() {
     const hidden = ignoredList(groups, ignored);
     $('discoverIgnoredToggle').textContent = `${showIgnored ? 'Hide' : 'Show'} ignored (${hidden.length})`;
     $('discoverIgnoredToggle').style.display = hidden.length ? '' : 'none';
-    $('discoverIgnored').innerHTML = showIgnored ? hidden.map(h => card(h.candidate, groups.find(g => g.id === h.ruleId), true)).join('') : '';
+    $('discoverIgnored').innerHTML = showIgnored ? hidden.map(h => card(h.candidate, h.group, true, h.ruleId)).join('') : '';
 }
 
 async function search() {
@@ -80,14 +83,12 @@ $('discover')?.addEventListener('click', async e => {
     try {
         if (ig) {
             const c = groups.flatMap(g => g.candidates).find(x => x.videoId === ig.dataset.id);
-            const key = ignoreKey(ig.dataset.rule, ig.dataset.id);
+            const key = ig.dataset.rule === '*' ? ig.dataset.id : ignoreKey(ig.dataset.rule, ig.dataset.id);   // '*' = everywhere (the bare video id)
             await setDoc(doc(db, 'discover-ignored', key), { videoId: ig.dataset.id, ruleId: ig.dataset.rule, title: c?.title || '', at: Date.now() });
             ignored.set(key, {}); render();
         } else if (re) {
-            // an older, global ignore (bare video id) is removed too, or the video would stay hidden
-            for (const key of [ignoreKey(re.dataset.rule, re.dataset.id), re.dataset.id]) {
-                if (ignored.has(key)) { await deleteDoc(doc(db, 'discover-ignored', key)); ignored.delete(key); }
-            }
+            const key = re.dataset.rule === '*' ? re.dataset.id : ignoreKey(re.dataset.rule, re.dataset.id);
+            await deleteDoc(doc(db, 'discover-ignored', key)); ignored.delete(key);
             render();
         } else if (more) {
             const g = groups.find(x => x.id === more.dataset.group);
