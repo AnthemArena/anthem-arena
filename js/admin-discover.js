@@ -1,9 +1,10 @@
 // Admin "Discover new edits": asks the discover-edits function for new YouTube Shorts that match the champion rules
 // (netlify/shared/discover-model.js), and shows the ones that are not already in data/edits.json.
-// "Ignore" is remembered in Firestore (discover-ignored, admin only). Adding is done with the importer: copy the links
-// into data/edit-urls.txt and run tools/edits-import.js, as for any other edit.
+// "Not for <champion>" is remembered in Firestore (discover-ignored, admin only), per champion (js/discover-view.js).
+// Adding is done with the importer: copy the links into data/edit-urls.txt and run tools/edits-import.js, as for any other edit.
 import { db, auth } from './firebase-config.js';
 import { collection, getDocs, doc, setDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { ignoreKey, visibleFor, championsFor, importerText, ignoredList } from './discover-view.js';
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const $ = id => document.getElementById(id);
@@ -12,40 +13,38 @@ let groups = [], ignored = new Map(), showIgnored = false, searchDays = 14;
 // Quota used today by this browser (YouTube resets at midnight Pacific time; this is a guide, not the real meter).
 const quotaKey = () => 'discoverQuota_' + new Date().toISOString().slice(0, 10);
 function quotaToday(add = 0) {
-    let n = 0;
-    try { n = (+localStorage.getItem(quotaKey())) + add; if (add) localStorage.setItem(quotaKey(), String(n)); else n = +localStorage.getItem(quotaKey()) || 0; } catch { /* storage blocked */ }
-    return n;
+    try {
+        const n = (+localStorage.getItem(quotaKey()) || 0) + add;
+        if (add) localStorage.setItem(quotaKey(), String(n));
+        return n;
+    } catch { return 0; }   // storage blocked
 }
 const quotaNote = () => `Quota used from this browser today: about ${quotaToday().toLocaleString('en-GB')} of 10,000.`;
 
-const importerBlock = (id, list) => list.length ? `#${id}\n${list.map(c => c.url).join('\n')}\n` : '';
-const visible = g => g.candidates.filter(c => !ignored.has(c.videoId));
-
-function card(c, isIgnored) {
+function card(c, g, restore) {
     const date = c.published ? new Date(c.published).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
+    const also = championsFor(groups, ignored, c.videoId).filter(x => x.id !== g.id).map(x => x.label);
     return `<div class="discover-card" data-id="${esc(c.videoId)}">
         <a href="${esc(c.url)}" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/${esc(c.videoId)}/mqdefault.jpg" alt="" loading="lazy" width="160" height="90"></a>
         <div class="discover-info">
             <a href="${esc(c.url)}" target="_blank" rel="noopener" class="discover-title">${esc(c.title)}</a>
-            <small>${esc(c.channel)} · ${esc(date)} · ${c.views.toLocaleString('en-GB')} views · ${c.seconds}s${c.arcane ? ' · <strong>mentions Arcane</strong>' : ''}</small>
-            <button type="button" class="btn ${isIgnored ? 'discover-restore' : 'discover-ignore'}" data-id="${esc(c.videoId)}">${isIgnored ? 'Restore' : 'Ignore'}</button>
+            <small>${esc(c.channel)} · ${esc(date)} · ${c.views.toLocaleString('en-GB')} views · ${c.seconds}s${c.arcane ? ' · <strong>mentions Arcane</strong>' : ''}${also.length && !restore ? ` · <strong>Also: ${esc(also.join(', '))}</strong>` : ''}</small>
+            <button type="button" class="btn ${restore ? 'discover-restore' : 'discover-ignore'}" data-id="${esc(c.videoId)}" data-rule="${esc(g.id)}">${restore ? `Restore for ${esc(g.label)}` : `Not for ${esc(g.label)}`}</button>
         </div></div>`;
 }
 
 function render() {
-    const out = $('discoverResults');
-    out.innerHTML = groups.map(g => {
-        const list = visible(g);
+    $('discoverResults').innerHTML = groups.map(g => {
+        const list = visibleFor(groups, ignored, g.id);
         return `<h3>${esc(g.label)} (${list.length})</h3>
             ${list.length ? `<button type="button" class="btn btn-info discover-copy" data-group="${esc(g.id)}">Copy ${list.length} link${list.length === 1 ? '' : 's'} for edit-urls.txt</button>` : '<p>Nothing new.</p>'}
-            <div class="discover-list">${list.map(c => card(c, false)).join('')}</div>
+            <div class="discover-list">${list.map(c => card(c, g, false)).join('')}</div>
             ${g.more ? `<button type="button" class="btn discover-more" data-group="${esc(g.id)}">Load more ${esc(g.label)} (about 300 quota)</button>` : ''}`;
     }).join('');
-    const ignoredHere = groups.flatMap(g => g.candidates.filter(c => ignored.has(c.videoId)));
-    const unique = [...new Map(ignoredHere.map(c => [c.videoId, c])).values()];
-    $('discoverIgnoredToggle').textContent = `${showIgnored ? 'Hide' : 'Show'} ignored (${unique.length})`;
-    $('discoverIgnoredToggle').style.display = unique.length ? '' : 'none';
-    $('discoverIgnored').innerHTML = showIgnored ? unique.map(c => card(c, true)).join('') : '';
+    const hidden = ignoredList(groups, ignored);
+    $('discoverIgnoredToggle').textContent = `${showIgnored ? 'Hide' : 'Show'} ignored (${hidden.length})`;
+    $('discoverIgnoredToggle').style.display = hidden.length ? '' : 'none';
+    $('discoverIgnored').innerHTML = showIgnored ? hidden.map(h => card(h.candidate, groups.find(g => g.id === h.ruleId), true)).join('') : '';
 }
 
 async function search() {
@@ -77,24 +76,28 @@ async function search() {
 $('discoverBtn')?.addEventListener('click', search);
 $('discoverIgnoredToggle')?.addEventListener('click', () => { showIgnored = !showIgnored; render(); });
 $('discover')?.addEventListener('click', async e => {
-    const ig = e.target.closest('.discover-ignore'), re = e.target.closest('.discover-restore'), cp = e.target.closest('.discover-copy');
+    const ig = e.target.closest('.discover-ignore'), re = e.target.closest('.discover-restore'), cp = e.target.closest('.discover-copy'), more = e.target.closest('.discover-more');
     try {
         if (ig) {
             const c = groups.flatMap(g => g.candidates).find(x => x.videoId === ig.dataset.id);
-            await setDoc(doc(db, 'discover-ignored', ig.dataset.id), { videoId: ig.dataset.id, title: c?.title || '', at: Date.now() });
-            ignored.set(ig.dataset.id, {}); render();
+            const key = ignoreKey(ig.dataset.rule, ig.dataset.id);
+            await setDoc(doc(db, 'discover-ignored', key), { videoId: ig.dataset.id, ruleId: ig.dataset.rule, title: c?.title || '', at: Date.now() });
+            ignored.set(key, {}); render();
         } else if (re) {
-            await deleteDoc(doc(db, 'discover-ignored', re.dataset.id));
-            ignored.delete(re.dataset.id); render();
-        } else if (e.target.closest('.discover-more')) {
-            const btn = e.target.closest('.discover-more'), g = groups.find(x => x.id === btn.dataset.group);
-            btn.disabled = true; btn.textContent = 'Loading...';
+            // an older, global ignore (bare video id) is removed too, or the video would stay hidden
+            for (const key of [ignoreKey(re.dataset.rule, re.dataset.id), re.dataset.id]) {
+                if (ignored.has(key)) { await deleteDoc(doc(db, 'discover-ignored', key)); ignored.delete(key); }
+            }
+            render();
+        } else if (more) {
+            const g = groups.find(x => x.id === more.dataset.group);
+            more.disabled = true; more.textContent = 'Loading...';
             const res = await fetch('/.netlify/functions/discover-edits', {
                 method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await auth.currentUser.getIdToken()}` },
                 body: JSON.stringify({ days: searchDays, ruleId: g.id, tokens: g.tokens })
             });
             const body = await res.json().catch(() => ({}));
-            if (!res.ok) { btn.disabled = false; btn.textContent = 'Load more'; throw new Error(body.error || `Request failed (${res.status})`); }
+            if (!res.ok) { more.disabled = false; more.textContent = 'Load more'; throw new Error(body.error || `Request failed (${res.status})`); }
             quotaToday(body.quotaUsed);
             const add = body.groups[0], have = new Set(g.candidates.map(c => c.videoId));
             g.candidates.push(...add.candidates.filter(c => !have.has(c.videoId)));
@@ -102,8 +105,7 @@ $('discover')?.addEventListener('click', async e => {
             $('discoverStatus').textContent = `Loaded ${add.candidates.length} more ${g.label} (${body.quotaUsed} quota). ${quotaNote()}`;
             render();
         } else if (cp) {
-            const g = groups.find(x => x.id === cp.dataset.group);
-            await navigator.clipboard.writeText(importerBlock(g.id, visible(g)));
+            await navigator.clipboard.writeText(importerText(groups, ignored, cp.dataset.group));
             cp.textContent = 'Copied. Paste into data/edit-urls.txt';
         }
     } catch (err) {

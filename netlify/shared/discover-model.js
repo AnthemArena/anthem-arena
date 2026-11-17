@@ -74,11 +74,6 @@ export function buildCandidates(items, rules, known, searchedBy = {}, sortBy = '
     return out;
 }
 
-// Text for data/edit-urls.txt: a heading line, then one link per line.
-export function importerBlock(ruleId, candidates) {
-    return candidates.length ? `#${ruleId}\n${candidates.map(c => c.url).join('\n')}\n` : '';
-}
-
 // days: 1-365 = that many days back. 0 = no date limit (the whole back catalogue, most viewed first). Anything else = 14.
 export function publishedAfter(days, now = Date.now()) {
     if (parseInt(days, 10) === 0) return null;

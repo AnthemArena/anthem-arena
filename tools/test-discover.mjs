@@ -2,7 +2,9 @@
 //   node tools/test-discover.mjs
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { DISCOVER_RULES, matchesRule, isoSeconds, usableShort, knownIds, buildCandidates, importerBlock, publishedAfter } from '../netlify/shared/discover-model.js';
+import { DISCOVER_RULES, matchesRule, isoSeconds, usableShort, knownIds, buildCandidates, publishedAfter } from '../netlify/shared/discover-model.js';
+import { ignoreKey, isIgnored, visibleFor, championsFor, importerText, ignoredList } from '../js/discover-view.js';
+import { charactersFromHeading } from './edits-groups.js';
 let failed = 0;
 const t = (name, fn) => { try { fn(); console.log('  ok  ' + name); } catch (e) { failed++; console.log('FAIL  ' + name + '\n      ' + e.message.split('\n')[0]); } };
 const rule = id => DISCOVER_RULES.find(r => r.id === id);
@@ -59,10 +61,44 @@ t('newest first; duplicates in the input collapse; unmatched and long videos are
     ], DISCOVER_RULES, new Set());
     assert.deepEqual(out.jinx.map(c => c.videoId), ['new', 'old']);
 });
-t('the importer block is a heading plus links, ready for data/edit-urls.txt', () => {
-    assert.equal(importerBlock('jinx', [{ url: 'https://www.youtube.com/watch?v=AAAAAAAAAAA' }]), '#jinx\nhttps://www.youtube.com/watch?v=AAAAAAAAAAA\n');
-    assert.equal(importerBlock('jinx', []), '');
-    for (const r of DISCOVER_RULES) assert.match(`#${r.id}`, /^#[a-z]+$/);   // a valid heading for tools/edits-groups.js
+const U = id => `https://www.youtube.com/watch?v=${id}`;
+const mkGroups = () => [
+    { id: 'jinx', label: 'Jinx', candidates: [{ videoId: 'SOLO', url: U('SOLO') }, { videoId: 'BOTH', url: U('BOTH') }] },
+    { id: 'vi', label: 'Vi', candidates: [] },
+    { id: 'ekko', label: 'Ekko', candidates: [{ videoId: 'BOTH', url: U('BOTH') }, { videoId: 'EONLY', url: U('EONLY') }] }
+];
+t('ignoring is per champion: "not for Jinx" keeps the video in the Ekko list', () => {
+    const g = mkGroups(), ig = new Map([[ignoreKey('jinx', 'BOTH'), {}]]);
+    assert.deepEqual(visibleFor(g, ig, 'jinx').map(c => c.videoId), ['SOLO']);
+    assert.deepEqual(visibleFor(g, ig, 'ekko').map(c => c.videoId), ['BOTH', 'EONLY']);
+});
+t('an older global ignore (bare video id) still hides the video everywhere', () => {
+    const g = mkGroups(), ig = new Map([['BOTH', {}]]);
+    assert.ok(isIgnored(ig, 'jinx', 'BOTH') && isIgnored(ig, 'ekko', 'BOTH') && !isIgnored(ig, 'ekko', 'EONLY'));
+    assert.deepEqual(visibleFor(g, ig, 'ekko').map(c => c.videoId), ['EONLY']);
+});
+t('championsFor lists where a video is still wanted', () => {
+    const g = mkGroups();
+    assert.deepEqual(championsFor(g, new Map(), 'BOTH').map(x => x.id), ['jinx', 'ekko']);
+    assert.deepEqual(championsFor(g, new Map([[ignoreKey('ekko', 'BOTH'), {}]]), 'BOTH').map(x => x.id), ['jinx']);
+});
+t('a joint edit is copied under a joint heading, once, with single-champion edits under theirs', () => {
+    const text = importerText(mkGroups(), new Map(), 'jinx');
+    assert.equal(text, `#jinx\n${U('SOLO')}\n\n#jinxandekko\n${U('BOTH')}\n`);
+});
+t('if the joint edit is "not for Ekko", it is copied as a plain Jinx edit', () => {
+    const text = importerText(mkGroups(), new Map([[ignoreKey('ekko', 'BOTH'), {}]]), 'jinx');
+    assert.equal(text, `#jinx\n${U('SOLO')}\n${U('BOTH')}\n`);
+});
+t('every heading it can produce is understood by the importer', () => {
+    assert.deepEqual(charactersFromHeading('jinxandekko'), ['Jinx', 'Ekko']);
+    const all = DISCOVER_RULES.map(r => r.id).join('and');
+    assert.equal(charactersFromHeading(all).length, DISCOVER_RULES.length);
+    assert.equal(importerText(mkGroups(), new Map([[ignoreKey('jinx', 'SOLO'), {}], [ignoreKey('jinx', 'BOTH'), {}]]), 'jinx'), '');
+});
+t('the ignored list says which champion each hide is for', () => {
+    const l = ignoredList(mkGroups(), new Map([[ignoreKey('jinx', 'BOTH'), {}]]));
+    assert.deepEqual(l.map(x => x.ruleId + ':' + x.candidate.videoId), ['jinx:BOTH']);
 });
 t('all-time results are ordered by views', () => {
     const out = buildCandidates([vid('a', 'Jinx edit', { snippet: { publishedAt: '2026-11-12T00:00:00Z' } }), Object.assign(vid('b', 'Jinx edit', { snippet: { publishedAt: '2024-01-01T00:00:00Z' } }), { statistics: { viewCount: '9000' } })], DISCOVER_RULES, new Set(), {}, 'views');
